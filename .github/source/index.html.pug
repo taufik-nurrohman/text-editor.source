@@ -1,0 +1,187 @@
+extends _index.pug
+
+block state
+  - const title = 'Text Editor Source ' + version
+  - const scripts = ['../text-editor/index.min.js', '../text-editor.history/index.min.js', 'index.min.js']
+
+block script
+  script
+    | Object.assign(TE.prototype, TE.History);
+    |
+    | let editor = new TE(document.querySelector('textarea'), '  ');
+    |
+    | function onKeyDown(e) {
+    |     TE.Source.onKeyDown.call(this, e, editor);
+    |     TE.Source.onKeyDownDent.call(this, e, editor);
+    |     TE.Source.onKeyDownHistory.call(this, e, editor);
+    | }
+    |
+    | function onKeyUp(e) {
+    |     TE.Source.onKeyUp.call(this, e, editor);
+    | }
+    |
+    | function letSourceEditor() {
+    |     editor.self.removeEventListener('keydown', onKeyDown);
+    |     editor.self.removeEventListener('keyup', onKeyUp);
+    |     editor.loss(true); // Remove all history data
+    | }
+    |
+    | function setSourceEditor() {
+    |     editor.self.addEventListener('keydown', onKeyDown, false);
+    |     editor.self.addEventListener('keyup', onKeyUp, false);
+    |     editor.record(); // Record the first history data
+    | }
+    |
+    | setSourceEditor();
+
+block style
+  style
+    | * {
+    |   box-sizing: border-box;
+    | }
+    | :root {
+    |   background: #fff;
+    |   color: #000;
+    |   border-top: 4px solid;
+    |   font: normal normal 16px/1.25 serif;
+    | }
+    | a {
+    |   color: #009;
+    |   text-decoration: none;
+    | }
+    | a, code {
+    |   word-wrap: break-word;
+    | }
+    | code {
+    |   font-family: monospace;
+    |   font-size: 80%;
+    | }
+    | footer, header, main, nav {
+    |   max-width: 700px;
+    |   margin: 0 auto;
+    | }
+    | hr {
+    |   border: 0;
+    |   color: inherit;
+    |   border-top: 1px dashed;
+    |   height: 0;
+    | }
+    | pre {
+    |   white-space: pre-wrap;
+    |   word-wrap: break-word;
+    | }
+    | pre code {
+    |   display: block;
+    |   background: #eee;
+    |   padding: 1em;
+    | }
+    | table {
+    |   width: 100%;
+    | }
+    | td, th {
+    |   text-align: left;
+    |   vertical-align: top;
+    | }
+    | textarea {
+    |   display: block;
+    |   box-sizing: border-box;
+    |   width: 100%;
+    |   height: 20em;
+    | }
+
+block content
+  header
+    h1= title
+    p Source code editor extension for #[a(href='../text-editor/index.html') text editor].
+    hr
+  main
+    p(tabindex='0') Previous tabbable element.
+    p: textarea(placeholder!='Code goes here&hellip;' spellcheck='false')
+      | node.addEventListener('click', e =&gt; {
+      |     fetch(this.href).then(r =&gt; r.json()).then(json =&gt; {
+      |         console.log(json);
+      |     });
+      | });
+    p(tabindex='0') Next tabbable element.
+    p
+      label
+        input(checked onchange='this.checked ? setSourceEditor() : letSourceEditor();' type='checkbox')
+        = ' '
+        span Enable Source Editor
+    h2 Usage
+    h4 Browser
+    pre: code
+      | &lt;script src="#[a(href='../text-editor/index.min.js' target='_blank') ./text-editor/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script src="#[a(href='../text-editor.history/index.min.js' target='_blank') ./text-editor.history/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script src="#[a(href='index.min.js' target='_blank') ./text-editor.source/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script&gt;
+      | Object.assign(TE.prototype, TE.History);
+      | const editor = new TE(document.querySelector('textarea'));
+      | editor.self.addEventListener('keydown', function(e) {
+      |     TE.Source.onKeyDown.call(this, e, editor);
+      |     TE.Source.onKeyDownHistory.call(this, e, editor);
+      |     TE.Source.onKeyDownTab.call(this, e, editor);
+      | });
+      | editor.self.addEventListener('keyup', function(e) {
+      |     TE.Source.onKeyUp.call(this, e, editor);
+      | });
+      | editor.record(); // Record the first history data
+      | &lt;/script&gt;
+    h4 CommonJS
+    pre: code
+      | const TE = require('@taufik-nurrohman/text-editor');
+      | const TE_History = require('@taufik-nurrohman/text-editor.history');
+      | const {onKeyDown, onKeyDownHistory, onKeyDownTab, onKeyUp} = require('@taufik-nurrohman/text-editor.source');
+      |
+      | Object.assign(TE.prototype, TE_History);
+      |
+      | const editor = new TE(document.querySelector('textarea'));
+      |
+      | editor.self.addEventListener('keydown', function(e) {
+      |     onKeyDown.call(this, e, editor);
+      |     onKeyDownHistory.call(this, e, editor);
+      |     onKeyDownTab.call(this, e, editor);
+      | });
+      |
+      | editor.self.addEventListener('keyup', function(e) {
+      |     onKeyUp.call(this, e, editor);
+      | });
+      |
+      | editor.record();
+    h4 ECMAScript
+    pre: code
+      | import TE from '@taufik-nurrohman/text-editor';
+      | import * as TE_History from '@taufik-nurrohman/text-editor.history';
+      | import {onKeyDown, onKeyDownHistory, onKeyDownTab, onKeyUp} from '@taufik-nurrohman/text-editor.source';
+      |
+      | Object.assign(TE.prototype, TE_History);
+      |
+      | const editor = new TE(document.querySelector('textarea'));
+      |
+      | editor.self.addEventListener('keydown', function(e) {
+      |     onKeyDown.call(this, e, editor);
+      |     onKeyDownHistory.call(this, e, editor);
+      |     onKeyDownTab.call(this, e, editor);
+      | });
+      |
+      | editor.self.addEventListener('keyup', function(e) {
+      |     onKeyUp.call(this, e, editor);
+      | });
+      |
+      | editor.record();
+    h3 Events
+    h4 onKeyDown(e, editor)
+    p This will handle tasks such as automatic bracket closing and continuous indentation.
+    h4 onKeyDownDent(e, editor)
+    p Events to handle indentation tasks using the key combination #[kbd= '⌘']#[kbd= ']'] for indent and #[kbd= '⌘']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
+    h4 onKeyDownHistory(e, editor)
+    p Events to handle history tasks using the key combination #[kbd= '⌘']#[kbd= 'z'] for undo and #[kbd= '⌘']#[kbd= 'y'] for redo.
+    h4 onKeyDownTab(e, editor)
+    p Events to handle indentation tasks using the #[kbd= '⇥'] key for indent and #[kbd= '⇧']#[kbd= '⇥'] for outdent.
+    h4 onKeyUp(e, editor)
+    p Currently only functions to update the history data as you type.
+  footer
+    hr
+    p
+      != '&copy; ' + year + ' '
+      a(href='/') Taufik Nurrohman

@@ -1,5 +1,6 @@
 import {offEventDefault} from '@taufik-nurrohman/event';
-import {esc, toPattern} from '@taufik-nurrohman/pattern';
+import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
+import {toObjectKeys} from '@taufik-nurrohman/to';
 
 let pairs = {
     '`': '`',
@@ -10,6 +11,8 @@ let pairs = {
     "'": "'",
     '<': '>'
 };
+
+let pairsKey = toObjectKeys(pairs);
 
 export function onKeyDown(e, $) {
     let charAfter,
@@ -83,12 +86,15 @@ export function onKeyDown(e, $) {
             }
         }
     }
-    let {after, before, start, value} = $.$();
-    charAfter = pairs[charBefore = before.slice(-1)];
+    let {after, before, start, value} = $.$(),
+        charBeforeList = escChar(pairsKey.join("")),
+        charBeforeMatch = before.match(toPattern('([' + charBeforeList + '])[^' + charBeforeList + ']+$', ""));
+    charBefore = charBeforeMatch && charBeforeMatch[1] || before.slice(-1);
     // Do nothing on escape
     if ('\\' === charBefore) {
         return;
     }
+    charAfter = pairs[charBefore];
     // `|}`
     if (after && before && charAfter && key === charAfter && key === after[0]) {
         if (value) {

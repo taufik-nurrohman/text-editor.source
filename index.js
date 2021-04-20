@@ -29,8 +29,39 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
 })(this, function(exports) {
     'use strict';
+    var isDefined = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isInstance = function isInstance(x, of ) {
+        return x && isSet( of ) && x instanceof of ;
+    };
+    var isNull = function isNull(x) {
+        return null === x;
+    };
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
+    };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
+    };
+    var toObjectKeys = function toObjectKeys(x) {
+        return Object.keys(x);
+    };
+    var escChar = function escChar(pattern, extra) {
+        if (extra === void 0) {
+            extra = "";
+        }
+        return pattern.replace(toPattern('[' + extra + '\\^\\[\\]\\-]'), '\\$&');
+    }; // Based on <https://blog.stevenlevithan.com/archives/javascript-match-recursive-regexp>
+    var isPattern = function isPattern(pattern) {
+        return isInstance(pattern, RegExp);
+    };
+    var toPattern = function toPattern(pattern, opt) {
+        if (isPattern(pattern)) {
+            return pattern;
+        } // No need to escape `/` in the pattern string
+        pattern = pattern.replace(/\//g, '\\/');
+        return new RegExp(pattern, isSet(opt) ? opt : 'g');
     };
     let pairs = {
         '`': '`',
@@ -41,6 +72,7 @@
         "'": "'",
         '<': '>'
     };
+    let pairsKey = toObjectKeys(pairs);
 
     function onKeyDown(e, $) {
         let charAfter,
@@ -124,11 +156,14 @@
             before,
             start,
             value
-        } = $.$();
-        charAfter = pairs[charBefore = before.slice(-1)]; // Do nothing on escape
+        } = $.$(),
+            charBeforeList = escChar(pairsKey.join("")),
+            charBeforeMatch = before.match(toPattern('([' + charBeforeList + '])[^' + charBeforeList + ']+$', ""));
+        charBefore = charBeforeMatch && charBeforeMatch[1] || before.slice(-1); // Do nothing on escape
         if ('\\' === charBefore) {
             return;
-        } // `|}`
+        }
+        charAfter = pairs[charBefore]; // `|}`
         if (after && before && charAfter && key === charAfter && key === after[0]) {
             if (value) {
                 // Wrap selection

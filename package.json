@@ -10,7 +10,8 @@
   "devDependencies": {
     "@taufik-nurrohman/event": "^0.2.0",
     "@taufik-nurrohman/factory": "^0.1.11",
-    "@taufik-nurrohman/pattern": "^0.1.5"
+    "@taufik-nurrohman/pattern": "^0.1.5",
+    "@taufik-nurrohman/to": "^0.0.16"
   },
   "exports": {
     "import": "./index.mjs",
@@ -47,5 +48,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TE.Source --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "2.0.1"
+  "version": "2.0.2"
 }

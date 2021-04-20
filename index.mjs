@@ -126,7 +126,6 @@ export function onKeyDown(e, $) {
             return;
         }
     }
-    // Do normal `Enter` key here
 }
 
 export function onKeyDownDent(e, $) {

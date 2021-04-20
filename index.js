@@ -161,7 +161,7 @@
                 }
                 return;
             }
-        } // Do normal `Enter` key here
+        }
     }
 
     function onKeyDownDent(e, $) {

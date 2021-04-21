@@ -8,8 +8,9 @@ Text Editor Source
 Release Notes
 -------------
 
-### 2.0.3
+### 2.0.4
 
+ - Added feature list.
  - Fixed cursor in balance pairs.
 
 ### 2.0.1

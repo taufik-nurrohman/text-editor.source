@@ -48,5 +48,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TE.Source --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "2.0.3"
+  "version": "2.0.4"
 }

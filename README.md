@@ -8,7 +8,7 @@ Text Editor Source
 Release Notes
 -------------
 
-### 2.0.2
+### 2.0.3
 
  - Fixed cursor in balance pairs.
 

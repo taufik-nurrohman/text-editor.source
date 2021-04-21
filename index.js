@@ -29,39 +29,11 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
 })(this, function(exports) {
     'use strict';
-    var isDefined = function isDefined(x) {
-        return 'undefined' !== typeof x;
-    };
-    var isInstance = function isInstance(x, of ) {
-        return x && isSet( of ) && x instanceof of ;
-    };
-    var isNull = function isNull(x) {
-        return null === x;
-    };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
-    };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
     };
-    var toObjectKeys = function toObjectKeys(x) {
-        return Object.keys(x);
-    };
-    var escChar = function escChar(pattern, extra) {
-        if (extra === void 0) {
-            extra = "";
-        }
-        return pattern.replace(toPattern('[' + extra + '\\^\\[\\]\\-]'), '\\$&');
-    }; // Based on <https://blog.stevenlevithan.com/archives/javascript-match-recursive-regexp>
-    var isPattern = function isPattern(pattern) {
-        return isInstance(pattern, RegExp);
-    };
-    var toPattern = function toPattern(pattern, opt) {
-        if (isPattern(pattern)) {
-            return pattern;
-        } // No need to escape `/` in the pattern string
-        pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet(opt) ? opt : 'g');
+    var toObjectValues = function toObjectValues(x) {
+        return Object.values(x);
     };
     let pairs = {
         '`': '`',
@@ -72,7 +44,7 @@
         "'": "'",
         '<': '>'
     };
-    let pairsKey = toObjectKeys(pairs);
+    let pairsValue = toObjectValues(pairs);
 
     function onKeyDown(e, $) {
         let charAfter,
@@ -83,7 +55,7 @@
             keyIsCtrl = e.ctrlKey,
             keyIsShift = e.shiftKey; // Do nothing
         if (keyIsAlt || keyIsCtrl) {
-            return;
+            return true;
         }
         if ('Enter' === key && !keyIsShift) {
             let {
@@ -98,12 +70,12 @@
                 if (after && before && (charAfter = pairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                     $.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
                 if (lineMatchIndent) {
                     $.insert('\n' + lineMatchIndent, -1).record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
             }
         }
@@ -119,14 +91,15 @@
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
             charAfter = pairs[charBefore = before.slice(-1)]; // Do nothing on escape
             if ('\\' === charBefore) {
-                return;
+                return true;
             }
             if (value) {
                 if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
                     $.record().peel(charBefore, charAfter).record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
+                return true;
             }
             charAfter = pairs[charBefore = before.trim().slice(-1)];
             if (charAfter && charBefore) {
@@ -134,20 +107,20 @@
                     // Collapse bracket(s)
                     $.trim("", "").record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
             } // Outdent
             if (lineBefore.endsWith(charIndent)) {
                 $.pull(charIndent).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
             if (after && before && !before.endsWith('\\' + charBefore)) {
                 if (charAfter === after[0]) {
                     // Peel pair
                     $.peel(charBefore, charAfter).record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
             }
         }
@@ -156,26 +129,17 @@
             before,
             start,
             value
-        } = $.$(),
-            charBeforeList = escChar(pairsKey.join("")),
-            charBeforeMatch = before.match(toPattern('([' + charBeforeList + '])[^' + charBeforeList + ']+$', ""));
-        charBefore = charBeforeMatch && charBeforeMatch[1] || before.slice(-1); // Do nothing on escape
-        if ('\\' === charBefore) {
-            return;
+        } = $.$(); // Do nothing on escape
+        if ('\\' === (charBefore = before.slice(-1))) {
+            return true;
         }
-        charAfter = pairs[charBefore]; // `|}`
-        if (after && before && charAfter && key === charAfter && key === after[0]) {
-            if (value) {
-                // Wrap selection
-                // `{|aaa|}`
-                $.record().wrap(charBefore, charAfter).record();
-                offEventDefault(e);
-                return;
-            } // Move to the next character
+        charAfter = pairsValue.includes(after[0]) ? after[0] : pairs[charBefore]; // `|}`
+        if (!value && after && before && charAfter && key === charAfter) {
+            // Move to the next character
             // `}|`
             $.select(start + 1).record();
             offEventDefault(e);
-            return;
+            return false;
         }
         for (charBefore in pairs) {
             charAfter = pairs[charBefore]; // `{|`
@@ -184,7 +148,7 @@
                 // `{|}` `{|aaa|}`
                 $.wrap(charBefore, charAfter).record();
                 offEventDefault(e);
-                return;
+                return false;
             } // `|}`
             if (charAfter === key) {
                 if (value) {
@@ -192,11 +156,12 @@
                     // `{|aaa|}`
                     $.record().wrap(charBefore, charAfter).record();
                     offEventDefault(e);
-                    return;
+                    return false;
                 }
-                return;
+                break;
             }
         }
+        return true;
     }
 
     function onKeyDownDent(e, $) {
@@ -218,6 +183,7 @@
                 return;
             }
         }
+        return true;
     }
 
     function onKeyDownHistory(e, $) {
@@ -237,6 +203,7 @@
                 return;
             }
         }
+        return true;
     }
 
     function onKeyDownTab(e, $) {
@@ -250,12 +217,14 @@
             offEventDefault(e);
             return;
         }
+        return true;
     }
     let throttle;
 
     function onKeyUp(e, $) {
         throttle && clearTimeout(throttle);
         throttle = setTimeout(() => $.record(), 100);
+        return true;
     }
     exports.onKeyDown = onKeyDown;
     exports.onKeyDownDent = onKeyDownDent;

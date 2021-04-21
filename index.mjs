@@ -1,6 +1,6 @@
 import {offEventDefault} from '@taufik-nurrohman/event';
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
-import {toObjectKeys} from '@taufik-nurrohman/to';
+import {toObjectValues} from '@taufik-nurrohman/to';
 
 let pairs = {
     '`': '`',
@@ -12,7 +12,7 @@ let pairs = {
     '<': '>'
 };
 
-let pairsKey = toObjectKeys(pairs);
+let pairsValue = toObjectValues(pairs);
 
 export function onKeyDown(e, $) {
     let charAfter,
@@ -24,7 +24,7 @@ export function onKeyDown(e, $) {
         keyIsShift = e.shiftKey;
     // Do nothing
     if (keyIsAlt || keyIsCtrl) {
-        return;
+        return true;
     }
     if ('Enter' === key && !keyIsShift) {
         let {after, before, value} = $.$(),
@@ -35,12 +35,12 @@ export function onKeyDown(e, $) {
             if (after && before && (charAfter = pairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                 $.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
             if (lineMatchIndent) {
                 $.insert('\n' + lineMatchIndent, -1).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
         }
     }
@@ -53,14 +53,15 @@ export function onKeyDown(e, $) {
         charAfter = pairs[charBefore = before.slice(-1)];
         // Do nothing on escape
         if ('\\' === charBefore) {
-            return;
+            return true;
         }
         if (value) {
             if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
                 $.record().peel(charBefore, charAfter).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
+            return true;
         }
         charAfter = pairs[charBefore = before.trim().slice(-1)];
         if (charAfter && charBefore) {
@@ -68,47 +69,37 @@ export function onKeyDown(e, $) {
                 // Collapse bracket(s)
                 $.trim("", "").record();
                 offEventDefault(e);
-                return;
+                return false;
             }
         }
         // Outdent
         if (lineBefore.endsWith(charIndent)) {
             $.pull(charIndent).record();
             offEventDefault(e);
-            return;
+            return false;
         }
         if (after && before && !before.endsWith('\\' + charBefore)) {
             if (charAfter === after[0]) {
                 // Peel pair
                 $.peel(charBefore, charAfter).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
         }
     }
-    let {after, before, start, value} = $.$(),
-        charBeforeList = escChar(pairsKey.join("")),
-        charBeforeMatch = before.match(toPattern('([' + charBeforeList + '])[^' + charBeforeList + ']+$', ""));
-    charBefore = charBeforeMatch && charBeforeMatch[1] || before.slice(-1);
+    let {after, before, start, value} = $.$();
     // Do nothing on escape
-    if ('\\' === charBefore) {
-        return;
+    if ('\\' === (charBefore = before.slice(-1))) {
+        return true;
     }
-    charAfter = pairs[charBefore];
+    charAfter = pairsValue.includes(after[0]) ? after[0] : pairs[charBefore];
     // `|}`
-    if (after && before && charAfter && key === charAfter && key === after[0]) {
-        if (value) {
-            // Wrap selection
-            // `{|aaa|}`
-            $.record().wrap(charBefore, charAfter).record();
-            offEventDefault(e);
-            return;
-        }
+    if (!value && after && before && charAfter && key === charAfter) {
         // Move to the next character
         // `}|`
         $.select(start + 1).record();
         offEventDefault(e);
-        return;
+        return false;
     }
     for (charBefore in pairs) {
         charAfter = pairs[charBefore];
@@ -118,7 +109,7 @@ export function onKeyDown(e, $) {
             // `{|}` `{|aaa|}`
             $.wrap(charBefore, charAfter).record();
             offEventDefault(e);
-            return;
+            return false;
         }
         // `|}`
         if (charAfter === key) {
@@ -127,11 +118,12 @@ export function onKeyDown(e, $) {
                 // `{|aaa|}`
                 $.record().wrap(charBefore, charAfter).record();
                 offEventDefault(e);
-                return;
+                return false;
             }
-            return;
+            break;
         }
     }
+    return true;
 }
 
 export function onKeyDownDent(e, $) {
@@ -154,6 +146,7 @@ export function onKeyDownDent(e, $) {
             return;
         }
     }
+    return true;
 }
 
 export function onKeyDownHistory(e, $) {
@@ -174,6 +167,7 @@ export function onKeyDownHistory(e, $) {
             return;
         }
     }
+    return true;
 }
 
 export function onKeyDownTab(e, $) {
@@ -188,6 +182,7 @@ export function onKeyDownTab(e, $) {
         offEventDefault(e);
         return;
     }
+    return true;
 }
 
 let throttle;
@@ -195,4 +190,5 @@ let throttle;
 export function onKeyUp(e, $) {
     throttle && clearTimeout(throttle);
     throttle = setTimeout(() => $.record(), 100);
+    return true;
 }

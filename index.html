@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Source editor extension for text editor." name="description">
-    <title>Text Editor Source 2.0.0</title>
+    <title>Text Editor Source 2.0.2</title>
     <style>
       * {
         box-sizing: border-box;
@@ -67,7 +67,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.0.0</h1>
+      <h1>Text Editor Source 2.0.2</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
     </header>
@@ -89,8 +89,8 @@
 Object.assign(TE.prototype, TE.History);
 const editor = new TE(document.querySelector('textarea'));
 editor.self.addEventListener('keydown', function(e) {
-    TE.Source.onKeyDown.call(this, e, editor);
-    TE.Source.onKeyDownHistory.call(this, e, editor);
+    TE.Source.onKeyDown.call(this, e, editor) ||
+    TE.Source.onKeyDownHistory.call(this, e, editor) ||
     TE.Source.onKeyDownTab.call(this, e, editor);
 });
 editor.self.addEventListener('keyup', function(e) {
@@ -108,8 +108,8 @@ Object.assign(TE.prototype, TE_History);
 const editor = new TE(document.querySelector('textarea'));
 
 editor.self.addEventListener('keydown', function(e) {
-    onKeyDown.call(this, e, editor);
-    onKeyDownHistory.call(this, e, editor);
+    onKeyDown.call(this, e, editor) ||
+    onKeyDownHistory.call(this, e, editor) ||
     onKeyDownTab.call(this, e, editor);
 });
 
@@ -128,8 +128,8 @@ Object.assign(TE.prototype, TE_History);
 const editor = new TE(document.querySelector('textarea'));
 
 editor.self.addEventListener('keydown', function(e) {
-    onKeyDown.call(this, e, editor);
-    onKeyDownHistory.call(this, e, editor);
+    onKeyDown.call(this, e, editor) ||
+    onKeyDownHistory.call(this, e, editor) ||
     onKeyDownTab.call(this, e, editor);
 });
 
@@ -139,6 +139,7 @@ editor.self.addEventListener('keyup', function(e) {
 
 editor.record();</code></pre>
       <h3>Events</h3>
+      <p>Events can either return <code>false</code> or <code>true</code>. If it returns <code>false</code>, it means that this extension has manipulated the existing value, and current event has also been default prevented. If it returns <code>true</code>, it means that current event works normally.</p>
       <h4>onKeyDown(e, editor)</h4>
       <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
       <h4>onKeyDownDent(e, editor)</h4>
@@ -163,9 +164,9 @@ editor.record();</code></pre>
       let editor = new TE(document.querySelector('textarea'), '  ');
 
       function onKeyDown(e) {
-          TE.Source.onKeyDown.call(this, e, editor);
-          TE.Source.onKeyDownDent.call(this, e, editor);
-          TE.Source.onKeyDownHistory.call(this, e, editor);
+          TE.Source.onKeyDown.call(this, e, editor) ||
+              TE.Source.onKeyDownDent.call(this, e, editor) ||
+              TE.Source.onKeyDownHistory.call(this, e, editor);
       }
 
       function onKeyUp(e) {

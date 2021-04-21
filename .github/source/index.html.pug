@@ -11,8 +11,8 @@ block script
     | let editor = new TE(document.querySelector('textarea'), '  ');
     |
     | function onKeyDown(e) {
-    |     TE.Source.onKeyDown.call(this, e, editor);
-    |     TE.Source.onKeyDownDent.call(this, e, editor);
+    |     TE.Source.onKeyDown.call(this, e, editor) ||
+    |     TE.Source.onKeyDownDent.call(this, e, editor) ||
     |     TE.Source.onKeyDownHistory.call(this, e, editor);
     | }
     |
@@ -118,8 +118,8 @@ block content
       | Object.assign(TE.prototype, TE.History);
       | const editor = new TE(document.querySelector('textarea'));
       | editor.self.addEventListener('keydown', function(e) {
-      |     TE.Source.onKeyDown.call(this, e, editor);
-      |     TE.Source.onKeyDownHistory.call(this, e, editor);
+      |     TE.Source.onKeyDown.call(this, e, editor) ||
+      |     TE.Source.onKeyDownHistory.call(this, e, editor) ||
       |     TE.Source.onKeyDownTab.call(this, e, editor);
       | });
       | editor.self.addEventListener('keyup', function(e) {
@@ -138,8 +138,8 @@ block content
       | const editor = new TE(document.querySelector('textarea'));
       |
       | editor.self.addEventListener('keydown', function(e) {
-      |     onKeyDown.call(this, e, editor);
-      |     onKeyDownHistory.call(this, e, editor);
+      |     onKeyDown.call(this, e, editor) ||
+      |     onKeyDownHistory.call(this, e, editor) ||
       |     onKeyDownTab.call(this, e, editor);
       | });
       |
@@ -159,8 +159,8 @@ block content
       | const editor = new TE(document.querySelector('textarea'));
       |
       | editor.self.addEventListener('keydown', function(e) {
-      |     onKeyDown.call(this, e, editor);
-      |     onKeyDownHistory.call(this, e, editor);
+      |     onKeyDown.call(this, e, editor) ||
+      |     onKeyDownHistory.call(this, e, editor) ||
       |     onKeyDownTab.call(this, e, editor);
       | });
       |
@@ -170,6 +170,7 @@ block content
       |
       | editor.record();
     h3 Events
+    p Events can either return #[code false] or #[code true]. If it returns #[code false], it means that this extension has manipulated the existing value, and current event has also been default prevented. If it returns #[code true], it means that current event works normally.
     h4 onKeyDown(e, editor)
     p This will handle tasks such as automatic bracket closing and continuous indentation.
     h4 onKeyDownDent(e, editor)

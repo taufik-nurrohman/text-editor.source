@@ -10,7 +10,7 @@ Release Notes
 
 ### 2.0.2
 
- - Fixed pairs.
+ - Fixed cursor in balance pairs.
 
 ### 2.0.1
 

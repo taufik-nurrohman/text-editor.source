@@ -26,12 +26,9 @@
  *
  */
 (function(global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
-})(this, function(exports) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, (global.TE = global.TE || {}, global.TE.Source = factory()));
+})(this, function() {
     'use strict';
-    var offEventDefault = function offEventDefault(e) {
-        return e && e.preventDefault();
-    };
     var toObjectValues = function toObjectValues(x) {
         return Object.values(x);
     };
@@ -46,45 +43,43 @@
     };
     let pairsValue = toObjectValues(pairs);
 
-    function onKeyDown(e, $) {
+    function canKeyDown(key, {
+        a,
+        c,
+        s
+    }, that) {
         let charAfter,
             charBefore,
-            charIndent = $.state.tab || '\t',
-            key = e.key,
-            keyIsAlt = e.altKey,
-            keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey; // Do nothing
-        if (keyIsAlt || keyIsCtrl) {
+            charIndent = that.state.tab || '\t'; // Do nothing
+        if (a || c) {
             return true;
         }
-        if ('Enter' === key && !keyIsShift) {
+        if ('Enter' === key && !s) {
             let {
                 after,
                 before,
                 value
-            } = $.$(),
+            } = that.$(),
                 lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
             if (!value) {
                 if (after && before && (charAfter = pairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
-                    $.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
-                    offEventDefault(e);
+                    that.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                     return false;
                 }
                 if (lineMatchIndent) {
-                    $.insert('\n' + lineMatchIndent, -1).record();
-                    offEventDefault(e);
+                    that.insert('\n' + lineMatchIndent, -1).record();
                     return false;
                 }
             }
         }
-        if ('Backspace' === key && !keyIsShift) {
+        if ('Backspace' === key && !s) {
             let {
                 after,
                 before,
                 value
-            } = $.$();
+            } = that.$();
             after.split('\n')[0];
             let lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
@@ -95,8 +90,7 @@
             }
             if (value) {
                 if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
-                    $.record().peel(charBefore, charAfter).record();
-                    offEventDefault(e);
+                    that.record().peel(charBefore, charAfter).record();
                     return false;
                 }
                 return true;
@@ -105,21 +99,18 @@
             if (charAfter && charBefore) {
                 if (after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
                     // Collapse bracket(s)
-                    $.trim("", "").record();
-                    offEventDefault(e);
+                    that.trim("", "").record();
                     return false;
                 }
             } // Outdent
             if (lineBefore.endsWith(charIndent)) {
-                $.pull(charIndent).record();
-                offEventDefault(e);
+                that.pull(charIndent).record();
                 return false;
             }
             if (after && before && !before.endsWith('\\' + charBefore)) {
                 if (charAfter === after[0]) {
                     // Peel pair
-                    $.peel(charBefore, charAfter).record();
-                    offEventDefault(e);
+                    that.peel(charBefore, charAfter).record();
                     return false;
                 }
             }
@@ -129,7 +120,7 @@
             before,
             start,
             value
-        } = $.$(); // Do nothing on escape
+        } = that.$(); // Do nothing on escape
         if ('\\' === (charBefore = before.slice(-1))) {
             return true;
         }
@@ -137,8 +128,7 @@
         if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
-            $.select(start + 1).record();
-            offEventDefault(e);
+            that.select(start + 1).record();
             return false;
         }
         for (charBefore in pairs) {
@@ -146,16 +136,14 @@
             if (charBefore === key) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
-                $.wrap(charBefore, charAfter).record();
-                offEventDefault(e);
+                that.wrap(charBefore, charAfter).record();
                 return false;
             } // `|}`
             if (charAfter === key) {
                 if (value) {
                     // Wrap selection
                     // `{|aaa|}`
-                    $.record().wrap(charBefore, charAfter).record();
-                    offEventDefault(e);
+                    that.record().wrap(charBefore, charAfter).record();
                     return false;
                 }
                 break;
@@ -164,71 +152,74 @@
         return true;
     }
 
-    function onKeyDownDent(e, $) {
-        let charIndent = $.state.tab || '\t',
-            key = e.key,
-            keyIsAlt = e.altKey,
-            keyIsCtrl = e.ctrlKey;
-        e.shiftKey;
-        if (!keyIsAlt && keyIsCtrl) {
+    function canKeyDownDent(key, {
+        a,
+        c,
+        s
+    }, that) {
+        let charIndent = that.state.tab || '\t';
+        if (!a && c) {
             // Indent with `⌘+]`
             if (']' === key) {
-                $.push(charIndent).record();
-                offEventDefault(e);
-                return;
+                that.push(charIndent).record();
+                return false;
             } // Outdent with `⌘+[`
             if ('[' === key) {
-                $.pull(charIndent).record();
-                offEventDefault(e);
-                return;
+                that.pull(charIndent).record();
+                return false;
             }
         }
         return true;
     }
 
-    function onKeyDownHistory(e, $) {
-        let key = e.key,
-            keyIsAlt = e.altKey,
-            keyIsCtrl = e.ctrlKey;
-        if (!keyIsAlt && keyIsCtrl) {
+    function canKeyDownHistory(key, {
+        a,
+        c,
+        s
+    }, that) {
+        if (!a && c) {
             // Redo with `⌘+y`
             if ('y' === key) {
-                $.redo();
-                offEventDefault(e);
-                return;
+                that.redo();
+                return false;
             } // Undo with `⌘+z`
             if ('z' === key) {
-                $.undo();
-                offEventDefault(e);
-                return;
+                that.undo();
+                return false;
             }
         }
         return true;
     }
 
-    function onKeyDownTab(e, $) {
-        let charIndent = $.state.tab || '\t',
-            key = e.key,
-            keyIsAlt = e.altKey,
-            keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey; // Indent/outdent with `⇥` or `⇧+⇥`
-        if ('Tab' === key && !keyIsAlt && !keyIsCtrl) {
-            $[keyIsShift ? 'pull' : 'push'](charIndent).record();
-            offEventDefault(e);
-            return;
+    function canKeyDownTab(key, {
+        a,
+        c,
+        s
+    }, that) {
+        let charIndent = that.state.tab || '\t'; // Indent/outdent with `⇥` or `⇧+⇥`
+        if ('Tab' === key && !a && !c) {
+            that[s ? 'pull' : 'push'](charIndent).record();
+            return false;
         }
         return true;
     }
     let throttle;
 
-    function onKeyUp(e, $) {
+    function canKeyUp(key, {
+        a,
+        c,
+        s
+    }, that) {
         throttle && clearTimeout(throttle);
-        throttle = setTimeout(() => $.record(), 100);
+        throttle = setTimeout(() => that.record(), 100);
         return true;
     }
-    exports.onKeyDown = onKeyDown;
-    exports.onKeyDownDent = onKeyDownDent;
-    exports.onKeyDownHistory = onKeyDownHistory;
-    exports.onKeyDownTab = onKeyDownTab;
-    exports.onKeyUp = onKeyUp;
+    var _virtual_entry = {
+        canKeyDown,
+        canKeyDownDent,
+        canKeyDownHistory,
+        canKeyDownTab,
+        canKeyUp
+    };
+    return _virtual_entry;
 });

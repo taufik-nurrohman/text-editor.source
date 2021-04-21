@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
-    <meta content="Source editor extension for text editor." name="description">
-    <title>Text Editor Source 2.0.4</title>
+    <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
+    <title>Text Editor Source 2.1.0</title>
     <style>
       * {
         box-sizing: border-box;
@@ -59,25 +59,27 @@
       }
       textarea {
         display: block;
-        box-sizing: border-box;
         width: 100%;
         height: 20em;
+      }
+      .source {
+        background: #000;
+        color: #fff;
+        border: 2px inset #fff;
+        padding: 1em;
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.0.4</h1>
+      <h1>Text Editor Source 2.1.0</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
+      <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
     </header>
     <main>
       <p tabindex="0">Previous tabbable element.</p>
-      <p><textarea placeholder="Code goes here&hellip;" spellcheck="false">node.addEventListener('click', e =&gt; {
-    fetch(this.href).then(r =&gt; r.json()).then(json =&gt; {
-        console.log(json);
-    });
-});</textarea></p>
+      <p><textarea placeholder="Code goes here&hellip;" spellcheck="false"></textarea></p>
       <p tabindex="0">Next tabbable element.</p>
       <p><label><input checked onchange="this.checked ? setSourceEditor() : letSourceEditor();" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <h2>Features</h2>
@@ -101,69 +103,112 @@
 &lt;script src="<a href="../text-editor.history/index.min.js" target="_blank">./text-editor.history/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
-Object.assign(TE.prototype, TE.History);
+Object.assign(TE.prototype, TE.History.that);
 const editor = new TE(document.querySelector('textarea'));
-editor.self.addEventListener('keydown', function(e) {
-    TE.Source.onKeyDown.call(this, e, editor) &&
-    TE.Source.onKeyDownHistory.call(this, e, editor) &&
-    TE.Source.onKeyDownTab.call(this, e, editor);
+const {canKeyDown, canKeyDownHistory, canKeyDownTab, canKeyUp} = TE.Source;
+editor.self.addEventListener('keydown', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    if (
+        canKeyDown(key, keys, editor) &amp;&amp;
+        canKeyDownHistory(key, keys, editor) &amp;&amp;
+        canKeyDownTab(key, keys, editor)
+    ) {
+        // Normal key strokes. Add more key strokes extension here!
+    } else {
+        e.preventDefault();
+    }
 });
-editor.self.addEventListener('keyup', function(e) {
-    TE.Source.onKeyUp.call(this, e, editor);
+editor.self.addEventListener('keyup', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    canKeyUp(key, keys, editor) || e.preventDefault();
 });
 editor.record(); // Record the first history data
 &lt;/script&gt;</code></pre>
       <h4>CommonJS</h4>
       <pre><code>const TE = require('@taufik-nurrohman/text-editor');
-const TE_History = require('@taufik-nurrohman/text-editor.history');
-const {onKeyDown, onKeyDownHistory, onKeyDownTab, onKeyUp} = require('@taufik-nurrohman/text-editor.source');
+const {that} = require('@taufik-nurrohman/text-editor.history');
 
-Object.assign(TE.prototype, TE_History);
+const {
+    canKeyDown,
+    canKeyDownHistory,
+    canKeyDownTab,
+    canKeyUp
+} = require('@taufik-nurrohman/text-editor.source');
+
+Object.assign(TE.prototype, that);
 
 const editor = new TE(document.querySelector('textarea'));
 
-editor.self.addEventListener('keydown', function(e) {
-    onKeyDown.call(this, e, editor) &&
-    onKeyDownHistory.call(this, e, editor) &&
-    onKeyDownTab.call(this, e, editor);
+editor.self.addEventListener('keydown', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    if (
+        canKeyDown(key, keys, editor) &amp;&amp;
+        canKeyDownHistory(key, keys, editor) &amp;&amp;
+        canKeyDownTab(key, keys, editor)
+    ) {
+        // Normal key strokes. Add more key strokes extension here!
+    } else {
+        e.preventDefault();
+    }
 });
 
-editor.self.addEventListener('keyup', function(e) {
-    onKeyUp.call(this, e, editor);
+editor.self.addEventListener('keyup', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    canKeyUp(key, keys, editor) || e.preventDefault();
 });
 
 editor.record();</code></pre>
       <h4>ECMAScript</h4>
       <pre><code>import TE from '@taufik-nurrohman/text-editor';
-import * as TE_History from '@taufik-nurrohman/text-editor.history';
-import {onKeyDown, onKeyDownHistory, onKeyDownTab, onKeyUp} from '@taufik-nurrohman/text-editor.source';
+import {that} from '@taufik-nurrohman/text-editor.history';
 
-Object.assign(TE.prototype, TE_History);
+import {
+    canKeyDown,
+    canKeyDownHistory,
+    canKeyDownTab,
+    canKeyUp
+} from '@taufik-nurrohman/text-editor.source';
+
+Object.assign(TE.prototype, that);
 
 const editor = new TE(document.querySelector('textarea'));
 
-editor.self.addEventListener('keydown', function(e) {
-    onKeyDown.call(this, e, editor) &&
-    onKeyDownHistory.call(this, e, editor) &&
-    onKeyDownTab.call(this, e, editor);
+editor.self.addEventListener('keydown', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    if (
+        canKeyDown(key, keys, editor) &amp;&amp;
+        canKeyDownHistory(key, keys, editor) &amp;&amp;
+        canKeyDownTab(key, keys, editor)
+    ) {
+        // Normal key strokes. Add more key strokes extension here!
+    } else {
+        e.preventDefault();
+    }
 });
 
-editor.self.addEventListener('keyup', function(e) {
-    onKeyUp.call(this, e, editor);
+editor.self.addEventListener('keyup', e =&gt; {
+    let key = e.key,
+        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+    canKeyUp(key, keys, editor) || e.preventDefault();
 });
 
 editor.record();</code></pre>
-      <h3>Events</h3>
-      <p>Events can either return <code>false</code> or <code>true</code>. If it returns <code>false</code>, it means that this extension has manipulated the existing value, and current event has also been default prevented. If it returns <code>true</code>, it means that current event works normally.</p>
-      <h4>onKeyDown(e, editor)</h4>
+      <h3>Strokes</h3>
+      <p>Strokes can either return <code>false</code> or <code>true</code>. If it returns <code>false</code>, it means that this extension has manipulated the existing value. If it returns <code>true</code>, it means that current key stroke works normally.</p>
+      <h4>TE.Source.canKeyDown(key, {a, c, s}, that)</h4>
       <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
-      <h4>onKeyDownDent(e, editor)</h4>
-      <p>Events to handle indentation tasks using the key combination <kbd>⌘</kbd><kbd>]</kbd> for indent and <kbd>⌘</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
-      <h4>onKeyDownHistory(e, editor)</h4>
-      <p>Events to handle history tasks using the key combination <kbd>⌘</kbd><kbd>z</kbd> for undo and <kbd>⌘</kbd><kbd>y</kbd> for redo.</p>
-      <h4>onKeyDownTab(e, editor)</h4>
-      <p>Events to handle indentation tasks using the <kbd>⇥</kbd> key for indent and <kbd>⇧</kbd><kbd>⇥</kbd> for outdent.</p>
-      <h4>onKeyUp(e, editor)</h4>
+      <h4>TE.Source.canKeyDownDent(key, {a, c, s}, that)</h4>
+      <p>Strokes to handle indentation tasks using the key combination <kbd>⌘</kbd><kbd>]</kbd> for indent and <kbd>⌘</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
+      <h4>TE.Source.canKeyDownHistory(key, {a, c, s}, that)</h4>
+      <p>Strokes to handle history tasks using the key combination <kbd>⌘</kbd><kbd>z</kbd> for undo and <kbd>⌘</kbd><kbd>y</kbd> for redo.</p>
+      <h4>TE.Source.canKeyDownTab(key, {a, c, s}, that)</h4>
+      <p>Strokes to handle indentation tasks using the <kbd>⇥</kbd> key for indent and <kbd>⇧</kbd><kbd>⇥</kbd> for outdent.</p>
+      <h4>TE.Source.canKeyUp(key, {a, c, s}, that)</h4>
       <p>Currently only functions to update the history data as you type.</p>
     </main>
     <footer>
@@ -174,27 +219,48 @@ editor.record();</code></pre>
     <script src="../text-editor.history/index.min.js"></script>
     <script src="index.min.js"></script>
     <script>
-      Object.assign(TE.prototype, TE.History);
+      Object.assign(TE.prototype, TE.History.that);
 
-      let editor = new TE(document.querySelector('textarea'), '  ');
+      let editor = new TE(document.querySelector('textarea'), '  '),
+          {
+              canKeyDown,
+              canKeyDownDent,
+              canKeyDownHistory,
+              canKeyUp
+          } = TE.Source;
 
       function onKeyDown(e) {
-          TE.Source.onKeyDown.call(this, e, editor) &&
-              TE.Source.onKeyDownDent.call(this, e, editor) &&
-              TE.Source.onKeyDownHistory.call(this, e, editor);
+          let key = e.key,
+              keys = {
+                  a: e.altKey,
+                  c: e.ctrlKey,
+                  s: e.shiftKey
+              };
+          canKeyDown(key, keys, editor) &&
+              canKeyDownDent(key, keys, editor) &&
+              canKeyDownHistory(key, keys, editor) ||
+              e.preventDefault();
       }
 
       function onKeyUp(e) {
-          TE.Source.onKeyUp.call(this, e, editor);
+          let key = e.key,
+              keys = {
+                  a: e.altKey,
+                  c: e.ctrlKey,
+                  s: e.shiftKey
+              };
+          canKeyUp(key, keys, editor) || e.preventDefault();
       }
 
       function letSourceEditor() {
+          editor.self.classList.remove('source');
           editor.self.removeEventListener('keydown', onKeyDown);
           editor.self.removeEventListener('keyup', onKeyUp);
           editor.loss(true); // Remove all history data
       }
 
       function setSourceEditor() {
+          editor.self.classList.add('source');
           editor.self.addEventListener('keydown', onKeyDown, false);
           editor.self.addEventListener('keyup', onKeyUp, false);
           editor.record(); // Record the first history data

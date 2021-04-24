@@ -111,7 +111,7 @@ block content
   main
     p(tabindex='0') Previous tabbable element.
     p: textarea(placeholder!='Code goes here&hellip;' spellcheck='false')
-    p: button(onclick='editor.toggle(\'"\')') Toggle Test
+    p: button(onclick='editor.toggle(\'"\').record();') Toggle Test
     p
       label
         input(checked onchange='this.checked ? setSourceEditor() : letSourceEditor();' type='checkbox')

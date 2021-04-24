@@ -171,10 +171,10 @@ block content
       |     canKeyDownHistory,
       |     canKeyDownTab,
       |     canKeyUp,
-      |     that: thatSource
+      |     that: #[mark thatSource]
       | } = require('@taufik-nurrohman/text-editor.source');
       |
-      | Object.assign(TE.prototype, that, thatSource);
+      | Object.assign(TE.prototype, that, #[mark thatSource]);
       |
       | const editor = new TE(document.querySelector('textarea'));
       |
@@ -209,10 +209,10 @@ block content
       |     canKeyDownHistory,
       |     canKeyDownTab,
       |     canKeyUp,
-      |     that: thatSource
+      |     that: #[mark thatSource]
       | } from '@taufik-nurrohman/text-editor.source';
       |
-      | Object.assign(TE.prototype, that, thatSource);
+      | Object.assign(TE.prototype, that, #[mark thatSource]);
       |
       | const editor = new TE(document.querySelector('textarea'));
       |

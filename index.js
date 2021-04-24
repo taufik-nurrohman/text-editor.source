@@ -50,17 +50,18 @@
         if (!close && "" !== close) {
             close = open;
         }
-        let {
-            after,
-            before,
-            value
-        } = this.$(),
+        let t = this,
+            {
+                after,
+                before,
+                value
+            } = t.$(),
             closeCount = toCount(close),
             openCount = toCount(open);
         if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
-            return this.peel(open, close, wrap);
+            return t.peel(open, close, wrap);
         }
-        return this.wrap(open, close, wrap);
+        return t.wrap(open, close, wrap);
     };
 
     function canKeyDown(key, {

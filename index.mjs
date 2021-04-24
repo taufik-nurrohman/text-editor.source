@@ -1,5 +1,5 @@
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
-import {toObjectValues} from '@taufik-nurrohman/to';
+import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
 let pairs = {
     '`': '`',
@@ -12,6 +12,24 @@ let pairs = {
 };
 
 let pairsValue = toObjectValues(pairs);
+
+let that = {};
+
+that.toggle = function(open, close, wrap) {
+    if (!close && "" !== close) {
+        close = open;
+    }
+    let {after, before, value} = this.$(),
+        closeCount = toCount(close),
+        openCount = toCount(open);
+    if (
+        (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) ||
+        (close === after.slice(0, closeCount) && open === before.slice(-openCount))
+    ) {
+        return this.peel(open, close, wrap);
+    }
+    return this.wrap(open, close, wrap);
+};
 
 function canKeyDown(key, {a, c, s}, that) {
     let charAfter,
@@ -36,6 +54,7 @@ function canKeyDown(key, {a, c, s}, that) {
                 return false;
             }
         }
+        return true;
     }
     if ('Backspace' === key && !s) {
         let {after, before, value} = that.$(),
@@ -69,12 +88,13 @@ function canKeyDown(key, {a, c, s}, that) {
             return false;
         }
         if (after && before && !before.endsWith('\\' + charBefore)) {
-            if (charAfter === after[0]) {
+            if (charAfter === after[0] && charBefore === before.slice(-1)) {
                 // Peel pair
                 that.peel(charBefore, charAfter).record();
                 return false;
             }
         }
+        return true;
     }
     let {after, before, start, value} = that.$();
     // Do nothing on escape
@@ -168,5 +188,6 @@ export default {
     canKeyDownDent,
     canKeyDownHistory,
     canKeyDownTab,
-    canKeyUp
+    canKeyUp,
+    that
 };

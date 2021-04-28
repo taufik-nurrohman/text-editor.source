@@ -35,7 +35,7 @@
     var toObjectValues = function toObjectValues(x) {
         return Object.values(x);
     };
-    let pairs = {
+    const pairs = {
         '`': '`',
         '(': ')',
         '{': '}',
@@ -44,8 +44,13 @@
         "'": "'",
         '<': '>'
     };
-    let pairsValue = toObjectValues(pairs);
-    let that = {};
+    const defaults = {
+        source: {
+            pairs
+        }
+    };
+    const pairsValue = toObjectValues(pairs);
+    const that = {};
     that.toggle = function(open, close, wrap) {
         if (!close && "" !== close) {
             close = open;
@@ -71,7 +76,8 @@
     }, that) {
         let charAfter,
             charBefore,
-            charIndent = that.state.tab || '\t'; // Do nothing
+            charIndent = defaults.tab || that.state.tab || '\t',
+            pairs = that.state.source?.pairs || pairs; // Do nothing
         if (a || c) {
             return true;
         }
@@ -243,6 +249,7 @@
         canKeyDownHistory,
         canKeyDownTab,
         canKeyUp,
+        state: defaults,
         that
     };
     return _virtual_entry;

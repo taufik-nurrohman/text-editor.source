@@ -1,7 +1,7 @@
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
-let pairs = {
+const pairs = {
     '`': '`',
     '(': ')',
     '{': '}',
@@ -11,9 +11,13 @@ let pairs = {
     '<': '>'
 };
 
-let pairsValue = toObjectValues(pairs);
+const defaults = {
+    source: {pairs}
+};
 
-let that = {};
+const pairsValue = toObjectValues(pairs);
+
+const that = {};
 
 that.toggle = function(open, close, wrap) {
     if (!close && "" !== close) {
@@ -35,7 +39,8 @@ that.toggle = function(open, close, wrap) {
 function canKeyDown(key, {a, c, s}, that) {
     let charAfter,
         charBefore,
-        charIndent = that.state.tab || '\t';
+        charIndent = defaults.tab || that.state.tab || '\t',
+        pairs = that.state.source?.pairs || pairs;
     // Do nothing
     if (a || c) {
         return true;
@@ -190,5 +195,6 @@ export default {
     canKeyDownHistory,
     canKeyDownTab,
     canKeyUp,
+    state: defaults,
     that
 };

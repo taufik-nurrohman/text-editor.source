@@ -11,6 +11,8 @@ block script
     | let editor = new TE(document.querySelector('textarea'), '  '),
     |     {canKeyDown, canKeyDownDent, canKeyDownHistory, canKeyUp} = TE.Source;
     |
+    | Object.assign(editor.state, TE.Source.state);
+    |
     | function onKeyDown(e) {
     |     let key = e.key,
     |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
@@ -141,6 +143,9 @@ block content
       | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
       | const editor = new TE(document.querySelector('textarea'));
       | const {canKeyDown, canKeyDownHistory, canKeyDownTab, canKeyUp} = TE.Source;
+      |
+      | Object.assign(editor.state, TE.Source.state);
+      |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
@@ -164,27 +169,30 @@ block content
     h4 CommonJS
     pre: code
       | const TE = require('@taufik-nurrohman/text-editor');
-      | const {that} = require('@taufik-nurrohman/text-editor.history');
+      | const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
       |
       | const {
-      |     canKeyDown,
-      |     canKeyDownHistory,
-      |     canKeyDownTab,
-      |     canKeyUp,
-      |     that: #[mark thatSource]
+      |     canKeyDown: canKeyDownSource,
+      |     canKeyDownHistory: canKeyDownHistorySource,
+      |     canKeyDownTab: canKeyDownTabSource,
+      |     canKeyUp: canKeyUpSource,
+      |     state: stateSource,
+      |     that: thatSource
       | } = require('@taufik-nurrohman/text-editor.source');
       |
-      | Object.assign(TE.prototype, that, #[mark thatSource]);
+      | Object.assign(TE.prototype, thatHistory, thatSource);
       |
       | const editor = new TE(document.querySelector('textarea'));
+      |
+      | Object.assign(editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
-      |         canKeyDown(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistory(key, keys, editor) &amp;&amp;
-      |         canKeyDownTab(key, keys, editor)
+      |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
       |     } else {
@@ -195,34 +203,37 @@ block content
       | editor.self.addEventListener('keyup', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUp(key, keys, editor) || e.preventDefault();
+      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
       | });
       |
       | editor.record();
     h4 ECMAScript
     pre: code
       | import TE from '@taufik-nurrohman/text-editor';
-      | import {that} from '@taufik-nurrohman/text-editor.history';
+      | import {that: thatHistory} from '@taufik-nurrohman/text-editor.history';
       |
       | import {
-      |     canKeyDown,
-      |     canKeyDownHistory,
-      |     canKeyDownTab,
-      |     canKeyUp,
-      |     that: #[mark thatSource]
+      |     canKeyDown: canKeyDownSource,
+      |     canKeyDownHistory: canKeyDownHistorySource,
+      |     canKeyDownTab: canKeyDownTabSource,
+      |     canKeyUp: canKeyUpSource,
+      |     state: stateSource,
+      |     that: thatSource
       | } from '@taufik-nurrohman/text-editor.source';
       |
-      | Object.assign(TE.prototype, that, #[mark thatSource]);
+      | Object.assign(TE.prototype, thatHistory, thatSource);
       |
       | const editor = new TE(document.querySelector('textarea'));
+      |
+      | Object.assign(editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
-      |         canKeyDown(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistory(key, keys, editor) &amp;&amp;
-      |         canKeyDownTab(key, keys, editor)
+      |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
       |     } else {
@@ -233,13 +244,16 @@ block content
       | editor.self.addEventListener('keyup', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUp(key, keys, editor) || e.preventDefault();
+      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
       | });
       |
       | editor.record();
     h3 Methods
     h4 editor.toggle(open, close = open, wrap = false)
     p Toggle wrap and peel of #[code open] and #[code close] string.
+    h3 Properties
+    h4 TE.Source.state
+    p Return the default state to be merged with #[code editor.state].
     h3 Strokes
     p Strokes can either return #[code false] or #[code true]. If it returns #[code false], it means that this extension has manipulated the existing value. If it returns #[code true], it means that current key stroke works normally.
     h4 TE.Source.canKeyDown(key, {a, c, s}, that)

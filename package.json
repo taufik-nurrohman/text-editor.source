@@ -4,7 +4,7 @@
   "bugs": "https://github.com/taufik-nurrohman/text-editor.source/issues",
   "dependencies": {
     "@taufik-nurrohman/text-editor": "^3.3.1",
-    "@taufik-nurrohman/text-editor.history": "^2.1.0"
+    "@taufik-nurrohman/text-editor.history": "^2.1.2"
   },
   "description": "Provides a set of key strokes to generate responses like in a typical source code editor.",
   "devDependencies": {
@@ -47,5 +47,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TE.Source --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "2.1.2"
+  "version": "2.1.3"
 }

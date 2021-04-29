@@ -9,23 +9,23 @@ block script
     | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
     |
     | let editor = new TE(document.querySelector('textarea'), '  '),
-    |     {canKeyDown, canKeyDownDent, canKeyDownHistory, canKeyUp} = TE.Source;
+    |     {canKeyDown: canKeyDownSource, canKeyDownDent: canKeyDownDentSource, canKeyDownHistory: canKeyDownHistorySource, canKeyUpSource} = TE.Source;
     |
     | Object.assign(editor.state, TE.Source.state);
     |
     | function onKeyDown(e) {
     |     let key = e.key,
     |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    |     canKeyDown(key, keys, editor) &&
-    |     canKeyDownDent(key, keys, editor) &&
-    |     canKeyDownHistory(key, keys, editor) ||
+    |     canKeyDownSource(key, keys, editor) &&
+    |     canKeyDownDentSource(key, keys, editor) &&
+    |     canKeyDownHistorySource(key, keys, editor) ||
     |     e.preventDefault();
     | }
     |
     | function onKeyUp(e) {
     |     let key = e.key,
     |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    |     canKeyUp(key, keys, editor) || e.preventDefault();
+    |     canKeyUpSource(key, keys, editor) || e.preventDefault();
     | }
     |
     | function letSourceEditor() {
@@ -122,6 +122,7 @@ block content
     h2 Features
     ul
       li Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
+      li <code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>␣</kbd>.
       li <code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>↵</kbd>.
       li <code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>⌫</kbd>.
       li <code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
@@ -140,9 +141,17 @@ block content
       | &lt;script src="#[a(href='../text-editor.history/index.min.js' target='_blank') ./text-editor.history/index.min.js]"&gt;&lt;/script&gt;
       | &lt;script src="#[a(href='index.min.js' target='_blank') ./text-editor.source/index.min.js]"&gt;&lt;/script&gt;
       | &lt;script&gt;
+      |
       | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
+      |
       | const editor = new TE(document.querySelector('textarea'));
-      | const {canKeyDown, canKeyDownHistory, canKeyDownTab, canKeyUp} = TE.Source;
+      |
+      | const {
+      |     canKeyDown: canKeyDownSource,
+      |     canKeyDownHistory: canKeyDownHistorySource,
+      |     canKeyDownTab: canKeyDownTabSource,
+      |     canKeyUp: canKeyUpSource
+      | } = TE.Source;
       |
       | Object.assign(editor.state, TE.Source.state);
       |
@@ -150,21 +159,24 @@ block content
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
-      |         canKeyDown(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistory(key, keys, editor) &amp;&amp;
-      |         canKeyDownTab(key, keys, editor)
+      |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
       |     } else {
       |         e.preventDefault();
       |     }
       | });
+      |
       | editor.self.addEventListener('keyup', e =&gt; {
       |     let key = e.key,
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUp(key, keys, editor) || e.preventDefault();
+      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
       | });
+      |
       | editor.record(); // Record the first history data
+      |
       | &lt;/script&gt;
     h4 CommonJS
     pre: code

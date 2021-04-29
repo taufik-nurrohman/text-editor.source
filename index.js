@@ -77,8 +77,21 @@
         let charAfter,
             charBefore,
             charIndent = defaults.tab || that.state.tab || '\t',
-            pairs = that.state.source?.pairs || pairs; // Do nothing
+            charPairs = that.state.source?.pairs || pairs; // Do nothing
         if (a || c) {
+            return true;
+        }
+        if (' ' === key && !s) {
+            let {
+                after,
+                before,
+                value
+            } = that.$();
+            charAfter = charPairs[charBefore = before.slice(-1)];
+            if (!value && charAfter && charBefore) {
+                that.wrap(' ', ' ');
+                return false;
+            }
             return true;
         }
         if ('Enter' === key && !s) {
@@ -91,7 +104,7 @@
                 lineMatch = lineBefore.match(/^(\s+)/),
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
             if (!value) {
-                if (after && before && (charAfter = pairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
+                if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                     that.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                     return false;
                 }
@@ -112,7 +125,7 @@
             let lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
-            charAfter = pairs[charBefore = before.slice(-1)]; // Do nothing on escape
+            charAfter = charPairs[charBefore = before.slice(-1)]; // Do nothing on escape
             if ('\\' === charBefore) {
                 return true;
             }
@@ -123,9 +136,9 @@
                 }
                 return true;
             }
-            charAfter = pairs[charBefore = before.trim().slice(-1)];
+            charAfter = charPairs[charBefore = before.trim().slice(-1)];
             if (charAfter && charBefore) {
-                if (after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
+                if (after.startsWith(' ' + charAfter) && before.endsWith(charBefore + ' ') || after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
                     // Collapse bracket(s)
                     that.trim("", "").record();
                     return false;
@@ -153,15 +166,15 @@
         if ('\\' === (charBefore = before.slice(-1))) {
             return true;
         }
-        charAfter = pairsValue.includes(after[0]) ? after[0] : pairs[charBefore]; // `|}`
+        charAfter = pairsValue.includes(after[0]) ? after[0] : charPairs[charBefore]; // `|}`
         if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
             that.select(start + 1).record();
             return false;
         }
-        for (charBefore in pairs) {
-            charAfter = pairs[charBefore]; // `{|`
+        for (charBefore in charPairs) {
+            charAfter = charPairs[charBefore]; // `{|`
             if (charBefore === key) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`

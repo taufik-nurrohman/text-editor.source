@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.1.3</title>
+    <title>Text Editor Source 2.1.4</title>
     <style>
       * {
         box-sizing: border-box;
@@ -72,7 +72,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.1.3</h1>
+      <h1>Text Editor Source 2.1.4</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -85,6 +85,7 @@
       <h2>Features</h2>
       <ul>
         <li>Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
+        <li><code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>␣</kbd>.</li>
         <li><code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>↵</kbd>.</li>
         <li><code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>⌫</kbd>.</li>
         <li><code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
@@ -103,9 +104,17 @@
 &lt;script src="<a href="../text-editor.history/index.min.js" target="_blank">./text-editor.history/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
+
 Object.assign(TE.prototype, TE.History.that, TE.Source.that);
+
 const editor = new TE(document.querySelector('textarea'));
-const {canKeyDown, canKeyDownHistory, canKeyDownTab, canKeyUp} = TE.Source;
+
+const {
+    canKeyDown: canKeyDownSource,
+    canKeyDownHistory: canKeyDownHistorySource,
+    canKeyDownTab: canKeyDownTabSource,
+    canKeyUp: canKeyUpSource
+} = TE.Source;
 
 Object.assign(editor.state, TE.Source.state);
 
@@ -113,21 +122,24 @@ editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,
         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
     if (
-        canKeyDown(key, keys, editor) &amp;&amp;
-        canKeyDownHistory(key, keys, editor) &amp;&amp;
-        canKeyDownTab(key, keys, editor)
+        canKeyDownSource(key, keys, editor) &amp;&amp;
+        canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+        canKeyDownTabSource(key, keys, editor)
     ) {
         // Normal key strokes. Add more key strokes extension here!
     } else {
         e.preventDefault();
     }
 });
+
 editor.self.addEventListener('keyup', e =&gt; {
     let key = e.key,
         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    canKeyUp(key, keys, editor) || e.preventDefault();
+    canKeyUpSource(key, keys, editor) || e.preventDefault();
 });
+
 editor.record(); // Record the first history data
+
 &lt;/script&gt;</code></pre>
       <h4>CommonJS</h4>
       <pre><code>const TE = require('@taufik-nurrohman/text-editor');
@@ -240,10 +252,10 @@ editor.record();</code></pre>
 
       let editor = new TE(document.querySelector('textarea'), '  '),
           {
-              canKeyDown,
-              canKeyDownDent,
-              canKeyDownHistory,
-              canKeyUp
+              canKeyDown: canKeyDownSource,
+              canKeyDownDent: canKeyDownDentSource,
+              canKeyDownHistory: canKeyDownHistorySource,
+              canKeyUpSource
           } = TE.Source;
 
       Object.assign(editor.state, TE.Source.state);
@@ -255,9 +267,9 @@ editor.record();</code></pre>
                   c: e.ctrlKey,
                   s: e.shiftKey
               };
-          canKeyDown(key, keys, editor) &&
-              canKeyDownDent(key, keys, editor) &&
-              canKeyDownHistory(key, keys, editor) ||
+          canKeyDownSource(key, keys, editor) &&
+              canKeyDownDentSource(key, keys, editor) &&
+              canKeyDownHistorySource(key, keys, editor) ||
               e.preventDefault();
       }
 
@@ -268,7 +280,7 @@ editor.record();</code></pre>
                   c: e.ctrlKey,
                   s: e.shiftKey
               };
-          canKeyUp(key, keys, editor) || e.preventDefault();
+          canKeyUpSource(key, keys, editor) || e.preventDefault();
       }
 
       function letSourceEditor() {

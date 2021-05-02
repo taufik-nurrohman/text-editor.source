@@ -1,5 +1,6 @@
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
+import {debounce} from '@taufik-nurrohman/tick';
 
 const pairs = {
     '`': '`',
@@ -193,12 +194,10 @@ function canKeyDownTab(key, {a, c, s}, that) {
     return true;
 }
 
-let throttle;
+let bounce = debounce(that => that.record(), 100);
 
 function canKeyUp(key, {a, c, s}, that) {
-    throttle && clearTimeout(throttle);
-    throttle = setTimeout(() => that.record(), 100);
-    return true;
+    return bounce(that), true;
 }
 
 export default {

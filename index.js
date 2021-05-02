@@ -35,6 +35,17 @@
     var toObjectValues = function toObjectValues(x) {
         return Object.values(x);
     };
+    var debounce = function debounce(then, time) {
+        var timer;
+        return function() {
+            var _arguments = arguments,
+                _this = this;
+            timer && clearTimeout(timer);
+            timer = setTimeout(function() {
+                return then.apply(_this, _arguments);
+            }, time);
+        };
+    };
     const pairs = {
         '`': '`',
         '(': ')',
@@ -245,16 +256,14 @@
         }
         return true;
     }
-    let throttle;
+    let bounce = debounce(that => that.record(), 100);
 
     function canKeyUp(key, {
         a,
         c,
         s
     }, that) {
-        throttle && clearTimeout(throttle);
-        throttle = setTimeout(() => that.record(), 100);
-        return true;
+        return bounce(that), true;
     }
     var _virtual_entry = {
         canKeyDown,

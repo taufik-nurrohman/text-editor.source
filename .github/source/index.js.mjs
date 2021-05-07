@@ -18,7 +18,7 @@ const defaults = {
 
 const pairsValue = toObjectValues(pairs);
 
-const that = {};
+export const that = {};
 
 that.toggle = function(open, close, wrap) {
     if (!close && "" !== close) {
@@ -37,7 +37,7 @@ that.toggle = function(open, close, wrap) {
     return t.wrap(open, close, wrap);
 };
 
-function canKeyDown(key, {a, c, s}, that) {
+export function canKeyDown(key, {a, c, s}, that) {
     let charAfter,
         charBefore,
         charIndent = defaults.tab || that.state.tab || '\t',
@@ -151,7 +151,7 @@ function canKeyDown(key, {a, c, s}, that) {
     return true;
 }
 
-function canKeyDownDent(key, {a, c, s}, that) {
+export function canKeyDownDent(key, {a, c, s}, that) {
     let charIndent = that.state.tab || '\t';
     if (!a && c) {
         // Indent with `⌘+]`
@@ -168,7 +168,7 @@ function canKeyDownDent(key, {a, c, s}, that) {
     return true;
 }
 
-function canKeyDownHistory(key, {a, c, s}, that) {
+export function canKeyDownHistory(key, {a, c, s}, that) {
     if (!a && c) {
         // Redo with `⌘+y`
         if ('y' === key) {
@@ -184,7 +184,7 @@ function canKeyDownHistory(key, {a, c, s}, that) {
     return true;
 }
 
-function canKeyDownTab(key, {a, c, s}, that) {
+export function canKeyDownTab(key, {a, c, s}, that) {
     let charIndent = that.state.tab || '\t';
     // Indent/outdent with `⇥` or `⇧+⇥`
     if ('Tab' === key && !a && !c) {
@@ -196,16 +196,8 @@ function canKeyDownTab(key, {a, c, s}, that) {
 
 let bounce = debounce(that => that.record(), 100);
 
-function canKeyUp(key, {a, c, s}, that) {
+export function canKeyUp(key, {a, c, s}, that) {
     return bounce(that), true;
 }
 
-export default {
-    canKeyDown,
-    canKeyDownDent,
-    canKeyDownHistory,
-    canKeyDownTab,
-    canKeyUp,
-    state: defaults,
-    that
-};
+export const state = defaults;

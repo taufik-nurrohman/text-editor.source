@@ -26,8 +26,8 @@
  *
  */
 (function(global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, (global.TE = global.TE || {}, global.TE.Source = factory()));
-})(this, function() {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
+})(this, function(exports) {
     'use strict';
     var toCount = function toCount(x) {
         return x.length;
@@ -265,14 +265,12 @@
     }, that) {
         return bounce(that), true;
     }
-    var _virtual_entry = {
-        canKeyDown,
-        canKeyDownDent,
-        canKeyDownHistory,
-        canKeyDownTab,
-        canKeyUp,
-        state: defaults,
-        that
-    };
-    return _virtual_entry;
+    const state = defaults;
+    exports.canKeyDown = canKeyDown;
+    exports.canKeyDownDent = canKeyDownDent;
+    exports.canKeyDownHistory = canKeyDownHistory;
+    exports.canKeyDownTab = canKeyDownTab;
+    exports.canKeyUp = canKeyUp;
+    exports.state = state;
+    exports.that = that;
 });

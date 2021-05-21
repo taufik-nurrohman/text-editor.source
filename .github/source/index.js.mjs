@@ -49,7 +49,7 @@ export function canKeyDown(key, {a, c, s}, that) {
     if (' ' === key && !s) {
         let {after, before, value} = that.$();
         charAfter = charPairs[charBefore = before.slice(-1)];
-        if (!value && charAfter && charBefore) {
+        if (!value && charAfter && charBefore && charAfter === after[0]) {
             that.wrap(' ', ' ');
             return false;
         }

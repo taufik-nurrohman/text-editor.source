@@ -11,7 +11,7 @@
   },
   "description": "Provides a set of key strokes to generate responses like in a typical source code editor.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^0.1.12"
+    "@taufik-nurrohman/factory": "^0.1.14"
   },
   "exports": {
     "import": "./index.mjs",
@@ -48,5 +48,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TE.Source --js-top='%(js.license)' --mjs=true --to=."
   },
   "type": "module",
-  "version": "2.1.6"
+  "version": "2.1.7"
 }

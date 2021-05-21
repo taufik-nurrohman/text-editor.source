@@ -99,7 +99,7 @@
                 value
             } = that.$();
             charAfter = charPairs[charBefore = before.slice(-1)];
-            if (!value && charAfter && charBefore) {
+            if (!value && charAfter && charBefore && charAfter === after[0]) {
                 that.wrap(' ', ' ');
                 return false;
             }

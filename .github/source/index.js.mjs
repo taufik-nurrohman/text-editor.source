@@ -1,6 +1,7 @@
 import {debounce} from '@taufik-nurrohman/tick';
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {hasValue} from '@taufik-nurrohman/has';
+import {isString} from '@taufik-nurrohman/is';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
 const pairs = {
@@ -19,7 +20,7 @@ const defaults = {
 
 export const that = {};
 
-that.toggle = function(open, close, wrap) {
+that.toggle = function(open, close, wrap, tidy = false) {
     if (!close && "" !== close) {
         close = open;
     }
@@ -32,6 +33,15 @@ that.toggle = function(open, close, wrap) {
         (close === after.slice(0, closeCount) && open === before.slice(-openCount))
     ) {
         return t.peel(open, close, wrap);
+    }
+    if (false !== tidy) {
+        if (true === tidy) {
+            tidy = ["", ""];
+        }
+        if (isString(tidy)) {
+            tidy = [tidy, tidy];
+        }
+        t.trim(tidy[0], tidy[1] || tidy[0]);
     }
     return t.wrap(open, close, wrap);
 };

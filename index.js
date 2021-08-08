@@ -50,6 +50,9 @@
     var isSet = function isSet(x) {
         return isDefined(x) && !isNull(x);
     };
+    var isString = function isString(x) {
+        return 'string' === typeof x;
+    };
     var toCount = function toCount(x) {
         return x.length;
     };
@@ -84,7 +87,7 @@
         }
     };
     const that = {};
-    that.toggle = function(open, close, wrap) {
+    that.toggle = function(open, close, wrap, tidy = false) {
         if (!close && "" !== close) {
             close = open;
         }
@@ -98,6 +101,15 @@
             openCount = toCount(open);
         if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
             return t.peel(open, close, wrap);
+        }
+        if (false !== tidy) {
+            if (true === tidy) {
+                tidy = ["", ""];
+            }
+            if (isString(tidy)) {
+                tidy = [tidy, tidy];
+            }
+            t.trim(tidy[0], tidy[1] || tidy[0]);
         }
         return t.wrap(open, close, wrap);
     };

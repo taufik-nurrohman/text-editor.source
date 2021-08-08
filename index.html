@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.1.9</title>
+    <title>Text Editor Source 2.1.10</title>
     <style>
       * {
         box-sizing: border-box;
@@ -73,7 +73,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.1.9</h1>
+      <h1>Text Editor Source 2.1.10</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -85,6 +85,10 @@
       <p><label><input checked onchange="this.checked ? setSourceEditor() : letSourceEditor();" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <h2>Features</h2>
       <ul>
+        <li><code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.</li>
+        <li><code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>↵</kbd>.</li>
+        <li><code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.</li>
+        <li><code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.</li>
         <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.</li>
         <li><code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>↵</kbd>.</li>
         <li><code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>⌫</kbd>.</li>
@@ -112,7 +116,9 @@ const editor = new TE(document.querySelector('textarea'));
 
 const {
     canKeyDown: canKeyDownSource,
+    canKeyDownEnter: canKeyDownEnterSource,
     canKeyDownHistory: canKeyDownHistorySource,
+    canKeyDownMove: canKeyDownMoveSource,
     canKeyDownTab: canKeyDownTabSource,
     canKeyUp: canKeyUpSource
 } = TE.Source;
@@ -124,7 +130,9 @@ editor.self.addEventListener('keydown', e =&gt; {
         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
     if (
         canKeyDownSource(key, keys, editor) &amp;&amp;
+        canKeyDownEnterSource(key, keys, editor) &amp;&amp;
         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+        canKeyDownMoveSource(key, keys, editor) &amp;&amp;
         canKeyDownTabSource(key, keys, editor)
     ) {
         // Normal key strokes. Add more key strokes extension here!
@@ -148,7 +156,9 @@ const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
 
 const {
     canKeyDown: canKeyDownSource,
+    canKeyDownEnter: canKeyDownEnterSource,
     canKeyDownHistory: canKeyDownHistorySource,
+    canKeyDownMove: canKeyDownMoveSource,
     canKeyDownTab: canKeyDownTabSource,
     canKeyUp: canKeyUpSource,
     state: stateSource,
@@ -166,7 +176,9 @@ editor.self.addEventListener('keydown', e =&gt; {
         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
     if (
         canKeyDownSource(key, keys, editor) &amp;&amp;
+        canKeyDownEnterSource(key, keys, editor) &amp;&amp;
         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+        canKeyDownMoveSource(key, keys, editor) &amp;&amp;
         canKeyDownTabSource(key, keys, editor)
     ) {
         // Normal key strokes. Add more key strokes extension here!
@@ -188,7 +200,9 @@ import {that as thatHistory} from '@taufik-nurrohman/text-editor.history';
 
 import {
     canKeyDown as canKeyDownSource,
+    canKeyDownEnter as canKeyDownEnterSource,
     canKeyDownHistory as canKeyDownHistorySource,
+    canKeyDownMove as canKeyDownMoveSource,
     canKeyDownTab as canKeyDownTabSource,
     canKeyUp as canKeyUpSource,
     state as stateSource,
@@ -206,7 +220,9 @@ editor.self.addEventListener('keydown', e =&gt; {
         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
     if (
         canKeyDownSource(key, keys, editor) &amp;&amp;
+        canKeyDownEnterSource(key, keys, editor) &amp;&amp;
         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+        canKeyDownMoveSource(key, keys, editor) &amp;&amp;
         canKeyDownTabSource(key, keys, editor)
     ) {
         // Normal key strokes. Add more key strokes extension here!
@@ -234,8 +250,12 @@ editor.record();</code></pre>
       <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
       <h4>TE.Source.canKeyDownDent(key, {a, c, s}, that)</h4>
       <p>Strokes to handle indentation tasks using the key combination <kbd>⌘</kbd><kbd>]</kbd> for indent and <kbd>⌘</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
+      <h4>TE.Source.canKeyDownEnter(key, {a, c, s}, that)</h4>
+      <p>Strokes to handle line insertion tasks using the key combination <kbd>⌘</kbd><kbd>↵</kbd> and <kbd>⌘</kbd><kbd>↵</kbd>.</p>
       <h4>TE.Source.canKeyDownHistory(key, {a, c, s}, that)</h4>
       <p>Strokes to handle history tasks using the key combination <kbd>⌘</kbd><kbd>z</kbd> for undo and <kbd>⌘</kbd><kbd>y</kbd> for redo.</p>
+      <h4>TE.Source.canKeyDownMove(key, {a, c, s}, that)</h4>
+      <p>Strokes to handle line or selection move tasks using the key combination <kbd>⌘</kbd><kbd>←</kbd>, <kbd>⌘</kbd><kbd>↑</kbd>, <kbd>⌘</kbd><kbd>→</kbd>, and <kbd>⌘</kbd><kbd>↓</kbd>.</p>
       <h4>TE.Source.canKeyDownTab(key, {a, c, s}, that)</h4>
       <p>Strokes to handle indentation tasks using the <kbd>⇥</kbd> key for indent and <kbd>⇧</kbd><kbd>⇥</kbd> for outdent.</p>
       <h4>TE.Source.canKeyUp(key, {a, c, s}, that)</h4>
@@ -255,7 +275,9 @@ editor.record();</code></pre>
           {
               canKeyDown: canKeyDownSource,
               canKeyDownDent: canKeyDownDentSource,
+              canKeyDownEnter: canKeyDownEnterSource,
               canKeyDownHistory: canKeyDownHistorySource,
+              canKeyDownMove: canKeyDownMoveSource,
               canKeyUp: canKeyUpSource
           } = TE.Source;
 
@@ -270,7 +292,9 @@ editor.record();</code></pre>
               };
           canKeyDownSource(key, keys, editor) &&
               canKeyDownDentSource(key, keys, editor) &&
-              canKeyDownHistorySource(key, keys, editor) ||
+              canKeyDownEnterSource(key, keys, editor) &&
+              canKeyDownHistorySource(key, keys, editor) &&
+              canKeyDownMoveSource(key, keys, editor) ||
               e.preventDefault();
       }
 

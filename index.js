@@ -27,12 +27,6 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
 })(this, function(exports) {
     'use strict';
-    var toCount = function toCount(x) {
-        return x.length;
-    };
-    var toObjectValues = function toObjectValues(x) {
-        return Object.values(x);
-    };
     var debounce = function debounce(then, time) {
         var timer;
         return function() {
@@ -43,6 +37,15 @@
                 return then.apply(_this, _arguments);
             }, time);
         };
+    };
+    var toCount = function toCount(x) {
+        return x.length;
+    };
+    var toObjectValues = function toObjectValues(x) {
+        return Object.values(x);
+    };
+    var hasValue = function hasValue(x, data) {
+        return -1 !== data.indexOf(x);
     };
     const pairs = {
         '`': '`',
@@ -223,6 +226,34 @@
         return true;
     }
 
+    function canKeyDownEnter(key, {
+        a,
+        c,
+        s
+    }, that) {
+        if (c && 'Enter' === key) {
+            let {
+                after,
+                before,
+                end,
+                start,
+                value
+            } = that.$(),
+                lineAfter = after.split('\n').shift(),
+                lineBefore = before.split('\n').pop(),
+                lineMatch = lineBefore.match(/^(\s+)/),
+                lineMatchIndent = lineMatch && lineMatch[1] || "";
+            if (before || after) {
+                if (s) {
+                    // Insert line over with `⌘+⇧+↵`
+                    return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').record(), false;
+                } // Insert line below with `⌘+↵`
+                return that.select(end + toCount(lineAfter)).insert('\n' + lineMatchIndent, -1).record(), false;
+            }
+        }
+        return true;
+    }
+
     function canKeyDownHistory(key, {
         a,
         c,
@@ -237,6 +268,61 @@
             if ('z' === key) {
                 that.undo();
                 return false;
+            }
+        }
+        return true;
+    }
+
+    function canKeyDownMove(key, {
+        a,
+        c,
+        s
+    }, that) {
+        if (c) {
+            let {
+                after,
+                before,
+                end,
+                start,
+                value
+            } = that.$(),
+                lineAfter = after.split('\n').shift(),
+                lineBefore = before.split('\n').pop(),
+                lineMatch = lineBefore.match(/^(\s+)/);
+            lineMatch && lineMatch[1] || ""; // Force to select the current line if there is no selection
+            end += toCount(lineAfter);
+            start -= toCount(lineBefore);
+            value = lineBefore + value + lineAfter;
+            if ('ArrowUp' === key) {
+                if (!hasValue('\n', before)) {
+                    return that.select(), false;
+                }
+                that.insert("");
+                that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+                that.replace(/(^|\n)([^\n]*?)$/, "", -1);
+                let $ = that.$();
+                before = $.before;
+                start = $.start;
+                lineBefore = before.split('\n').pop();
+                that.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+                that.select(start, start + toCount(value));
+                return that.record(), false;
+            }
+            if ('ArrowDown' === key) {
+                if (!hasValue('\n', after)) {
+                    return that.select(), false;
+                }
+                that.insert("");
+                that.replace(/^([^\n]*?)(\n|$)/, "", 1);
+                that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+                let $ = that.$();
+                after = $.after;
+                end = $.end;
+                lineAfter = after.split('\n').shift();
+                that.select(end = end + toCount(lineAfter)).wrap('\n', value);
+                end += 1;
+                that.select(end, end + toCount(value));
+                return that.record(), false;
             }
         }
         return true;
@@ -266,7 +352,9 @@
     const state = defaults;
     exports.canKeyDown = canKeyDown;
     exports.canKeyDownDent = canKeyDownDent;
+    exports.canKeyDownEnter = canKeyDownEnter;
     exports.canKeyDownHistory = canKeyDownHistory;
+    exports.canKeyDownMove = canKeyDownMove;
     exports.canKeyDownTab = canKeyDownTab;
     exports.canKeyUp = canKeyUp;
     exports.state = state;

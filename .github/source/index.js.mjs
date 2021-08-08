@@ -1,6 +1,7 @@
-import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
-import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 import {debounce} from '@taufik-nurrohman/tick';
+import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
+import {hasValue} from '@taufik-nurrohman/has';
+import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
 const pairs = {
     '`': '`',
@@ -168,6 +169,25 @@ export function canKeyDownDent(key, {a, c, s}, that) {
     return true;
 }
 
+export function canKeyDownEnter(key, {a, c, s}, that) {
+    if (c && 'Enter' === key) {
+        let {after, before, end, start, value} = that.$(),
+            lineAfter = after.split('\n').shift(),
+            lineBefore = before.split('\n').pop(),
+            lineMatch = lineBefore.match(/^(\s+)/),
+            lineMatchIndent = lineMatch && lineMatch[1] || "";
+        if (before || after) {
+            if (s) {
+                // Insert line over with `⌘+⇧+↵`
+                return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').record(), false;
+            }
+            // Insert line below with `⌘+↵`
+            return that.select(end + toCount(lineAfter)).insert('\n' + lineMatchIndent, -1).record(), false;
+        }
+    }
+    return true;
+}
+
 export function canKeyDownHistory(key, {a, c, s}, that) {
     if (!a && c) {
         // Redo with `⌘+y`
@@ -179,6 +199,52 @@ export function canKeyDownHistory(key, {a, c, s}, that) {
         if ('z' === key) {
             that.undo();
             return false;
+        }
+    }
+    return true;
+}
+
+export function canKeyDownMove(key, {a, c, s}, that) {
+    if (c) {
+        let {after, before, end, start, value} = that.$(),
+            lineAfter = after.split('\n').shift(),
+            lineBefore = before.split('\n').pop(),
+            lineMatch = lineBefore.match(/^(\s+)/),
+            lineMatchIndent = lineMatch && lineMatch[1] || "";
+        // Force to select the current line if there is no selection
+        end += toCount(lineAfter);
+        start -= toCount(lineBefore);
+        value = lineBefore + value + lineAfter;
+        if ('ArrowUp' === key) {
+            if (!hasValue('\n', before)) {
+                return that.select(), false;
+            }
+            that.insert("");
+            that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+            that.replace(/(^|\n)([^\n]*?)$/, "", -1);
+            let $ = that.$();
+            before = $.before;
+            start = $.start;
+            lineBefore = before.split('\n').pop();
+            that.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+            that.select(start, start + toCount(value));
+            return that.record(), false;
+        }
+        if ('ArrowDown' === key) {
+            if (!hasValue('\n', after)) {
+                return that.select(), false;
+            }
+            that.insert("");
+            that.replace(/^([^\n]*?)(\n|$)/, "", 1);
+            that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+            let $ = that.$();
+            after = $.after;
+            end = $.end;
+            lineAfter = after.split('\n').shift();
+            that.select(end = end + toCount(lineAfter)).wrap('\n', value);
+            end += 1;
+            that.select(end, end + toCount(value));
+            return that.record(), false;
         }
     }
     return true;

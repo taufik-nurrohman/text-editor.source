@@ -9,7 +9,7 @@ block script
     | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
     |
     | let editor = new TE(document.querySelector('textarea'), '  '),
-    |     {canKeyDown: canKeyDownSource, canKeyDownDent: canKeyDownDentSource, canKeyDownHistory: canKeyDownHistorySource, canKeyUp: canKeyUpSource} = TE.Source;
+    |     {canKeyDown: canKeyDownSource, canKeyDownDent: canKeyDownDentSource, canKeyDownEnter: canKeyDownEnterSource, canKeyDownHistory: canKeyDownHistorySource, canKeyDownMove: canKeyDownMoveSource, canKeyUp: canKeyUpSource} = TE.Source;
     |
     | Object.assign(editor.state, TE.Source.state);
     |
@@ -18,7 +18,9 @@ block script
     |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
     |     canKeyDownSource(key, keys, editor) &&
     |     canKeyDownDentSource(key, keys, editor) &&
-    |     canKeyDownHistorySource(key, keys, editor) ||
+    |     canKeyDownEnterSource(key, keys, editor) &&
+    |     canKeyDownHistorySource(key, keys, editor) &&
+    |     canKeyDownMoveSource(key, keys, editor) ||
     |     e.preventDefault();
     | }
     |
@@ -122,6 +124,10 @@ block content
         span Enable Source Editor
     h2 Features
     ul
+      li <code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.
+      li <code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>↵</kbd>.
+      li <code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.
+      li <code>as<mark>|</mark>df</code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.
       li <code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.
       li <code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>↵</kbd>.
       li <code>(<mark>|</mark>)</code>, <code>[<mark>|</mark>]</code>, <code>{<mark>|</mark>}</code>, <code>'<mark>|</mark>'</code>, <code>"<mark>|</mark>"</code>, or <code>&lt;<mark>|</mark>&gt;</code> then press <kbd>⌫</kbd>.
@@ -149,7 +155,9 @@ block content
       |
       | const {
       |     canKeyDown: canKeyDownSource,
+      |     canKeyDownEnter: canKeyDownEnterSource,
       |     canKeyDownHistory: canKeyDownHistorySource,
+      |     canKeyDownMove: canKeyDownMoveSource,
       |     canKeyDownTab: canKeyDownTabSource,
       |     canKeyUp: canKeyUpSource
       | } = TE.Source;
@@ -161,7 +169,9 @@ block content
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
       |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
       |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
       |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
@@ -186,7 +196,9 @@ block content
       |
       | const {
       |     canKeyDown: canKeyDownSource,
+      |     canKeyDownEnter: canKeyDownEnterSource,
       |     canKeyDownHistory: canKeyDownHistorySource,
+      |     canKeyDownMove: canKeyDownMoveSource,
       |     canKeyDownTab: canKeyDownTabSource,
       |     canKeyUp: canKeyUpSource,
       |     state: stateSource,
@@ -204,7 +216,9 @@ block content
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
       |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
       |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
       |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
@@ -227,7 +241,9 @@ block content
       |
       | import {
       |     canKeyDown as canKeyDownSource,
+      |     canKeyDownEnter as canKeyDownEnterSource,
       |     canKeyDownHistory as canKeyDownHistorySource,
+      |     canKeyDownMove as canKeyDownMoveSource,
       |     canKeyDownTab as canKeyDownTabSource,
       |     canKeyUp as canKeyUpSource,
       |     state as stateSource,
@@ -245,7 +261,9 @@ block content
       |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
       |     if (
       |         canKeyDownSource(key, keys, editor) &amp;&amp;
+      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
       |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
       |         canKeyDownTabSource(key, keys, editor)
       |     ) {
       |         // Normal key strokes. Add more key strokes extension here!
@@ -273,8 +291,12 @@ block content
     p This will handle tasks such as automatic bracket closing and continuous indentation.
     h4 TE.Source.canKeyDownDent(key, {a, c, s}, that)
     p Strokes to handle indentation tasks using the key combination #[kbd= '⌘']#[kbd= ']'] for indent and #[kbd= '⌘']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
+    h4 TE.Source.canKeyDownEnter(key, {a, c, s}, that)
+    p Strokes to handle line insertion tasks using the key combination #[kbd= '⌘']#[kbd= '↵'] and #[kbd= '⌘']#[kbd= '↵'].
     h4 TE.Source.canKeyDownHistory(key, {a, c, s}, that)
     p Strokes to handle history tasks using the key combination #[kbd= '⌘']#[kbd= 'z'] for undo and #[kbd= '⌘']#[kbd= 'y'] for redo.
+    h4 TE.Source.canKeyDownMove(key, {a, c, s}, that)
+    p Strokes to handle line or selection move tasks using the key combination #[kbd= '⌘']#[kbd= '←'], #[kbd= '⌘']#[kbd= '↑'], #[kbd= '⌘']#[kbd= '→'], and #[kbd= '⌘']#[kbd= '↓'].
     h4 TE.Source.canKeyDownTab(key, {a, c, s}, that)
     p Strokes to handle indentation tasks using the #[kbd= '⇥'] key for indent and #[kbd= '⇧']#[kbd= '⇥'] for outdent.
     h4 TE.Source.canKeyUp(key, {a, c, s}, that)

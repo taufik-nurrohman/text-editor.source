@@ -38,11 +38,33 @@
             }, time);
         };
     };
+    var isDefined = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isInstance = function isInstance(x, of ) {
+        return x && isSet( of ) && x instanceof of ;
+    };
+    var isNull = function isNull(x) {
+        return null === x;
+    };
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
+    };
     var toCount = function toCount(x) {
         return x.length;
     };
     var toObjectValues = function toObjectValues(x) {
         return Object.values(x);
+    };
+    var isPattern = function isPattern(pattern) {
+        return isInstance(pattern, RegExp);
+    };
+    var toPattern = function toPattern(pattern, opt) {
+        if (isPattern(pattern)) {
+            return pattern;
+        } // No need to escape `/` in the pattern string
+        pattern = pattern.replace(/\//g, '\\/');
+        return new RegExp(pattern, isSet(opt) ? opt : 'g');
     };
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -61,7 +83,6 @@
             pairs
         }
     };
-    const pairsValue = toObjectValues(pairs);
     const that = {};
     that.toggle = function(open, close, wrap) {
         if (!close && "" !== close) {
@@ -88,8 +109,9 @@
     }, that) {
         let charAfter,
             charBefore,
-            charIndent = defaults.tab || that.state.tab || '\t',
-            charPairs = that.state.source?.pairs || pairs; // Do nothing
+            charIndent = that.state.source?.tab || that.state.tab || '\t',
+            charPairs = that.state.source?.pairs || {},
+            charPairsValues = toObjectValues(charPairs); // Do nothing
         if (a || c) {
             return true;
         }
@@ -178,7 +200,7 @@
         if ('\\' === (charBefore = before.slice(-1))) {
             return true;
         }
-        charAfter = pairsValue.includes(after[0]) ? after[0] : charPairs[charBefore]; // `|}`
+        charAfter = charPairsValues.includes(after[0]) ? after[0] : charPairs[charBefore]; // `|}`
         if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
@@ -211,7 +233,7 @@
         c,
         s
     }, that) {
-        let charIndent = that.state.tab || '\t';
+        let charIndent = that.state.source?.tab || that.state.tab || '\t';
         if (!a && c) {
             // Indent with `⌘+]`
             if (']' === key) {
@@ -246,9 +268,9 @@
             if (before || after) {
                 if (s) {
                     // Insert line over with `⌘+⇧+↵`
-                    return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').record(), false;
+                    return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
                 } // Insert line below with `⌘+↵`
-                return that.select(end + toCount(lineAfter)).insert('\n' + lineMatchIndent, -1).record(), false;
+                return that.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
             }
         }
         return true;
@@ -286,7 +308,39 @@
                 start,
                 value
             } = that.$(),
-                lineAfter = after.split('\n').shift(),
+                charPair,
+                charPairValue,
+                charPairs = that.state.source?.pairs || {},
+                boundaries = [],
+                m;
+            if (value) {
+                if (!a) {
+                    for (charPair in charPairs) {
+                        if (!(charPairValue = charPairs[charPair])) {
+                            continue;
+                        }
+                        boundaries.push('(?:\\' + charPair + '(?:\\\\.|[^\\' + charPair + (charPairValue !== charPair ? '\\' + charPairValue : "") + '])*\\' + charPairValue + ')');
+                    }
+                    boundaries.push('\\w+'); // Word(s)
+                    boundaries.push('\\s+'); // White-space(s)
+                }
+                boundaries.push('[\\s\\S]'); // Last try!
+                if ('ArrowLeft' === key) {
+                    if (m = before.match(toPattern('(' + boundaries.join('|') + ')$', ""))) {
+                        that.insert("").select(start - toCount(m[0])).insert(value);
+                        return that.record(), false;
+                    }
+                    return that.select(), false;
+                }
+                if ('ArrowRight' === key) {
+                    if (m = after.match(toPattern('^(' + boundaries.join('|') + ')', ""))) {
+                        that.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
+                        return that.record(), false;
+                    }
+                    return that.select(), false;
+                }
+            }
+            let lineAfter = after.split('\n').shift(),
                 lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/);
             lineMatch && lineMatch[1] || ""; // Force to select the current line if there is no selection
@@ -333,7 +387,7 @@
         c,
         s
     }, that) {
-        let charIndent = that.state.tab || '\t'; // Indent/outdent with `⇥` or `⇧+⇥`
+        let charIndent = that.state.source?.tab || that.state.tab || '\t'; // Indent/outdent with `⇥` or `⇧+⇥`
         if ('Tab' === key && !a && !c) {
             that[s ? 'pull' : 'push'](charIndent).record();
             return false;

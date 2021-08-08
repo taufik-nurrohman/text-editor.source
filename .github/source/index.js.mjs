@@ -15,7 +15,10 @@ const pairs = {
 };
 
 const defaults = {
-    source: {pairs}
+    source: {
+        pairs,
+        type: null
+    }
 };
 
 export const that = {};
@@ -35,11 +38,10 @@ that.toggle = function(open, close, wrap, tidy = false) {
         return t.peel(open, close, wrap);
     }
     if (false !== tidy) {
-        if (true === tidy) {
-            tidy = ["", ""];
-        }
         if (isString(tidy)) {
             tidy = [tidy, tidy];
+        } else {
+            tidy = ["", ""];
         }
         t.trim(tidy[0], tidy[1] || tidy[0]);
     }
@@ -49,8 +51,8 @@ that.toggle = function(open, close, wrap, tidy = false) {
 export function canKeyDown(key, {a, c, s}, that) {
     let charAfter,
         charBefore,
-        charIndent = that.state.source?.tab || that.state.tab || '\t',
-        charPairs = that.state.source?.pairs || {},
+        charIndent = that.state.source.tab || that.state.tab || '\t',
+        charPairs = that.state.source.pairs || {},
         charPairsValues = toObjectValues(charPairs);
     // Do nothing
     if (a || c) {
@@ -162,7 +164,7 @@ export function canKeyDown(key, {a, c, s}, that) {
 }
 
 export function canKeyDownDent(key, {a, c, s}, that) {
-    let charIndent = that.state.source?.tab || that.state.tab || '\t';
+    let charIndent = that.state.source.tab || that.state.tab || '\t';
     if (!a && c) {
         // Indent with `⌘+]`
         if (']' === key) {
@@ -217,7 +219,7 @@ export function canKeyDownMove(key, {a, c, s}, that) {
     if (c) {
         let {after, before, end, start, value} = that.$(),
             charPair, charPairValue,
-            charPairs = that.state.source?.pairs || {},
+            charPairs = that.state.source.pairs || {},
             boundaries = [], m;
         if (value) {
             if (!a) {
@@ -290,7 +292,7 @@ export function canKeyDownMove(key, {a, c, s}, that) {
 }
 
 export function canKeyDownTab(key, {a, c, s}, that) {
-    let charIndent = that.state.source?.tab || that.state.tab || '\t';
+    let charIndent = that.state.source.tab || that.state.tab || '\t';
     // Indent/outdent with `⇥` or `⇧+⇥`
     if ('Tab' === key && !a && !c) {
         that[s ? 'pull' : 'push'](charIndent).record();

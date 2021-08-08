@@ -1,19 +1,19 @@
 /*!
  *
  * The MIT License (MIT)
- *
+
  * Copyright © 2021 Taufik Nurrohman <https://github.com/taufik-nurrohman>
- *
+
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -83,7 +83,8 @@
     };
     const defaults = {
         source: {
-            pairs
+            pairs,
+            type: null
         }
     };
     const that = {};
@@ -103,11 +104,10 @@
             return t.peel(open, close, wrap);
         }
         if (false !== tidy) {
-            if (true === tidy) {
-                tidy = ["", ""];
-            }
             if (isString(tidy)) {
                 tidy = [tidy, tidy];
+            } else {
+                tidy = ["", ""];
             }
             t.trim(tidy[0], tidy[1] || tidy[0]);
         }
@@ -121,8 +121,8 @@
     }, that) {
         let charAfter,
             charBefore,
-            charIndent = that.state.source?.tab || that.state.tab || '\t',
-            charPairs = that.state.source?.pairs || {},
+            charIndent = that.state.source.tab || that.state.tab || '\t',
+            charPairs = that.state.source.pairs || {},
             charPairsValues = toObjectValues(charPairs); // Do nothing
         if (a || c) {
             return true;
@@ -245,7 +245,7 @@
         c,
         s
     }, that) {
-        let charIndent = that.state.source?.tab || that.state.tab || '\t';
+        let charIndent = that.state.source.tab || that.state.tab || '\t';
         if (!a && c) {
             // Indent with `⌘+]`
             if (']' === key) {
@@ -322,7 +322,7 @@
             } = that.$(),
                 charPair,
                 charPairValue,
-                charPairs = that.state.source?.pairs || {},
+                charPairs = that.state.source.pairs || {},
                 boundaries = [],
                 m;
             if (value) {
@@ -399,7 +399,7 @@
         c,
         s
     }, that) {
-        let charIndent = that.state.source?.tab || that.state.tab || '\t'; // Indent/outdent with `⇥` or `⇧+⇥`
+        let charIndent = that.state.source.tab || that.state.tab || '\t'; // Indent/outdent with `⇥` or `⇧+⇥`
         if ('Tab' === key && !a && !c) {
             that[s ? 'pull' : 'push'](charIndent).record();
             return false;

@@ -11,7 +11,7 @@ block script
     | let editor = new TE(document.querySelector('textarea'), '  '),
     |     {canKeyDown: canKeyDownSource, canKeyDownDent: canKeyDownDentSource, canKeyDownEnter: canKeyDownEnterSource, canKeyDownHistory: canKeyDownHistorySource, canKeyDownMove: canKeyDownMoveSource, canKeyUp: canKeyUpSource} = TE.Source;
     |
-    | Object.assign(editor.state, TE.Source.state);
+    | editor.state = Object.assign({}, editor.state, TE.Source.state);
     |
     | function onKeyDown(e) {
     |     let key = e.key,
@@ -161,46 +161,46 @@ block content
       | &lt;script src="#[a(href='index.min.js' target='_blank') ./text-editor.source/index.min.js]"&gt;&lt;/script&gt;
       | &lt;script&gt;
       |
-      | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
+      |   Object.assign(TE.prototype, TE.History.that, TE.Source.that);
       |
-      | const editor = new TE(document.querySelector('textarea'));
+      |   const editor = new TE(document.querySelector('textarea'));
       |
-      | const {
-      |     canKeyDown: canKeyDownSource,
-      |     canKeyDownEnter: canKeyDownEnterSource,
-      |     canKeyDownHistory: canKeyDownHistorySource,
-      |     canKeyDownMove: canKeyDownMoveSource,
-      |     canKeyDownTab: canKeyDownTabSource,
-      |     canKeyUp: canKeyUpSource
-      | } = TE.Source;
+      |   const {
+      |       canKeyDown: canKeyDownSource,
+      |       canKeyDownEnter: canKeyDownEnterSource,
+      |       canKeyDownHistory: canKeyDownHistorySource,
+      |       canKeyDownMove: canKeyDownMoveSource,
+      |       canKeyDownTab: canKeyDownTabSource,
+      |       canKeyUp: canKeyUpSource
+      |   } = TE.Source;
       |
-      | function fromStates(...lot) { #[a(href='https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57' target='_blank') &hellip;] }
+      |   function fromStates(...lot) { #[a(href='https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57' target='_blank') &hellip;] }
       |
-      | fromStates(editor.state, TE.Source.state);
+      |   editor.state = fromStates({}, editor.state, TE.Source.state);
       |
-      | editor.self.addEventListener('keydown', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     if (
-      |         canKeyDownSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
-      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownTabSource(key, keys, editor)
-      |     ) {
-      |         // Normal key strokes. Add more key strokes extension here!
-      |     } else {
-      |         e.preventDefault();
-      |     }
-      | });
+      |   editor.self.addEventListener('keydown', e =&gt; {
+      |       let key = e.key,
+      |           keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+      |       if (
+      |           canKeyDownSource(key, keys, editor) &amp;&amp;
+      |           canKeyDownEnterSource(key, keys, editor) &amp;&amp;
+      |           canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+      |           canKeyDownMoveSource(key, keys, editor) &amp;&amp;
+      |           canKeyDownTabSource(key, keys, editor)
+      |       ) {
+      |           // Normal key strokes. Add more key strokes extension here!
+      |       } else {
+      |           e.preventDefault();
+      |       }
+      |   });
       |
-      | editor.self.addEventListener('keyup', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
-      | });
+      |   editor.self.addEventListener('keyup', e =&gt; {
+      |       let key = e.key,
+      |           keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+      |       canKeyUpSource(key, keys, editor) || e.preventDefault();
+      |   });
       |
-      | editor.record(); // Record the first history data
+      |   editor.record(); // Record the first history data
       |
       | &lt;/script&gt;
     h4 CommonJS
@@ -224,7 +224,7 @@ block content
       |
       | const editor = new TE(document.querySelector('textarea'));
       |
-      | fromStates(editor.state, stateSource);
+      | editor.state = fromStates({}, editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
@@ -270,7 +270,7 @@ block content
       |
       | const editor = new TE(document.querySelector('textarea'));
       |
-      | fromStates(editor.state, stateSource);
+      | editor.state = fromStates({}, editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,

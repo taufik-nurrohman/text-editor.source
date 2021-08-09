@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.1.14</title>
+    <title>Text Editor Source 2.1.15</title>
     <style>
       * {
         box-sizing: border-box;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.1.14</h1>
+      <h1>Text Editor Source 2.1.15</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -122,46 +122,46 @@
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
 
-Object.assign(TE.prototype, TE.History.that, TE.Source.that);
+  Object.assign(TE.prototype, TE.History.that, TE.Source.that);
 
-const editor = new TE(document.querySelector('textarea'));
+  const editor = new TE(document.querySelector('textarea'));
 
-const {
-    canKeyDown: canKeyDownSource,
-    canKeyDownEnter: canKeyDownEnterSource,
-    canKeyDownHistory: canKeyDownHistorySource,
-    canKeyDownMove: canKeyDownMoveSource,
-    canKeyDownTab: canKeyDownTabSource,
-    canKeyUp: canKeyUpSource
-} = TE.Source;
+  const {
+      canKeyDown: canKeyDownSource,
+      canKeyDownEnter: canKeyDownEnterSource,
+      canKeyDownHistory: canKeyDownHistorySource,
+      canKeyDownMove: canKeyDownMoveSource,
+      canKeyDownTab: canKeyDownTabSource,
+      canKeyUp: canKeyUpSource
+  } = TE.Source;
 
-function fromStates(...lot) { <a href="https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57" target="_blank">&hellip;</a> }
+  function fromStates(...lot) { <a href="https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57" target="_blank">&hellip;</a> }
 
-fromStates(editor.state, TE.Source.state);
+  editor.state = fromStates({}, editor.state, TE.Source.state);
 
-editor.self.addEventListener('keydown', e =&gt; {
-    let key = e.key,
-        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    if (
-        canKeyDownSource(key, keys, editor) &amp;&amp;
-        canKeyDownEnterSource(key, keys, editor) &amp;&amp;
-        canKeyDownHistorySource(key, keys, editor) &amp;&amp;
-        canKeyDownMoveSource(key, keys, editor) &amp;&amp;
-        canKeyDownTabSource(key, keys, editor)
-    ) {
-        // Normal key strokes. Add more key strokes extension here!
-    } else {
-        e.preventDefault();
-    }
-});
+  editor.self.addEventListener('keydown', e =&gt; {
+      let key = e.key,
+          keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+      if (
+          canKeyDownSource(key, keys, editor) &amp;&amp;
+          canKeyDownEnterSource(key, keys, editor) &amp;&amp;
+          canKeyDownHistorySource(key, keys, editor) &amp;&amp;
+          canKeyDownMoveSource(key, keys, editor) &amp;&amp;
+          canKeyDownTabSource(key, keys, editor)
+      ) {
+          // Normal key strokes. Add more key strokes extension here!
+      } else {
+          e.preventDefault();
+      }
+  });
 
-editor.self.addEventListener('keyup', e =&gt; {
-    let key = e.key,
-        keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    canKeyUpSource(key, keys, editor) || e.preventDefault();
-});
+  editor.self.addEventListener('keyup', e =&gt; {
+      let key = e.key,
+          keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
+      canKeyUpSource(key, keys, editor) || e.preventDefault();
+  });
 
-editor.record(); // Record the first history data
+  editor.record(); // Record the first history data
 
 &lt;/script&gt;</code></pre>
       <h4>CommonJS</h4>
@@ -184,7 +184,7 @@ Object.assign(TE.prototype, thatHistory, thatSource);
 
 const editor = new TE(document.querySelector('textarea'));
 
-fromStates(editor.state, stateSource);
+editor.state = fromStates({}, editor.state, stateSource);
 
 editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,
@@ -229,7 +229,7 @@ Object.assign(TE.prototype, thatHistory, thatSource);
 
 const editor = new TE(document.querySelector('textarea'));
 
-fromStates(editor.state, stateSource);
+editor.state = fromStates({}, editor.state, stateSource);
 
 editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,
@@ -297,7 +297,7 @@ editor.record();</code></pre>
               canKeyUp: canKeyUpSource
           } = TE.Source;
 
-      Object.assign(editor.state, TE.Source.state);
+      editor.state = Object.assign({}, editor.state, TE.Source.state);
 
       function onKeyDown(e) {
           let key = e.key,

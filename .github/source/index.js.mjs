@@ -4,7 +4,7 @@ import {hasValue} from '@taufik-nurrohman/has';
 import {isString} from '@taufik-nurrohman/is';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
-const pairs = {
+let pairs = {
     '`': '`',
     '(': ')',
     '{': '}',
@@ -14,7 +14,7 @@ const pairs = {
     '<': '>'
 };
 
-const defaults = {
+let defaults = {
     source: {
         pairs,
         type: null
@@ -307,4 +307,4 @@ export function canKeyUp(key, {a, c, s}, that) {
     return bounce(that), true;
 }
 
-export const state = defaults;
+export let state = defaults;

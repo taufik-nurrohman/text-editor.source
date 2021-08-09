@@ -72,7 +72,7 @@
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
-    const pairs = {
+    let pairs = {
         '`': '`',
         '(': ')',
         '{': '}',
@@ -81,7 +81,7 @@
         "'": "'",
         '<': '>'
     };
-    const defaults = {
+    let defaults = {
         source: {
             pairs,
             type: null
@@ -415,7 +415,7 @@
     }, that) {
         return bounce(that), true;
     }
-    const state = defaults;
+    let state = defaults;
     exports.canKeyDown = canKeyDown;
     exports.canKeyDownDent = canKeyDownDent;
     exports.canKeyDownEnter = canKeyDownEnter;

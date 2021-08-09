@@ -132,14 +132,14 @@ block content
         span Enable Source Editor
     h2 Features
     ul
-      li <code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>↵</kbd>.
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>⌫</kbd>.
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>␣</kbd>.
-      li <code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
-      li <code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.
+      li <code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.
       li <code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.
       li <code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd>→</kbd>.
+      li <code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
+      li <code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.
       li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.
       li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.
       li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.
@@ -174,7 +174,9 @@ block content
       |     canKeyUp: canKeyUpSource
       | } = TE.Source;
       |
-      | Object.assign(editor.state, TE.Source.state);
+      | function fromStates(...lot) { #[a(href='https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57' target='_blank') &hellip;] }
+      |
+      | fromStates(editor.state, TE.Source.state);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
@@ -203,6 +205,7 @@ block content
       | &lt;/script&gt;
     h4 CommonJS
     pre: code
+      | const {fromStates} = require('@taufik-nurrohman/from');
       | const TE = require('@taufik-nurrohman/text-editor');
       | const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
       |
@@ -221,7 +224,7 @@ block content
       |
       | const editor = new TE(document.querySelector('textarea'));
       |
-      | Object.assign(editor.state, stateSource);
+      | fromStates(editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,
@@ -248,6 +251,7 @@ block content
       | editor.record();
     h4 ECMAScript
     pre: code
+      | import {fromStates} from '@taufik-nurrohman/from';
       | import TE from '@taufik-nurrohman/text-editor';
       | import {that as thatHistory} from '@taufik-nurrohman/text-editor.history';
       |
@@ -266,7 +270,7 @@ block content
       |
       | const editor = new TE(document.querySelector('textarea'));
       |
-      | Object.assign(editor.state, stateSource);
+      | fromStates(editor.state, stateSource);
       |
       | editor.self.addEventListener('keydown', e =&gt; {
       |     let key = e.key,

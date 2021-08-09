@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.1.12</title>
+    <title>Text Editor Source 2.1.13</title>
     <style>
       * {
         box-sizing: border-box;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.1.12</h1>
+      <h1>Text Editor Source 2.1.13</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -93,14 +93,14 @@
       <p><label><input checked onchange="this.checked ? setSourceEditor() : letSourceEditor();" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <h2>Features</h2>
       <ul>
-        <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.</li>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>↵</kbd>.</li>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>⌫</kbd>.</li>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>␣</kbd>.</li>
-        <li><code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
-        <li><code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.</li>
+        <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.</li>
         <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.</li>
         <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd>→</kbd>.</li>
+        <li><code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
+        <li><code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.</li>
         <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.</li>
         <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.</li>
         <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.</li>
@@ -135,7 +135,9 @@ const {
     canKeyUp: canKeyUpSource
 } = TE.Source;
 
-Object.assign(editor.state, TE.Source.state);
+function fromStates(...lot) { <a href="https://github.com/taufik-nurrohman/from/blob/v0.0.8/index.mjs#L31-L57" target="_blank">&hellip;</a> }
+
+fromStates(editor.state, TE.Source.state);
 
 editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,
@@ -163,7 +165,8 @@ editor.record(); // Record the first history data
 
 &lt;/script&gt;</code></pre>
       <h4>CommonJS</h4>
-      <pre><code>const TE = require('@taufik-nurrohman/text-editor');
+      <pre><code>const {fromStates} = require('@taufik-nurrohman/from');
+const TE = require('@taufik-nurrohman/text-editor');
 const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
 
 const {
@@ -181,7 +184,7 @@ Object.assign(TE.prototype, thatHistory, thatSource);
 
 const editor = new TE(document.querySelector('textarea'));
 
-Object.assign(editor.state, stateSource);
+fromStates(editor.state, stateSource);
 
 editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,
@@ -207,7 +210,8 @@ editor.self.addEventListener('keyup', e =&gt; {
 
 editor.record();</code></pre>
       <h4>ECMAScript</h4>
-      <pre><code>import TE from '@taufik-nurrohman/text-editor';
+      <pre><code>import {fromStates} from '@taufik-nurrohman/from';
+import TE from '@taufik-nurrohman/text-editor';
 import {that as thatHistory} from '@taufik-nurrohman/text-editor.history';
 
 import {
@@ -225,7 +229,7 @@ Object.assign(TE.prototype, thatHistory, thatSource);
 
 const editor = new TE(document.querySelector('textarea'));
 
-Object.assign(editor.state, stateSource);
+fromStates(editor.state, stateSource);
 
 editor.self.addEventListener('keydown', e =&gt; {
     let key = e.key,

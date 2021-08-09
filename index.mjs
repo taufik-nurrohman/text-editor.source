@@ -1,3 +1,4 @@
+import {W} from '@taufik-nurrohman/document';
 import {debounce} from '@taufik-nurrohman/tick';
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -16,7 +17,10 @@ const pairs = {
 
 const defaults = {
     source: {
+        alert: (key) => W.alert(key),
+        confirm: (key) => W.confirm(key),
         pairs,
+        prompt: (key, value) => W.prompt(key, value),
         type: null
     }
 };

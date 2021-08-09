@@ -27,16 +27,8 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
 })(this, function(exports) {
     'use strict';
-    var debounce = function debounce(then, time) {
-        var timer;
-        return function() {
-            var _arguments = arguments,
-                _this = this;
-            timer && clearTimeout(timer);
-            timer = setTimeout(function() {
-                return then.apply(_this, _arguments);
-            }, time);
-        };
+    var hasValue = function hasValue(x, data) {
+        return -1 !== data.indexOf(x);
     };
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
@@ -59,6 +51,18 @@
     var toObjectValues = function toObjectValues(x) {
         return Object.values(x);
     };
+    var W = window;
+    var debounce = function debounce(then, time) {
+        var timer;
+        return function() {
+            var _arguments = arguments,
+                _this = this;
+            timer && clearTimeout(timer);
+            timer = setTimeout(function() {
+                return then.apply(_this, _arguments);
+            }, time);
+        };
+    };
     var isPattern = function isPattern(pattern) {
         return isInstance(pattern, RegExp);
     };
@@ -68,9 +72,6 @@
         } // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
         return new RegExp(pattern, isSet(opt) ? opt : 'g');
-    };
-    var hasValue = function hasValue(x, data) {
-        return -1 !== data.indexOf(x);
     };
     const pairs = {
         '`': '`',
@@ -83,7 +84,10 @@
     };
     const defaults = {
         source: {
+            alert: key => W.alert(key),
+            confirm: key => W.confirm(key),
             pairs,
+            prompt: (key, value) => W.prompt(key, value),
             type: null
         }
     };

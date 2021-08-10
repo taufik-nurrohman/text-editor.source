@@ -32,6 +32,7 @@ block script
     |
     | function letSourceEditor() {
     |     editor.self.classList.remove('source');
+    |     editor.self.parentNode.nextElementSibling.style.display = 'none';
     |     editor.self.removeEventListener('keydown', onKeyDown);
     |     editor.self.removeEventListener('keyup', onKeyUp);
     |     editor.loss(true); // Remove all history data
@@ -39,6 +40,7 @@ block script
     |
     | function setSourceEditor() {
     |     editor.self.classList.add('source');
+    |     editor.self.parentNode.nextElementSibling.style.display = "";
     |     editor.self.addEventListener('keydown', onKeyDown, false);
     |     editor.self.addEventListener('keyup', onKeyUp, false);
     |     editor.record(); // Record the first history data
@@ -297,7 +299,7 @@ block content
       | editor.record();
     h3 Methods
     h4 editor.toggle(open, close = open, wrap = false, tidy = false)
-    p Toggle wrap and peel of #[code open] and #[code close] string.
+    p Toggle wrap and peel selection with #[code open] and #[code close] string.
     h3 Properties
     h4 TE.Source.state
     p Return the default state to be merged with #[code editor.state].

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.1.16</title>
+    <title>Text Editor Source 2.1.17</title>
     <style>
       * {
         box-sizing: border-box;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.1.16</h1>
+      <h1>Text Editor Source 2.1.17</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -256,7 +256,7 @@ editor.self.addEventListener('keyup', e =&gt; {
 editor.record();</code></pre>
       <h3>Methods</h3>
       <h4>editor.toggle(open, close = open, wrap = false, tidy = false)</h4>
-      <p>Toggle wrap and peel of <code>open</code> and <code>close</code> string.</p>
+      <p>Toggle wrap and peel selection with <code>open</code> and <code>close</code> string.</p>
       <h3>Properties</h3>
       <h4>TE.Source.state</h4>
       <p>Return the default state to be merged with <code>editor.state</code>.</p>
@@ -326,6 +326,7 @@ editor.record();</code></pre>
 
       function letSourceEditor() {
           editor.self.classList.remove('source');
+          editor.self.parentNode.nextElementSibling.style.display = 'none';
           editor.self.removeEventListener('keydown', onKeyDown);
           editor.self.removeEventListener('keyup', onKeyUp);
           editor.loss(true); // Remove all history data
@@ -333,6 +334,7 @@ editor.record();</code></pre>
 
       function setSourceEditor() {
           editor.self.classList.add('source');
+          editor.self.parentNode.nextElementSibling.style.display = "";
           editor.self.addEventListener('keydown', onKeyDown, false);
           editor.self.addEventListener('keyup', onKeyUp, false);
           editor.record(); // Record the first history data

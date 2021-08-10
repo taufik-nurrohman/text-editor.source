@@ -147,7 +147,7 @@ export function canKeyDown(key, {a, c, s}, that) {
     for (charBefore in charPairs) {
         charAfter = charPairs[charBefore];
         // `{|`
-        if (charBefore === key) {
+        if (charBefore === key && charAfter) {
             // Wrap pair or selection
             // `{|}` `{|aaa|}`
             that.wrap(charBefore, charAfter).record();

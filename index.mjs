@@ -2,7 +2,7 @@ import {W} from '@taufik-nurrohman/document';
 import {debounce} from '@taufik-nurrohman/tick';
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {hasValue} from '@taufik-nurrohman/has';
-import {isString} from '@taufik-nurrohman/is';
+import {isArray, isString} from '@taufik-nurrohman/is';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
 const pairs = {
@@ -44,10 +44,13 @@ that.toggle = function(open, close, wrap, tidy = false) {
     if (false !== tidy) {
         if (isString(tidy)) {
             tidy = [tidy, tidy];
-        } else {
+        } else if (!isArray(tidy)) {
             tidy = ["", ""];
         }
-        t.trim(tidy[0], tidy[1] || tidy[0]);
+        if (!isSet(tidy[1])) {
+            tidy[1] = tidy[0];
+        }
+        t.trim(tidy[0], tidy[1]);
     }
     return t.wrap(open, close, wrap);
 };

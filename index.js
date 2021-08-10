@@ -30,16 +30,19 @@
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
+    var isArray = function isArray(x) {
+        return Array.isArray(x);
+    };
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
     var isInstance = function isInstance(x, of ) {
-        return x && isSet( of ) && x instanceof of ;
+        return x && isSet$1( of ) && x instanceof of ;
     };
     var isNull = function isNull(x) {
         return null === x;
     };
-    var isSet = function isSet(x) {
+    var isSet$1 = function isSet(x) {
         return isDefined(x) && !isNull(x);
     };
     var isString = function isString(x) {
@@ -71,7 +74,7 @@
             return pattern;
         } // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet(opt) ? opt : 'g');
+        return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
     };
     const pairs = {
         '`': '`',
@@ -110,10 +113,13 @@
         if (false !== tidy) {
             if (isString(tidy)) {
                 tidy = [tidy, tidy];
-            } else {
+            } else if (!isArray(tidy)) {
                 tidy = ["", ""];
             }
-            t.trim(tidy[0], tidy[1] || tidy[0]);
+            if (!isSet(tidy[1])) {
+                tidy[1] = tidy[0];
+            }
+            t.trim(tidy[0], tidy[1]);
         }
         return t.wrap(open, close, wrap);
     };

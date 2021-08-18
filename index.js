@@ -85,15 +85,22 @@
         "'": "'",
         '<': '>'
     };
+
+    function promisy(type, lot) {
+        return new Promise((resolve, reject) => {
+            let r = W[type].apply(W, lot);
+            return r ? resolve(r) : reject(r);
+        });
+    }
     const defaults = {
         source: {
-            alert: key => W.alert(key),
-            confirm: key => W.confirm(key),
             pairs,
-            prompt: (key, value) => W.prompt(key, value),
             type: null
         }
     };
+    ['alert', 'confirm', 'prompt'].forEach(type => {
+        defaults.source[type] = (...lot) => promisy(type, lot);
+    });
     const that = {};
     that.toggle = function(open, close, wrap, tidy = false) {
         if (!close && "" !== close) {

@@ -2,51 +2,82 @@ extends _index.pug
 
 block state
   - const title = 'Text Editor Source ' + version
-  - const scripts = ['../text-editor/index.min.js', '../text-editor.history/index.min.js', 'index.min.js']
+  - const scripts = ['../key/index.min.js', '../text-editor/index.min.js', '../text-editor.history/index.min.js', 'index.min.js']
 
 block script
   script
     | Object.assign(TE.prototype, TE.History.that, TE.Source.that);
     |
     | let editor = new TE(document.querySelector('textarea'), '  '),
+    |     log = document.querySelector('#log'),
+    |     map = new K(editor),
     |     {canKeyDown: canKeyDownSource, canKeyDownDent: canKeyDownDentSource, canKeyDownEnter: canKeyDownEnterSource, canKeyDownHistory: canKeyDownHistorySource, canKeyDownMove: canKeyDownMoveSource, canKeyUp: canKeyUpSource} = TE.Source;
     |
-    | editor.state = Object.assign({}, editor.state, TE.Source.state);
+    | editor.state = Object.assign({}, editor.state, TE.Source.state, {
+    |     commands: map.commands,
+    |     keys: map.keys
+    | });
+    |
+    | function onBlur() {
+    |     map.pull(); // Reset all!
+    | }
+    |
+    | function onInput() {
+    |     map.pull(); // Reset all!
+    | }
     |
     | function onKeyDown(e) {
-    |     let key = e.key,
-    |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    |     canKeyDownSource(key, keys, editor) &&
-    |     canKeyDownDentSource(key, keys, editor) &&
-    |     canKeyDownEnterSource(key, keys, editor) &&
-    |     canKeyDownHistorySource(key, keys, editor) &&
-    |     canKeyDownMoveSource(key, keys, editor) ||
-    |     e.preventDefault();
+    |     map.push(e.key);
+    |     let command = map.test();
+    |     // Check for custom command…
+    |     if (command) {
+    |         let value = map.fire(command);
+    |         if (false === value) {
+    |             e.preventDefault();
+    |         } else if (null === value) {
+    |             console.error('Unknown command:', command);
+    |         }
+    |     // Else, run the defaults!
+    |     } else {
+    |         canKeyDownSource(map, editor) &&
+    |         canKeyDownDentSource(map, editor) &&
+    |         canKeyDownEnterSource(map, editor) &&
+    |         canKeyDownHistorySource(map, editor) &&
+    |         canKeyDownMoveSource(map, editor) ||
+    |         e.preventDefault();
+    |     }
+    |     log.textContent = map + "";
     | }
     |
     | function onKeyUp(e) {
-    |     let key = e.key,
-    |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-    |     canKeyUpSource(key, keys, editor) || e.preventDefault();
+    |     canKeyUpSource(map, editor) || e.preventDefault();
+    |     map.pull(e.key);
+    |     log.textContent = map + "";
     | }
     |
-    | function letSourceEditor() {
+    | function letEditor() {
     |     editor.self.classList.remove('source');
     |     editor.self.parentNode.nextElementSibling.style.display = 'none';
+    |     editor.self.removeEventListener('blur', onBlur);
+    |     editor.self.removeEventListener('input', onInput);
     |     editor.self.removeEventListener('keydown', onKeyDown);
     |     editor.self.removeEventListener('keyup', onKeyUp);
-    |     editor.loss(true); // Remove all history data
+    |     editor.loss(true); // Remove all history data!
+    |     return editor;
     | }
     |
-    | function setSourceEditor() {
+    | function setEditor() {
     |     editor.self.classList.add('source');
     |     editor.self.parentNode.nextElementSibling.style.display = "";
+    |     editor.self.addEventListener('blur', onBlur, false);
+    |     editor.self.addEventListener('input', onInput, false);
     |     editor.self.addEventListener('keydown', onKeyDown, false);
     |     editor.self.addEventListener('keyup', onKeyUp, false);
-    |     editor.record(); // Record the first history data
+    |     editor.record(); // Record the first history data!
+    |     return editor;
     | }
     |
-    | setSourceEditor();
+    | setEditor();
 
 block style
   style
@@ -55,8 +86,8 @@ block style
     | }
     | :root {
     |   background: #fff;
-    |   color: #000;
     |   border-top: 4px solid;
+    |   color: #000;
     |   font: normal normal 16px/1.25 serif;
     |   position: relative;
     | }
@@ -72,30 +103,30 @@ block style
     |   font-size: 80%;
     | }
     | footer, header, main, nav {
-    |   max-width: 700px;
     |   margin: 0 auto;
+    |   max-width: 700px;
     | }
     | hr {
     |   border: 0;
-    |   color: inherit;
     |   border-top: 1px dashed;
+    |   color: inherit;
     |   height: 0;
     | }
     | mark {
-    |   display: inline-block;
-    |   vertical-align: middle;
-    |   height: 1.25em;
     |   background: #ff0;
     |   border: 1px solid #f00;
+    |   display: inline-block;
+    |   height: 1.25em;
     |   min-width: 3px;
+    |   vertical-align: middle;
     | }
     | pre {
     |   white-space: pre-wrap;
     |   word-wrap: break-word;
     | }
     | pre code {
-    |   display: block;
     |   background: #eee;
+    |   display: block;
     |   padding: 1em;
     | }
     | table {
@@ -107,13 +138,13 @@ block style
     | }
     | textarea {
     |   display: block;
-    |   width: 100%;
     |   height: 20em;
+    |   width: 100%;
     | }
     | .source {
     |   background: #ccc;
-    |   color: #000;
     |   border: 1px solid #000;
+    |   color: #000;
     |   padding: 2px;
     | }
 
@@ -126,10 +157,13 @@ block content
   main
     p(tabindex='0') Previous tabbable element.
     p: textarea(placeholder!='Code goes here&hellip;' spellcheck='false')
-    p: button(onclick='editor.toggle(\'"\').record();') Toggle Test
+    p
+      button(onclick='editor.toggle(\'"\').record();') Toggle Test
+      = ' '
+      code#log
     p
       label
-        input(checked onchange='this.checked ? setSourceEditor() : letSourceEditor();' type='checkbox')
+        input(checked onchange='this.checked ? setEditor() : letEditor();' type='checkbox')
         = ' '
         span Enable Source Editor
     h2 Features
@@ -166,6 +200,7 @@ block content
       |   Object.assign(TE.prototype, TE.History.that, TE.Source.that);
       |
       |   const editor = new TE(document.querySelector('textarea'));
+      |   const map = new K(editor);
       |
       |   const {
       |       canKeyDown: canKeyDownSource,
@@ -178,36 +213,53 @@ block content
       |
       |   function fromStates(...lot) { #[a(href='https://github.com/taufik-nurrohman/from' target='_blank') &hellip;] }
       |
-      |   editor.state = fromStates({}, editor.state, TE.Source.state);
+      |   editor.state = fromStates({}, editor.state, TE.Source.state, {
+      |       commands: map.commands,
+      |       keys: map.keys
+      |   });
+      |
+      |   editor.self.addEventListener('blur', () => map.pull());
+      |   editor.self.addEventListener('input', () => map.pull());
       |
       |   editor.self.addEventListener('keydown', e =&gt; {
-      |       let key = e.key,
-      |           keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |       if (
-      |           canKeyDownSource(key, keys, editor) &amp;&amp;
-      |           canKeyDownEnterSource(key, keys, editor) &amp;&amp;
-      |           canKeyDownHistorySource(key, keys, editor) &amp;&amp;
-      |           canKeyDownMoveSource(key, keys, editor) &amp;&amp;
-      |           canKeyDownTabSource(key, keys, editor)
-      |       ) {
-      |           // Normal key strokes. Add more key strokes extension here!
+      |       map.push(e.key);
+      |       let command = map.test();
+      |       // Check for custom command…
+      |       if (command) {
+      |           let value = map.fire(command);
+      |           if (false === value) {
+      |               e.preventDefault();
+      |           } else if (null === value) {
+      |               console.error('Unknown command:', command);
+      |           }
+      |       // Else, run the defaults!
       |       } else {
-      |           e.preventDefault();
+      |           if (
+      |               canKeyDownSource(map, editor) &amp;&amp;
+      |               canKeyDownEnterSource(map, editor) &amp;&amp;
+      |               canKeyDownHistorySource(map, editor) &amp;&amp;
+      |               canKeyDownMoveSource(map, editor) &amp;&amp;
+      |               canKeyDownTabSource(map, editor)
+      |           ) {
+      |               // Normal key strokes. Add more key strokes extension here!
+      |           } else {
+      |               e.preventDefault();
+      |           }
       |       }
       |   });
       |
       |   editor.self.addEventListener('keyup', e =&gt; {
-      |       let key = e.key,
-      |           keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |       canKeyUpSource(key, keys, editor) || e.preventDefault();
+      |       canKeyUpSource(map, editor) || e.preventDefault();
+      |       map.pull(e.key);
       |   });
       |
-      |   editor.record(); // Record the first history data
+      |   editor.record(); // Record the first history data!
       |
       | &lt;/script&gt;
     h4 CommonJS
     pre: code
       | const {fromStates} = require('@taufik-nurrohman/from');
+      | const K = require('@taufik-nurrohman/key');
       | const TE = require('@taufik-nurrohman/text-editor');
       | const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
       |
@@ -225,35 +277,53 @@ block content
       | Object.assign(TE.prototype, thatHistory, thatSource);
       |
       | const editor = new TE(document.querySelector('textarea'));
+      | const map = new K(editor);
       |
-      | editor.state = fromStates({}, editor.state, stateSource);
+      | editor.state = fromStates({}, editor.state, stateSource, {
+      |     commands: map.commands,
+      |     keys: map.keys
+      | });
+      |
+      | editor.self.addEventListener('blur', () => map.pull());
+      | editor.self.addEventListener('input', () => map.pull());
       |
       | editor.self.addEventListener('keydown', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     if (
-      |         canKeyDownSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
-      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownTabSource(key, keys, editor)
-      |     ) {
-      |         // Normal key strokes. Add more key strokes extension here!
+      |     map.push(e.key);
+      |     let command = map.test();
+      |     // Check for custom command…
+      |     if (command) {
+      |         let value = map.fire(command);
+      |         if (false === value) {
+      |             e.preventDefault();
+      |         } else if (null === value) {
+      |             console.error('Unknown command:', command);
+      |         }
+      |     // Else, run the defaults!
       |     } else {
-      |         e.preventDefault();
+      |         if (
+      |             canKeyDownSource(map, editor) &amp;&amp;
+      |             canKeyDownEnterSource(map, editor) &amp;&amp;
+      |             canKeyDownHistorySource(map, editor) &amp;&amp;
+      |             canKeyDownMoveSource(map, editor) &amp;&amp;
+      |             canKeyDownTabSource(map, editor)
+      |         ) {
+      |             // Normal key strokes. Add more key strokes extension here!
+      |         } else {
+      |             e.preventDefault();
+      |         }
       |     }
       | });
       |
       | editor.self.addEventListener('keyup', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
+      |     canKeyUpSource(map, editor) || e.preventDefault();
+      |     map.pull(e.key);
       | });
       |
-      | editor.record();
+      | editor.record(); // Record the first history data!
     h4 ECMAScript
     pre: code
       | import {fromStates} from '@taufik-nurrohman/from';
+      | import K from '@taufik-nurrohman/key';
       | import TE from '@taufik-nurrohman/text-editor';
       | import {that as thatHistory} from '@taufik-nurrohman/text-editor.history';
       |
@@ -271,32 +341,49 @@ block content
       | Object.assign(TE.prototype, thatHistory, thatSource);
       |
       | const editor = new TE(document.querySelector('textarea'));
+      | const map = new K(editor);
       |
-      | editor.state = fromStates({}, editor.state, stateSource);
+      | editor.state = fromStates({}, editor.state, stateSource, {
+      |     commands: map.commands,
+      |     keys: map.keys
+      | });
+      |
+      | editor.self.addEventListener('blur', () => map.pull());
+      | editor.self.addEventListener('input', () => map.pull());
       |
       | editor.self.addEventListener('keydown', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     if (
-      |         canKeyDownSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownEnterSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownHistorySource(key, keys, editor) &amp;&amp;
-      |         canKeyDownMoveSource(key, keys, editor) &amp;&amp;
-      |         canKeyDownTabSource(key, keys, editor)
-      |     ) {
-      |         // Normal key strokes. Add more key strokes extension here!
+      |     map.push(e.key);
+      |     let command = map.test();
+      |     // Check for custom command…
+      |     if (command) {
+      |         let value = map.fire(command);
+      |         if (false === value) {
+      |             e.preventDefault();
+      |         } else if (null === value) {
+      |             console.error('Unknown command:', command);
+      |         }
+      |     // Else, run the defaults!
       |     } else {
-      |         e.preventDefault();
+      |         if (
+      |             canKeyDownSource(map, editor) &amp;&amp;
+      |             canKeyDownEnterSource(map, editor) &amp;&amp;
+      |             canKeyDownHistorySource(map, editor) &amp;&amp;
+      |             canKeyDownMoveSource(map, editor) &amp;&amp;
+      |             canKeyDownTabSource(map, editor)
+      |         ) {
+      |             // Normal key strokes. Add more key strokes extension here!
+      |         } else {
+      |             e.preventDefault();
+      |         }
       |     }
       | });
       |
       | editor.self.addEventListener('keyup', e =&gt; {
-      |     let key = e.key,
-      |         keys = {a: e.altKey, c: e.ctrlKey, s: e.shiftKey};
-      |     canKeyUpSource(key, keys, editor) || e.preventDefault();
+      |     canKeyUpSource(map, editor) || e.preventDefault();
+      |     map.pull(e.key);
       | });
       |
-      | editor.record();
+      | editor.record(); // Record the first history data!
     h3 Methods
     h4 editor.toggle(open, close = open, wrap = false, tidy = false)
     p Toggle wrap and peel selection with #[code open] and #[code close] string.
@@ -305,19 +392,19 @@ block content
     p Return the default state to be merged with #[code editor.state].
     h3 Strokes
     p Strokes can either return #[code false] or #[code true]. If it returns #[code false], it means that this extension has manipulated the existing value. If it returns #[code true], it means that current key stroke works normally.
-    h4 TE.Source.canKeyDown(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDown(map, that)
     p This will handle tasks such as automatic bracket closing and continuous indentation.
-    h4 TE.Source.canKeyDownDent(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDownDent(map, that)
     p Strokes to handle indentation tasks using the key combination #[kbd= '⌘']#[kbd= ']'] for indent and #[kbd= '⌘']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
-    h4 TE.Source.canKeyDownEnter(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDownEnter(map, that)
     p Strokes to handle line insertion tasks using the key combination #[kbd= '⌘']#[kbd= '↵'] and #[kbd= '⌘']#[kbd= '↵'].
-    h4 TE.Source.canKeyDownHistory(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDownHistory(map, that)
     p Strokes to handle history tasks using the key combination #[kbd= '⌘']#[kbd= 'z'] for undo and #[kbd= '⌘']#[kbd= 'y'] for redo.
-    h4 TE.Source.canKeyDownMove(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDownMove(map, that)
     p Strokes to handle line or selection move tasks using the key combination #[kbd= '⌘']#[kbd= '←'], #[kbd= '⌘']#[kbd= '↑'], #[kbd= '⌘']#[kbd= '→'], and #[kbd= '⌘']#[kbd= '↓'].
-    h4 TE.Source.canKeyDownTab(key, {a, c, s}, that)
+    h4 TE.Source.canKeyDownTab(map, that)
     p Strokes to handle indentation tasks using the #[kbd= '⇥'] key for indent and #[kbd= '⇧']#[kbd= '⇥'] for outdent.
-    h4 TE.Source.canKeyUp(key, {a, c, s}, that)
+    h4 TE.Source.canKeyUp(map, that)
     p Currently only functions to update the history data as you type.
   footer
     hr

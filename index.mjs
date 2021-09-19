@@ -15,7 +15,7 @@ const pairs = {
     '<': '>'
 };
 
-function promisy(type, lot) {
+function promisify(type, lot) {
     return new Promise((resolve, reject) => {
         let r = W[type].apply(W, lot);
         return r ? resolve(r) : reject(r);
@@ -30,7 +30,7 @@ const defaults = {
 };
 
 ['alert', 'confirm', 'prompt'].forEach(type => {
-    defaults.source[type] = (...lot) => promisy(type, lot);
+    defaults.source[type] = (...lot) => promisify(type, lot);
 });
 
 export const that = {};
@@ -63,17 +63,23 @@ that.toggle = function(open, close, wrap, tidy = false) {
     return t.wrap(open, close, wrap);
 };
 
-export function canKeyDown(key, {a, c, s}, that) {
+const ALT_PREFIX = 'Alt-';
+const CTRL_PREFIX = 'Control-';
+const SHIFT_PREFIX = 'Shift-';
+
+export function canKeyDown(map, that) {
     let charAfter,
         charBefore,
         charIndent = that.state.source.tab || that.state.tab || '\t',
         charPairs = that.state.source.pairs || {},
-        charPairsValues = toObjectValues(charPairs);
+        charPairsValues = toObjectValues(charPairs),
+        {key, queue} = map,
+        keyValue = map + "";
     // Do nothing
-    if (a || c) {
+    if (queue.Alt || queue.Control) {
         return true;
     }
-    if (' ' === key && !s) {
+    if (' ' === keyValue) {
         let {after, before, value} = that.$();
         charAfter = charPairs[charBefore = before.slice(-1)];
         if (!value && charAfter && charBefore && charAfter === after[0]) {
@@ -82,7 +88,7 @@ export function canKeyDown(key, {a, c, s}, that) {
         }
         return true;
     }
-    if ('Enter' === key && !s) {
+    if ('Enter' === keyValue) {
         let {after, before, value} = that.$(),
             lineBefore = before.split('\n').pop(),
             lineMatch = lineBefore.match(/^(\s+)/),
@@ -99,7 +105,7 @@ export function canKeyDown(key, {a, c, s}, that) {
         }
         return true;
     }
-    if ('Backspace' === key && !s) {
+    if ('Backspace' === keyValue) {
         let {after, before, value} = that.$(),
             lineAfter = after.split('\n')[0],
             lineBefore = before.split('\n').pop(),
@@ -147,7 +153,7 @@ export function canKeyDown(key, {a, c, s}, that) {
     if ('\\' === (charBefore = before.slice(-1))) {
         return true;
     }
-    charAfter = charPairsValues.includes(after[0]) ? after[0] : charPairs[charBefore];
+    charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
     // `|}`
     if (!value && after && before && charAfter && key === charAfter) {
         // Move to the next character
@@ -158,14 +164,14 @@ export function canKeyDown(key, {a, c, s}, that) {
     for (charBefore in charPairs) {
         charAfter = charPairs[charBefore];
         // `{|`
-        if (charBefore === key && charAfter) {
+        if (key === charBefore && charAfter) {
             // Wrap pair or selection
             // `{|}` `{|aaa|}`
             that.wrap(charBefore, charAfter).record();
             return false;
         }
         // `|}`
-        if (charAfter === key) {
+        if (key === charAfter) {
             if (value) {
                 // Wrap selection
                 // `{|aaa|}`
@@ -178,32 +184,33 @@ export function canKeyDown(key, {a, c, s}, that) {
     return true;
 }
 
-export function canKeyDownDent(key, {a, c, s}, that) {
-    let charIndent = that.state.source.tab || that.state.tab || '\t';
-    if (!a && c) {
-        // Indent with `⌘+]`
-        if (']' === key) {
-            that.push(charIndent).record();
-            return false;
-        }
-        // Outdent with `⌘+[`
-        if ('[' === key) {
-            that.pull(charIndent).record();
-            return false;
-        }
+export function canKeyDownDent(map, that) {
+    let charIndent = that.state.source.tab || that.state.tab || '\t',
+        {key, queue} = map,
+        keyValue = map + "";
+    // Indent with `⌘+]`
+    if (CTRL_PREFIX + ']' === keyValue) {
+        that.push(charIndent).record();
+        return false;
+    }
+    // Outdent with `⌘+[`
+    if (CTRL_PREFIX + '[' === keyValue) {
+        that.pull(charIndent).record();
+        return false;
     }
     return true;
 }
 
-export function canKeyDownEnter(key, {a, c, s}, that) {
-    if (c && 'Enter' === key) {
+export function canKeyDownEnter(map, that) {
+    let {key, queue} = map;
+    if (queue.Control && queue.Enter) {
         let {after, before, end, start, value} = that.$(),
             lineAfter = after.split('\n').shift(),
             lineBefore = before.split('\n').pop(),
             lineMatch = lineBefore.match(/^(\s+)/),
             lineMatchIndent = lineMatch && lineMatch[1] || "";
         if (before || after) {
-            if (s) {
+            if (queue.Shift) {
                 // Insert line over with `⌘+⇧+↵`
                 return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
             }
@@ -214,111 +221,113 @@ export function canKeyDownEnter(key, {a, c, s}, that) {
     return true;
 }
 
-export function canKeyDownHistory(key, {a, c, s}, that) {
-    if (!a && c) {
-        // Redo with `⌘+y`
-        if ('y' === key) {
-            that.redo();
-            return false;
-        }
-        // Undo with `⌘+z`
-        if ('z' === key) {
-            that.undo();
-            return false;
-        }
+export function canKeyDownHistory(map, that) {
+    let keyValue = map + "";
+    // Redo with `⌘+y`
+    if (CTRL_PREFIX + 'y' === keyValue) {
+        return that.redo(), false;
+    }
+    // Undo with `⌘+z`
+    if (CTRL_PREFIX + 'z' === keyValue) {
+        return that.undo(), false;
     }
     return true;
 }
 
-export function canKeyDownMove(key, {a, c, s}, that) {
-    if (c) {
-        let {after, before, end, start, value} = that.$(),
-            charPair, charPairValue,
-            charPairs = that.state.source.pairs || {},
-            boundaries = [], m;
-        if (value) {
-            if (!a) {
-                for (charPair in charPairs) {
-                    if (!(charPairValue = charPairs[charPair])) {
-                        continue;
-                    }
-                    boundaries.push('(?:\\' + charPair + '(?:\\\\.|[^\\' + charPair + (charPairValue !== charPair ? '\\' + charPairValue : "") + '])*\\' + charPairValue + ')');
-                }
-                boundaries.push('\\w+'); // Word(s)
-                boundaries.push('\\s+'); // White-space(s)
+export function canKeyDownMove(map, that) {
+    let {key, queue} = map,
+        keyValue = map + "";
+    if (!queue.Control) {
+        return true;
+    }
+    let {after, before, end, start, value} = that.$(),
+        charPair, charPairValue,
+        charPairs = that.state.source.pairs || {},
+        boundaries = [], m;
+    if (value) {
+        for (charPair in charPairs) {
+            if (!(charPairValue = charPairs[charPair])) {
+                continue;
             }
-            boundaries.push('[\\s\\S]'); // Last try!
-            if ('ArrowLeft' === key) {
-                if (m = before.match(toPattern('(' + boundaries.join('|') + ')$', ""))) {
-                    that.insert("").select(start - toCount(m[0])).insert(value);
-                    return that.record(), false;
-                }
-                return that.select(), false;
-            }
-            if ('ArrowRight' === key) {
-                if (m = after.match(toPattern('^(' + boundaries.join('|') + ')', ""))) {
-                    that.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
-                    return that.record(), false;
-                }
-                return that.select(), false;
-            }
+            boundaries.push('(?:\\' + charPair + '(?:\\\\.|[^\\' + charPair + (charPairValue !== charPair ? '\\' + charPairValue : "") + '])*\\' + charPairValue + ')');
         }
-        let lineAfter = after.split('\n').shift(),
-            lineBefore = before.split('\n').pop(),
-            lineMatch = lineBefore.match(/^(\s+)/),
-            lineMatchIndent = lineMatch && lineMatch[1] || "";
-        // Force to select the current line if there is no selection
-        end += toCount(lineAfter);
-        start -= toCount(lineBefore);
-        value = lineBefore + value + lineAfter;
-        if ('ArrowUp' === key) {
-            if (!hasValue('\n', before)) {
-                return that.select(), false;
+        boundaries.push('\\w+'); // Word(s)
+        boundaries.push('\\s+'); // White-space(s)
+        boundaries.push('[\\s\\S]'); // Last try!
+        if (CTRL_PREFIX + 'ArrowLeft' === keyValue) {
+            if (m = before.match(toPattern('(' + boundaries.join('|') + ')$', ""))) {
+                that.insert("").select(start - toCount(m[0])).insert(value);
+                return that.record(), false;
             }
-            that.insert("");
-            that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
-            that.replace(/(^|\n)([^\n]*?)$/, "", -1);
-            let $ = that.$();
-            before = $.before;
-            start = $.start;
-            lineBefore = before.split('\n').pop();
-            that.select(start = start - toCount(lineBefore)).wrap(value, '\n');
-            that.select(start, start + toCount(value));
-            return that.record(), false;
+            return that.select(), false;
         }
-        if ('ArrowDown' === key) {
-            if (!hasValue('\n', after)) {
-                return that.select(), false;
+        if (CTRL_PREFIX + 'ArrowRight' === keyValue) {
+            if (m = after.match(toPattern('^(' + boundaries.join('|') + ')', ""))) {
+                that.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
+                return that.record(), false;
             }
-            that.insert("");
-            that.replace(/^([^\n]*?)(\n|$)/, "", 1);
-            that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-            let $ = that.$();
-            after = $.after;
-            end = $.end;
-            lineAfter = after.split('\n').shift();
-            that.select(end = end + toCount(lineAfter)).wrap('\n', value);
-            end += 1;
-            that.select(end, end + toCount(value));
-            return that.record(), false;
+            return that.select(), false;
         }
+    }
+    let lineAfter = after.split('\n').shift(),
+        lineBefore = before.split('\n').pop(),
+        lineMatch = lineBefore.match(/^(\s+)/),
+        lineMatchIndent = lineMatch && lineMatch[1] || "";
+    // Force to select the current line if there is no selection
+    end += toCount(lineAfter);
+    start -= toCount(lineBefore);
+    value = lineBefore + value + lineAfter;
+    if (CTRL_PREFIX + 'ArrowUp' === keyValue) {
+        if (!hasValue('\n', before)) {
+            return that.select(), false;
+        }
+        that.insert("");
+        that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+        that.replace(/(^|\n)([^\n]*?)$/, "", -1);
+        let $ = that.$();
+        before = $.before;
+        start = $.start;
+        lineBefore = before.split('\n').pop();
+        that.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+        that.select(start, start + toCount(value));
+        return that.record(), false;
+    }
+    if (CTRL_PREFIX + 'ArrowDown' === keyValue) {
+        if (!hasValue('\n', after)) {
+            return that.select(), false;
+        }
+        that.insert("");
+        that.replace(/^([^\n]*?)(\n|$)/, "", 1);
+        that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+        let $ = that.$();
+        after = $.after;
+        end = $.end;
+        lineAfter = after.split('\n').shift();
+        that.select(end = end + toCount(lineAfter)).wrap('\n', value);
+        end += 1;
+        that.select(end, end + toCount(value));
+        return that.record(), false;
     }
     return true;
 }
 
-export function canKeyDownTab(key, {a, c, s}, that) {
-    let charIndent = that.state.source.tab || that.state.tab || '\t';
-    // Indent/outdent with `⇥` or `⇧+⇥`
-    if ('Tab' === key && !a && !c) {
-        that[s ? 'pull' : 'push'](charIndent).record();
-        return false;
+export function canKeyDownTab(map, that) {
+    let charIndent = that.state.source.tab || that.state.tab || '\t',
+        keyValue = map + "";
+    // Indent with `⇥`
+    if ('Tab' === keyValue) {
+        return that.push(charIndent).record(), false;
+    }
+    // Outdent with `⇧+⇥`
+    if (SHIFT_PREFIX + 'Tab' === keyValue) {
+        return that.pull(charIndent).record(), false;
     }
     return true;
 }
 
 let bounce = debounce(that => that.record(), 100);
 
-export function canKeyUp(key, {a, c, s}, that) {
+export function canKeyUp(map, that) {
     return bounce(that), true;
 }
 

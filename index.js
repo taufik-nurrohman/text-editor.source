@@ -262,11 +262,11 @@
 
     function canKeyDownDent(map, that) {
         let charIndent = that.state.source.tab || that.state.tab || '\t',
-            keyValue = map + ""; // Indent with `⌘+]`
+            keyValue = map + ""; // Indent with `⎈]`
         if (CTRL_PREFIX + ']' === keyValue) {
             that.push(charIndent).record();
             return false;
-        } // Outdent with `⌘+[`
+        } // Outdent with `⎈[`
         if (CTRL_PREFIX + '[' === keyValue) {
             that.pull(charIndent).record();
             return false;
@@ -293,9 +293,9 @@
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
             if (before || after) {
                 if (queue.Shift) {
-                    // Insert line over with `⌘+⇧+↵`
+                    // Insert line over with `⎈⇧↵`
                     return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
-                } // Insert line below with `⌘+↵`
+                } // Insert line below with `⎈↵`
                 return that.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
             }
         }
@@ -303,10 +303,10 @@
     }
 
     function canKeyDownHistory(map, that) {
-        let keyValue = map + ""; // Redo with `⌘+y`
+        let keyValue = map + ""; // Redo with `⎈y`
         if (CTRL_PREFIX + 'y' === keyValue) {
             return that.redo(), false;
-        } // Undo with `⌘+z`
+        } // Undo with `⎈z`
         if (CTRL_PREFIX + 'z' === keyValue) {
             return that.undo(), false;
         }

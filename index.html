@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.2.0</title>
+    <title>Text Editor Source 2.2.1</title>
     <style>
       * {
         box-sizing: border-box;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.2.0</h1>
+      <h1>Text Editor Source 2.2.1</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -97,23 +97,23 @@
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>⌫</kbd>.</li>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>␣</kbd>.</li>
         <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.</li>
-        <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.</li>
-        <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd>→</kbd>.</li>
+        <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⎈</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.</li>
+        <li><code><mark>asdf</mark> asdf</code>, then press <kbd>⎈</kbd><kbd>→</kbd>.</li>
         <li><code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
         <li><code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.</li>
-        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.</li>
-        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.</li>
-        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.</li>
-        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>↵</kbd>.</li>
-        <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>←</kbd>.</li>
-        <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>⌥</kbd><kbd>←</kbd>.</li>
+        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↑</kbd>.</li>
+        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↓</kbd>.</li>
+        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↵</kbd>.</li>
+        <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⇧</kbd><kbd>↵</kbd>.</li>
+        <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.</li>
+        <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⌥</kbd><kbd>←</kbd>.</li>
         <li>Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
         <li>Press <kbd>⇥</kbd> to indent via <code>onKeyDownTab</code>.</li>
         <li>Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>onKeyDownTab</code>.</li>
-        <li>Press <kbd>⌘</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.</li>
-        <li>Press <kbd>⌘</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.</li>
-        <li>Press <kbd>⌘</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.</li>
-        <li>Press <kbd>⌘</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.</li>
       </ul>
       <h2>Usage</h2>
       <h4>Browser</h4>
@@ -318,13 +318,13 @@ editor.record(); // Record the first history data!</code></pre>
       <h4>TE.Source.canKeyDown(map, that)</h4>
       <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
       <h4>TE.Source.canKeyDownDent(map, that)</h4>
-      <p>Strokes to handle indentation tasks using the key combination <kbd>⌘</kbd><kbd>]</kbd> for indent and <kbd>⌘</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
+      <p>Strokes to handle indentation tasks using the key combination <kbd>⎈</kbd><kbd>]</kbd> for indent and <kbd>⎈</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
       <h4>TE.Source.canKeyDownEnter(map, that)</h4>
-      <p>Strokes to handle line insertion tasks using the key combination <kbd>⌘</kbd><kbd>↵</kbd> and <kbd>⌘</kbd><kbd>↵</kbd>.</p>
+      <p>Strokes to handle line insertion tasks using the key combination <kbd>⎈</kbd><kbd>↵</kbd> and <kbd>⎈</kbd><kbd>↵</kbd>.</p>
       <h4>TE.Source.canKeyDownHistory(map, that)</h4>
-      <p>Strokes to handle history tasks using the key combination <kbd>⌘</kbd><kbd>z</kbd> for undo and <kbd>⌘</kbd><kbd>y</kbd> for redo.</p>
+      <p>Strokes to handle history tasks using the key combination <kbd>⎈</kbd><kbd>z</kbd> for undo and <kbd>⎈</kbd><kbd>y</kbd> for redo.</p>
       <h4>TE.Source.canKeyDownMove(map, that)</h4>
-      <p>Strokes to handle line or selection move tasks using the key combination <kbd>⌘</kbd><kbd>←</kbd>, <kbd>⌘</kbd><kbd>↑</kbd>, <kbd>⌘</kbd><kbd>→</kbd>, and <kbd>⌘</kbd><kbd>↓</kbd>.</p>
+      <p>Strokes to handle line or selection move tasks using the key combination <kbd>⎈</kbd><kbd>←</kbd>, <kbd>⎈</kbd><kbd>↑</kbd>, <kbd>⎈</kbd><kbd>→</kbd>, and <kbd>⎈</kbd><kbd>↓</kbd>.</p>
       <h4>TE.Source.canKeyDownTab(map, that)</h4>
       <p>Strokes to handle indentation tasks using the <kbd>⇥</kbd> key for indent and <kbd>⇧</kbd><kbd>⇥</kbd> for outdent.</p>
       <h4>TE.Source.canKeyUp(map, that)</h4>

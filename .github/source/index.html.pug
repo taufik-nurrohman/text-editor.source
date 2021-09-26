@@ -172,23 +172,23 @@ block content
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>⌫</kbd>.
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>␣</kbd>.
       li <code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.
-      li <code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.
-      li <code><mark>asdf</mark> asdf</code>, then press <kbd>⌘</kbd><kbd>→</kbd>.
+      li <code><mark>asdf</mark> asdf</code>, then press <kbd>⎈</kbd><kbd></kbd><kbd>⌥</kbd><kbd>→</kbd>.
+      li <code><mark>asdf</mark> asdf</code>, then press <kbd>⎈</kbd><kbd>→</kbd>.
       li <code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
       li <code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.
-      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↑</kbd>.
-      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↓</kbd>.
-      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>↵</kbd>.
-      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>↵</kbd>.
-      li <code>asdf <mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>←</kbd>.
-      li <code>asdf <mark>asdf</mark></code>, then press <kbd>⌘</kbd><kbd>⌥</kbd><kbd>←</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↑</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↓</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↵</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⇧</kbd><kbd>↵</kbd>.
+      li <code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.
+      li <code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⌥</kbd><kbd>←</kbd>.
       li Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
       li Press <kbd>⇥</kbd> to indent via <code>onKeyDownTab</code>.
       li Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>onKeyDownTab</code>.
-      li Press <kbd>⌘</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.
-      li Press <kbd>⌘</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.
-      li Press <kbd>⌘</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.
-      li Press <kbd>⌘</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.
+      li Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.
+      li Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.
+      li Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.
+      li Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.
     h2 Usage
     h4 Browser
     pre: code
@@ -395,13 +395,13 @@ block content
     h4 TE.Source.canKeyDown(map, that)
     p This will handle tasks such as automatic bracket closing and continuous indentation.
     h4 TE.Source.canKeyDownDent(map, that)
-    p Strokes to handle indentation tasks using the key combination #[kbd= '⌘']#[kbd= ']'] for indent and #[kbd= '⌘']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
+    p Strokes to handle indentation tasks using the key combination #[kbd= '⎈']#[kbd= ']'] for indent and #[kbd= '⎈']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
     h4 TE.Source.canKeyDownEnter(map, that)
-    p Strokes to handle line insertion tasks using the key combination #[kbd= '⌘']#[kbd= '↵'] and #[kbd= '⌘']#[kbd= '↵'].
+    p Strokes to handle line insertion tasks using the key combination #[kbd= '⎈']#[kbd= '↵'] and #[kbd= '⎈']#[kbd= '↵'].
     h4 TE.Source.canKeyDownHistory(map, that)
-    p Strokes to handle history tasks using the key combination #[kbd= '⌘']#[kbd= 'z'] for undo and #[kbd= '⌘']#[kbd= 'y'] for redo.
+    p Strokes to handle history tasks using the key combination #[kbd= '⎈']#[kbd= 'z'] for undo and #[kbd= '⎈']#[kbd= 'y'] for redo.
     h4 TE.Source.canKeyDownMove(map, that)
-    p Strokes to handle line or selection move tasks using the key combination #[kbd= '⌘']#[kbd= '←'], #[kbd= '⌘']#[kbd= '↑'], #[kbd= '⌘']#[kbd= '→'], and #[kbd= '⌘']#[kbd= '↓'].
+    p Strokes to handle line or selection move tasks using the key combination #[kbd= '⎈']#[kbd= '←'], #[kbd= '⎈']#[kbd= '↑'], #[kbd= '⎈']#[kbd= '→'], and #[kbd= '⎈']#[kbd= '↓'].
     h4 TE.Source.canKeyDownTab(map, that)
     p Strokes to handle indentation tasks using the #[kbd= '⇥'] key for indent and #[kbd= '⇧']#[kbd= '⇥'] for outdent.
     h4 TE.Source.canKeyUp(map, that)

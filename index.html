@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.2.1</title>
+    <title>Text Editor Source 2.2.2</title>
     <style>
       * {
         box-sizing: border-box;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.2.1</h1>
+      <h1>Text Editor Source 2.2.2</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -340,7 +340,6 @@ editor.record(); // Record the first history data!</code></pre>
     <script src="index.min.js"></script>
     <script>
       Object.assign(TE.prototype, TE.History.that, TE.Source.that);
-
       let editor = new TE(document.querySelector('textarea'), '  '),
           log = document.querySelector('#log'),
           map = new K(editor),
@@ -352,7 +351,6 @@ editor.record(); // Record the first history data!</code></pre>
               canKeyDownMove: canKeyDownMoveSource,
               canKeyUp: canKeyUpSource
           } = TE.Source;
-
       editor.state = Object.assign({}, editor.state, TE.Source.state, {
           commands: map.commands,
           keys: map.keys
@@ -379,12 +377,7 @@ editor.record(); // Record the first history data!</code></pre>
               }
               // Else, run the defaults!
           } else {
-              canKeyDownSource(map, editor) &&
-                  canKeyDownDentSource(map, editor) &&
-                  canKeyDownEnterSource(map, editor) &&
-                  canKeyDownHistorySource(map, editor) &&
-                  canKeyDownMoveSource(map, editor) ||
-                  e.preventDefault();
+              canKeyDownSource(map, editor) && canKeyDownDentSource(map, editor) && canKeyDownEnterSource(map, editor) && canKeyDownHistorySource(map, editor) && canKeyDownMoveSource(map, editor) || e.preventDefault();
           }
           log.textContent = map + "";
       }
@@ -416,7 +409,6 @@ editor.record(); // Record the first history data!</code></pre>
           editor.record(); // Record the first history data!
           return editor;
       }
-
       setEditor();
     </script>
   </body>

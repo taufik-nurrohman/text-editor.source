@@ -35,7 +35,7 @@ const defaults = {
 
 export const that = {};
 
-that.toggle = function(open, close, wrap, tidy = false) {
+that.toggle = function (open, close, wrap, tidy = false) {
     if (!close && "" !== close) {
         close = open;
     }

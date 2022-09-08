@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function(global, factory) {
+(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
-})(this, function(exports) {
+})(this, function (exports) {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -57,11 +57,11 @@
     var W = window;
     var debounce = function debounce(then, time) {
         var timer;
-        return function() {
+        return function () {
             var _arguments = arguments,
                 _this = this;
             timer && clearTimeout(timer);
-            timer = setTimeout(function() {
+            timer = setTimeout(function () {
                 return then.apply(_this, _arguments);
             }, time);
         };
@@ -102,7 +102,7 @@
         defaults.source[type] = (...lot) => promisify(type, lot);
     });
     const that = {};
-    that.toggle = function(open, close, wrap, tidy = false) {
+    that.toggle = function (open, close, wrap, tidy = false) {
         if (!close && "" !== close) {
             close = open;
         }

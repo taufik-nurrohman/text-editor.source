@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.2.4</title>
+    <title>Text Editor Source 2.2.5</title>
     <style>
       * {
         box-sizing: border-box;
@@ -78,7 +78,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.2.4</h1>
+      <h1>Text Editor Source 2.2.5</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -188,7 +188,7 @@
 const {debounce} = require('@taufik-nurrohman/tick');
 const K = require('@taufik-nurrohman/key').default;
 const TE = require('@taufik-nurrohman/text-editor').default;
-const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history').default;
+const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
 
 const {
     canKeyDown: canKeyDownSource,

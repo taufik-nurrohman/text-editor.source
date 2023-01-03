@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.2.6</title>
+    <title>Text Editor Source 2.2.7</title>
     <style>
       * {
         box-sizing: border-box;
@@ -86,7 +86,7 @@
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.2.6</h1>
+      <h1>Text Editor Source 2.2.7</h1>
       <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
@@ -113,12 +113,12 @@
         <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.</li>
         <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⌥</kbd><kbd>←</kbd>.</li>
         <li>Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
-        <li>Press <kbd>⇥</kbd> to indent via <code>onKeyDownTab</code>.</li>
-        <li>Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>onKeyDownTab</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.</li>
+        <li>Press <kbd>⇥</kbd> to indent via <code>canKeyDownTab</code>.</li>
+        <li>Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>canKeyDownTab</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>canKeyDownDent</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>canKeyDownDent</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>canKeyDownHistory</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>canKeyDownHistory</code>.</li>
       </ul>
       <h2>Usage</h2>
       <h4>Browser</h4>
@@ -336,7 +336,7 @@ editor.record(); // Record the first history data!</code></pre>
       <h4>TE.Source.canKeyDown(map, that)</h4>
       <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
       <h4>TE.Source.canKeyDownDent(map, that)</h4>
-      <p>Strokes to handle indentation tasks using the key combination <kbd>⎈</kbd><kbd>]</kbd> for indent and <kbd>⎈</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>onKeyDownTab</code> so that it is possible to use the tab key normally.</p>
+      <p>Strokes to handle indentation tasks using the key combination <kbd>⎈</kbd><kbd>]</kbd> for indent and <kbd>⎈</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>canKeyDownTab</code> so that it is possible to use the tab key normally.</p>
       <h4>TE.Source.canKeyDownEnter(map, that)</h4>
       <p>Strokes to handle line insertion tasks using the key combination <kbd>⎈</kbd><kbd>↵</kbd> and <kbd>⎈</kbd><kbd>↵</kbd>.</p>
       <h4>TE.Source.canKeyDownHistory(map, that)</h4>
@@ -350,7 +350,7 @@ editor.record(); // Record the first history data!</code></pre>
     </main>
     <footer>
       <hr>
-      <p>&copy; 2022 <a href="/">Taufik Nurrohman</a></p>
+      <p>&copy; 2023 <a href="/">Taufik Nurrohman</a></p>
     </footer>
     <script src="../key/index.min.js"></script>
     <script src="../text-editor/index.min.js"></script>

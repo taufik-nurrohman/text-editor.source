@@ -191,12 +191,12 @@ block content
       li <code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.
       li <code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⌥</kbd><kbd>←</kbd>.
       li Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
-      li Press <kbd>⇥</kbd> to indent via <code>onKeyDownTab</code>.
-      li Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>onKeyDownTab</code>.
-      li Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>onKeyDownDent</code>.
-      li Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>onKeyDownDent</code>.
-      li Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>onKeyDownHistory</code>.
-      li Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>onKeyDownHistory</code>.
+      li Press <kbd>⇥</kbd> to indent via <code>canKeyDownTab</code>.
+      li Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>canKeyDownTab</code>.
+      li Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>canKeyDownDent</code>.
+      li Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>canKeyDownDent</code>.
+      li Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>canKeyDownHistory</code>.
+      li Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>canKeyDownHistory</code>.
     h2 Usage
     h4 Browser
     pre: code
@@ -416,7 +416,7 @@ block content
     h4 TE.Source.canKeyDown(map, that)
     p This will handle tasks such as automatic bracket closing and continuous indentation.
     h4 TE.Source.canKeyDownDent(map, that)
-    p Strokes to handle indentation tasks using the key combination #[kbd= '⎈']#[kbd= ']'] for indent and #[kbd= '⎈']#[kbd= '['] for outdent. Use this as an alternative to #[code onKeyDownTab] so that it is possible to use the tab key normally.
+    p Strokes to handle indentation tasks using the key combination #[kbd= '⎈']#[kbd= ']'] for indent and #[kbd= '⎈']#[kbd= '['] for outdent. Use this as an alternative to #[code canKeyDownTab] so that it is possible to use the tab key normally.
     h4 TE.Source.canKeyDownEnter(map, that)
     p Strokes to handle line insertion tasks using the key combination #[kbd= '⎈']#[kbd= '↵'] and #[kbd= '⎈']#[kbd= '↵'].
     h4 TE.Source.canKeyDownHistory(map, that)

@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2022 Taufik Nurrohman <https://github.com/taufik-nurrohman>
+ * Copyright © 2023 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.TE = global.TE || {}, global.TE.Source = {})));
-})(this, function (exports) {
+(function (g, f) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? f(exports) : typeof define === 'function' && define.amd ? define(['exports'], f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, f((g.TE = g.TE || {}, g.TE.Source = {})));
+})(this, (function (exports) {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -36,8 +36,8 @@
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
-    var isInstance = function isInstance(x, of ) {
-        return x && isSet$1( of ) && x instanceof of ;
+    var isInstance = function isInstance(x, of) {
+        return x && isSet$1(of) && x instanceof of ;
     };
     var isNull = function isNull(x) {
         return null === x;
@@ -72,11 +72,12 @@
     var toPattern = function toPattern(pattern, opt) {
         if (isPattern(pattern)) {
             return pattern;
-        } // No need to escape `/` in the pattern string
+        }
+        // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
         return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
     };
-    const pairs = {
+    var pairs = {
         '`': '`',
         '(': ')',
         '{': '}',
@@ -87,31 +88,38 @@
     };
 
     function promisify(type, lot) {
-        return new Promise((resolve, reject) => {
-            let r = W[type].apply(W, lot);
+        return new Promise(function (resolve, reject) {
+            var r = W[type].apply(W, lot);
             return r ? resolve(r) : reject(r);
         });
     }
-    const defaults = {
+    var defaults = {
         source: {
-            pairs,
+            pairs: pairs,
             type: null
         }
     };
-    ['alert', 'confirm', 'prompt'].forEach(type => {
-        defaults.source[type] = (...lot) => promisify(type, lot);
+    ['alert', 'confirm', 'prompt'].forEach(function (type) {
+        defaults.source[type] = function () {
+            for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
+                lot[_key] = arguments[_key];
+            }
+            return promisify(type, lot);
+        };
     });
-    const that = {};
-    that.toggle = function (open, close, wrap, tidy = false) {
+    var that = {};
+    that.toggle = function (open, close, wrap, tidy) {
+        if (tidy === void 0) {
+            tidy = false;
+        }
         if (!close && "" !== close) {
             close = open;
         }
-        let t = this,
-            {
-                after,
-                before,
-                value
-            } = t.$(),
+        var t = this,
+            _t$$ = t.$(),
+            after = _t$$.after,
+            before = _t$$.before,
+            value = _t$$.value,
             closeCount = toCount(close),
             openCount = toCount(open);
         if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
@@ -130,47 +138,44 @@
         }
         return t.wrap(open, close, wrap);
     };
-    const CTRL_PREFIX = 'Control-';
-    const SHIFT_PREFIX = 'Shift-';
+    var CTRL_PREFIX = 'Control-';
+    var SHIFT_PREFIX = 'Shift-';
 
     function canKeyDown(map, that) {
-        let charAfter,
+        var charAfter,
             charBefore,
             charIndent = that.state.source.tab || that.state.tab || '\t',
             charPairs = that.state.source.pairs || {},
             charPairsValues = toObjectValues(charPairs),
-            {
-                key,
-                queue
-            } = map,
-            keyValue = map + ""; // Do nothing
+            key = map.key,
+            queue = map.queue,
+            keyValue = map + "";
+        // Do nothing
         if (queue.Alt || queue.Control) {
             return true;
         }
         if (' ' === keyValue) {
-            let {
-                after,
-                before,
-                value
-            } = that.$();
-            charAfter = charPairs[charBefore = before.slice(-1)];
-            if (!value && charAfter && charBefore && charAfter === after[0]) {
+            var _that$$ = that.$(),
+                _after = _that$$.after,
+                _before = _that$$.before,
+                _value = _that$$.value;
+            charAfter = charPairs[charBefore = _before.slice(-1)];
+            if (!_value && charAfter && charBefore && charAfter === _after[0]) {
                 that.wrap(' ', ' ');
                 return false;
             }
             return true;
         }
         if ('Enter' === keyValue) {
-            let {
-                after,
-                before,
-                value
-            } = that.$(),
-                lineBefore = before.split('\n').pop(),
+            var _that$$2 = that.$(),
+                _after2 = _that$$2.after,
+                _before2 = _that$$2.before,
+                _value2 = _that$$2.value,
+                lineBefore = _before2.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
-            if (!value) {
-                if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
+            if (!_value2) {
+                if (_after2 && _before2 && (charAfter = charPairs[charBefore = _before2.slice(-1)]) && charAfter === _after2[0]) {
                     that.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                     return false;
                 }
@@ -182,40 +187,41 @@
             return true;
         }
         if ('Backspace' === keyValue) {
-            let {
-                after,
-                before,
-                value
-            } = that.$();
-            after.split('\n')[0];
-            let lineBefore = before.split('\n').pop(),
-                lineMatch = lineBefore.match(/^(\s+)/),
-                lineMatchIndent = lineMatch && lineMatch[1] || "";
-            charAfter = charPairs[charBefore = before.slice(-1)]; // Do nothing on escape
+            var _that$$3 = that.$(),
+                _after3 = _that$$3.after,
+                _before3 = _that$$3.before,
+                _value3 = _that$$3.value;
+            _after3.split('\n')[0];
+            var _lineBefore = _before3.split('\n').pop(),
+                _lineMatch = _lineBefore.match(/^(\s+)/),
+                _lineMatchIndent = _lineMatch && _lineMatch[1] || "";
+            charAfter = charPairs[charBefore = _before3.slice(-1)];
+            // Do nothing on escape
             if ('\\' === charBefore) {
                 return true;
             }
-            if (value) {
-                if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
+            if (_value3) {
+                if (_after3 && _before3 && charAfter && charAfter === _after3[0] && !_before3.endsWith('\\' + charBefore)) {
                     that.record().peel(charBefore, charAfter).record();
                     return false;
                 }
                 return true;
             }
-            charAfter = charPairs[charBefore = before.trim().slice(-1)];
+            charAfter = charPairs[charBefore = _before3.trim().slice(-1)];
             if (charAfter && charBefore) {
-                if (after.startsWith(' ' + charAfter) && before.endsWith(charBefore + ' ') || after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
+                if (_after3.startsWith(' ' + charAfter) && _before3.endsWith(charBefore + ' ') || _after3.startsWith('\n' + _lineMatchIndent + charAfter) && _before3.endsWith(charBefore + '\n' + _lineMatchIndent)) {
                     // Collapse bracket(s)
                     that.trim("", "").record();
                     return false;
                 }
-            } // Outdent
-            if (lineBefore.endsWith(charIndent)) {
+            }
+            // Outdent
+            if (_lineBefore.endsWith(charIndent)) {
                 that.pull(charIndent).record();
                 return false;
             }
-            if (after && before && !before.endsWith('\\' + charBefore)) {
-                if (charAfter === after[0] && charBefore === before.slice(-1)) {
+            if (_after3 && _before3 && !_before3.endsWith('\\' + charBefore)) {
+                if (charAfter === _after3[0] && charBefore === _before3.slice(-1)) {
                     // Peel pair
                     that.peel(charBefore, charAfter).record();
                     return false;
@@ -223,16 +229,17 @@
             }
             return true;
         }
-        let {
-            after,
-            before,
-            start,
-            value
-        } = that.$(); // Do nothing on escape
+        var _that$$4 = that.$(),
+            after = _that$$4.after,
+            before = _that$$4.before,
+            start = _that$$4.start,
+            value = _that$$4.value;
+        // Do nothing on escape
         if ('\\' === (charBefore = before.slice(-1))) {
             return true;
         }
-        charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore]; // `|}`
+        charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
+        // `|}`
         if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
@@ -240,13 +247,15 @@
             return false;
         }
         for (charBefore in charPairs) {
-            charAfter = charPairs[charBefore]; // `{|`
+            charAfter = charPairs[charBefore];
+            // `{|`
             if (key === charBefore && charAfter) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
                 that.wrap(charBefore, charAfter).record();
                 return false;
-            } // `|}`
+            }
+            // `|}`
             if (key === charAfter) {
                 if (value) {
                     // Wrap selection
@@ -261,12 +270,16 @@
     }
 
     function canKeyDownDent(map, that) {
-        let charIndent = that.state.source.tab || that.state.tab || '\t',
-            keyValue = map + ""; // Indent with `⎈]`
+        var charIndent = that.state.source.tab || that.state.tab || '\t';
+        map.key;
+        map.queue;
+        var keyValue = map + "";
+        // Indent with `⎈]`
         if (CTRL_PREFIX + ']' === keyValue) {
             that.push(charIndent).record();
             return false;
-        } // Outdent with `⎈[`
+        }
+        // Outdent with `⎈[`
         if (CTRL_PREFIX + '[' === keyValue) {
             that.pull(charIndent).record();
             return false;
@@ -275,18 +288,15 @@
     }
 
     function canKeyDownEnter(map, that) {
-        let {
-            key,
-            queue
-        } = map;
+        map.key;
+        var queue = map.queue;
         if (queue.Control && queue.Enter) {
-            let {
-                after,
-                before,
-                end,
-                start,
-                value
-            } = that.$(),
+            var _that$$5 = that.$(),
+                after = _that$$5.after,
+                before = _that$$5.before,
+                end = _that$$5.end,
+                start = _that$$5.start,
+                value = _that$$5.value,
                 lineAfter = after.split('\n').shift(),
                 lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
@@ -295,7 +305,8 @@
                 if (queue.Shift) {
                     // Insert line over with `⎈⇧↵`
                     return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
-                } // Insert line below with `⎈↵`
+                }
+                // Insert line below with `⎈↵`
                 return that.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
             }
         }
@@ -303,10 +314,12 @@
     }
 
     function canKeyDownHistory(map, that) {
-        let keyValue = map + ""; // Redo with `⎈y`
+        var keyValue = map + "";
+        // Redo with `⎈y`
         if (CTRL_PREFIX + 'y' === keyValue) {
             return that.redo(), false;
-        } // Undo with `⎈z`
+        }
+        // Undo with `⎈z`
         if (CTRL_PREFIX + 'z' === keyValue) {
             return that.undo(), false;
         }
@@ -314,21 +327,18 @@
     }
 
     function canKeyDownMove(map, that) {
-        let {
-            key,
-            queue
-        } = map,
-        keyValue = map + "";
+        map.key;
+        var queue = map.queue,
+            keyValue = map + "";
         if (!queue.Control) {
             return true;
         }
-        let {
-            after,
-            before,
-            end,
-            start,
-            value
-        } = that.$(),
+        var _that$$6 = that.$(),
+            after = _that$$6.after,
+            before = _that$$6.before,
+            end = _that$$6.end,
+            start = _that$$6.start,
+            value = _that$$6.value,
             charPair,
             charPairValue,
             charPairs = that.state.source.pairs || {},
@@ -359,10 +369,11 @@
                 return that.select(), false;
             }
         }
-        let lineAfter = after.split('\n').shift(),
+        var lineAfter = after.split('\n').shift(),
             lineBefore = before.split('\n').pop(),
             lineMatch = lineBefore.match(/^(\s+)/);
-        lineMatch && lineMatch[1] || ""; // Force to select the current line if there is no selection
+        lineMatch && lineMatch[1] || "";
+        // Force to select the current line if there is no selection
         end += toCount(lineAfter);
         start -= toCount(lineBefore);
         value = lineBefore + value + lineAfter;
@@ -373,7 +384,7 @@
             that.insert("");
             that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
             that.replace(/(^|\n)([^\n]*?)$/, "", -1);
-            let $ = that.$();
+            var $ = that.$();
             before = $.before;
             start = $.start;
             lineBefore = before.split('\n').pop();
@@ -388,9 +399,9 @@
             that.insert("");
             that.replace(/^([^\n]*?)(\n|$)/, "", 1);
             that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-            let $ = that.$();
-            after = $.after;
-            end = $.end;
+            var _$ = that.$();
+            after = _$.after;
+            end = _$.end;
             lineAfter = after.split('\n').shift();
             that.select(end = end + toCount(lineAfter)).wrap('\n', value);
             end += 1;
@@ -401,22 +412,26 @@
     }
 
     function canKeyDownTab(map, that) {
-        let charIndent = that.state.source.tab || that.state.tab || '\t',
-            keyValue = map + ""; // Indent with `⇥`
+        var charIndent = that.state.source.tab || that.state.tab || '\t',
+            keyValue = map + "";
+        // Indent with `⇥`
         if ('Tab' === keyValue) {
             return that.push(charIndent).record(), false;
-        } // Outdent with `⇧+⇥`
+        }
+        // Outdent with `⇧+⇥`
         if (SHIFT_PREFIX + 'Tab' === keyValue) {
             return that.pull(charIndent).record(), false;
         }
         return true;
     }
-    let bounce = debounce(that => that.record(), 100);
+    var bounce = debounce(function (that) {
+        return that.record();
+    }, 100);
 
     function canKeyUp(map, that) {
         return bounce(that), true;
     }
-    const state = defaults;
+    var state = defaults;
     exports.canKeyDown = canKeyDown;
     exports.canKeyDownDent = canKeyDownDent;
     exports.canKeyDownEnter = canKeyDownEnter;
@@ -426,4 +441,7 @@
     exports.canKeyUp = canKeyUp;
     exports.state = state;
     exports.that = that;
-});
+    Object.defineProperty(exports, '__esModule', {
+        value: true
+    });
+}));

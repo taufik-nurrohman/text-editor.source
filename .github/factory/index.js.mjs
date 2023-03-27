@@ -2,7 +2,7 @@ import {W} from '@taufik-nurrohman/document';
 import {debounce} from '@taufik-nurrohman/tick';
 import {esc, escChar, toPattern} from '@taufik-nurrohman/pattern';
 import {hasValue} from '@taufik-nurrohman/has';
-import {isArray, isString} from '@taufik-nurrohman/is';
+import {isArray, isSet, isString} from '@taufik-nurrohman/is';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 
 const pairs = {

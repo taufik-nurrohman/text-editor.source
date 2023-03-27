@@ -37,12 +37,12 @@
         return 'undefined' !== typeof x;
     };
     var isInstance = function isInstance(x, of) {
-        return x && isSet$1(of) && x instanceof of ;
+        return x && isSet(of) && x instanceof of ;
     };
     var isNull = function isNull(x) {
         return null === x;
     };
-    var isSet$1 = function isSet(x) {
+    var isSet = function isSet(x) {
         return isDefined(x) && !isNull(x);
     };
     var isString = function isString(x) {
@@ -75,7 +75,7 @@
         }
         // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
+        return new RegExp(pattern, isSet(opt) ? opt : 'g');
     };
     var pairs = {
         '`': '`',

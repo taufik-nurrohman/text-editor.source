@@ -49,5 +49,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.github/factory --js-format=umd --js-name=TE.Source --js-top='%(js.license)' --mjs=true --to=."
   },
-  "version": "2.2.9"
+  "version": "2.2.10"
 }

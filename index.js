@@ -141,11 +141,11 @@
     var CTRL_PREFIX = 'Control-';
     var SHIFT_PREFIX = 'Shift-';
 
-    function canKeyDown(map, that) {
+    function canKeyDown(map, of) {
         var charAfter,
             charBefore,
-            charIndent = that.state.source.tab || that.state.tab || '\t',
-            charPairs = that.state.source.pairs || {},
+            charIndent = of.state.source.tab || of.state.tab || '\t',
+            charPairs = of.state.source.pairs || {},
             charPairsValues = toObjectValues(charPairs),
             key = map.key,
             queue = map.queue,
@@ -155,42 +155,42 @@
             return true;
         }
         if (' ' === keyValue) {
-            var _that$$ = that.$(),
-                _after = _that$$.after,
-                _before = _that$$.before,
-                _value = _that$$.value;
+            var _of$$ = of.$(),
+                _after = _of$$.after,
+                _before = _of$$.before,
+                _value = _of$$.value;
             charAfter = charPairs[charBefore = _before.slice(-1)];
             if (!_value && charAfter && charBefore && charAfter === _after[0]) {
-                that.wrap(' ', ' ');
+                of.wrap(' ', ' ');
                 return false;
             }
             return true;
         }
         if ('Enter' === keyValue) {
-            var _that$$2 = that.$(),
-                _after2 = _that$$2.after,
-                _before2 = _that$$2.before,
-                _value2 = _that$$2.value,
+            var _of$$2 = of.$(),
+                _after2 = _of$$2.after,
+                _before2 = _of$$2.before,
+                _value2 = _of$$2.value,
                 lineBefore = _before2.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
                 lineMatchIndent = lineMatch && lineMatch[1] || "";
             if (!_value2) {
                 if (_after2 && _before2 && (charAfter = charPairs[charBefore = _before2.slice(-1)]) && charAfter === _after2[0]) {
-                    that.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
+                    of.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                     return false;
                 }
                 if (lineMatchIndent) {
-                    that.insert('\n' + lineMatchIndent, -1).record();
+                    of.insert('\n' + lineMatchIndent, -1).record();
                     return false;
                 }
             }
             return true;
         }
         if ('Backspace' === keyValue) {
-            var _that$$3 = that.$(),
-                _after3 = _that$$3.after,
-                _before3 = _that$$3.before,
-                _value3 = _that$$3.value;
+            var _of$$3 = of.$(),
+                _after3 = _of$$3.after,
+                _before3 = _of$$3.before,
+                _value3 = _of$$3.value;
             _after3.split('\n')[0];
             var _lineBefore = _before3.split('\n').pop(),
                 _lineMatch = _lineBefore.match(/^(\s+)/),
@@ -202,7 +202,7 @@
             }
             if (_value3) {
                 if (_after3 && _before3 && charAfter && charAfter === _after3[0] && !_before3.endsWith('\\' + charBefore)) {
-                    that.record().peel(charBefore, charAfter).record();
+                    of.record().peel(charBefore, charAfter).record();
                     return false;
                 }
                 return true;
@@ -211,29 +211,29 @@
             if (charAfter && charBefore) {
                 if (_after3.startsWith(' ' + charAfter) && _before3.endsWith(charBefore + ' ') || _after3.startsWith('\n' + _lineMatchIndent + charAfter) && _before3.endsWith(charBefore + '\n' + _lineMatchIndent)) {
                     // Collapse bracket(s)
-                    that.trim("", "").record();
+                    of.trim("", "").record();
                     return false;
                 }
             }
             // Outdent
             if (_lineBefore.endsWith(charIndent)) {
-                that.pull(charIndent).record();
+                of.pull(charIndent).record();
                 return false;
             }
             if (_after3 && _before3 && !_before3.endsWith('\\' + charBefore)) {
                 if (charAfter === _after3[0] && charBefore === _before3.slice(-1)) {
                     // Peel pair
-                    that.peel(charBefore, charAfter).record();
+                    of.peel(charBefore, charAfter).record();
                     return false;
                 }
             }
             return true;
         }
-        var _that$$4 = that.$(),
-            after = _that$$4.after,
-            before = _that$$4.before,
-            start = _that$$4.start,
-            value = _that$$4.value;
+        var _of$$4 = of.$(),
+            after = _of$$4.after,
+            before = _of$$4.before,
+            start = _of$$4.start,
+            value = _of$$4.value;
         // Do nothing on escape
         if ('\\' === (charBefore = before.slice(-1))) {
             return true;
@@ -243,7 +243,7 @@
         if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
-            that.select(start + 1).record();
+            of.select(start + 1).record();
             return false;
         }
         for (charBefore in charPairs) {
@@ -252,7 +252,7 @@
             if (key === charBefore && charAfter) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
-                that.wrap(charBefore, charAfter).record();
+                of.wrap(charBefore, charAfter).record();
                 return false;
             }
             // `|}`
@@ -260,7 +260,7 @@
                 if (value) {
                     // Wrap selection
                     // `{|aaa|}`
-                    that.record().wrap(charBefore, charAfter).record();
+                    of.record().wrap(charBefore, charAfter).record();
                     return false;
                 }
                 break;
@@ -269,34 +269,34 @@
         return true;
     }
 
-    function canKeyDownDent(map, that) {
-        var charIndent = that.state.source.tab || that.state.tab || '\t';
+    function canKeyDownDent(map, of) {
+        var charIndent = of.state.source.tab || of.state.tab || '\t';
         map.key;
         map.queue;
         var keyValue = map + "";
         // Indent with `⎈]`
         if (CTRL_PREFIX + ']' === keyValue) {
-            that.push(charIndent).record();
+            of.push(charIndent).record();
             return false;
         }
         // Outdent with `⎈[`
         if (CTRL_PREFIX + '[' === keyValue) {
-            that.pull(charIndent).record();
+            of.pull(charIndent).record();
             return false;
         }
         return true;
     }
 
-    function canKeyDownEnter(map, that) {
+    function canKeyDownEnter(map, of) {
         map.key;
         var queue = map.queue;
         if (queue.Control && queue.Enter) {
-            var _that$$5 = that.$(),
-                after = _that$$5.after,
-                before = _that$$5.before,
-                end = _that$$5.end,
-                start = _that$$5.start,
-                value = _that$$5.value,
+            var _of$$5 = of.$(),
+                after = _of$$5.after,
+                before = _of$$5.before,
+                end = _of$$5.end,
+                start = _of$$5.start,
+                value = _of$$5.value,
                 lineAfter = after.split('\n').shift(),
                 lineBefore = before.split('\n').pop(),
                 lineMatch = lineBefore.match(/^(\s+)/),
@@ -304,44 +304,44 @@
             if (before || after) {
                 if (queue.Shift) {
                     // Insert line over with `⎈⇧↵`
-                    return that.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
+                    return of.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
                 }
                 // Insert line below with `⎈↵`
-                return that.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
+                return of.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
             }
         }
         return true;
     }
 
-    function canKeyDownHistory(map, that) {
+    function canKeyDownHistory(map, of) {
         var keyValue = map + "";
         // Redo with `⎈y`
         if (CTRL_PREFIX + 'y' === keyValue) {
-            return that.redo(), false;
+            return of.redo(), false;
         }
         // Undo with `⎈z`
         if (CTRL_PREFIX + 'z' === keyValue) {
-            return that.undo(), false;
+            return of.undo(), false;
         }
         return true;
     }
 
-    function canKeyDownMove(map, that) {
+    function canKeyDownMove(map, of) {
         map.key;
         var queue = map.queue,
             keyValue = map + "";
         if (!queue.Control) {
             return true;
         }
-        var _that$$6 = that.$(),
-            after = _that$$6.after,
-            before = _that$$6.before,
-            end = _that$$6.end,
-            start = _that$$6.start,
-            value = _that$$6.value,
+        var _of$$6 = of.$(),
+            after = _of$$6.after,
+            before = _of$$6.before,
+            end = _of$$6.end,
+            start = _of$$6.start,
+            value = _of$$6.value,
             charPair,
             charPairValue,
-            charPairs = that.state.source.pairs || {},
+            charPairs = of.state.source.pairs || {},
             boundaries = [],
             m;
         if (value) {
@@ -356,17 +356,17 @@
             boundaries.push('[\\s\\S]'); // Last try!
             if (CTRL_PREFIX + 'ArrowLeft' === keyValue) {
                 if (m = before.match(toPattern('(' + boundaries.join('|') + ')$', ""))) {
-                    that.insert("").select(start - toCount(m[0])).insert(value);
-                    return that.record(), false;
+                    of.insert("").select(start - toCount(m[0])).insert(value);
+                    return of.record(), false;
                 }
-                return that.select(), false;
+                return of.select(), false;
             }
             if (CTRL_PREFIX + 'ArrowRight' === keyValue) {
                 if (m = after.match(toPattern('^(' + boundaries.join('|') + ')', ""))) {
-                    that.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
-                    return that.record(), false;
+                    of.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
+                    return of.record(), false;
                 }
-                return that.select(), false;
+                return of.select(), false;
             }
         }
         var lineAfter = after.split('\n').shift(),
@@ -379,57 +379,57 @@
         value = lineBefore + value + lineAfter;
         if (CTRL_PREFIX + 'ArrowUp' === keyValue) {
             if (!hasValue('\n', before)) {
-                return that.select(), false;
+                return of.select(), false;
             }
-            that.insert("");
-            that.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
-            that.replace(/(^|\n)([^\n]*?)$/, "", -1);
-            var $ = that.$();
+            of.insert("");
+            of.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+            of.replace(/(^|\n)([^\n]*?)$/, "", -1);
+            var $ = of.$();
             before = $.before;
             start = $.start;
             lineBefore = before.split('\n').pop();
-            that.select(start = start - toCount(lineBefore)).wrap(value, '\n');
-            that.select(start, start + toCount(value));
-            return that.record(), false;
+            of.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+            of.select(start, start + toCount(value));
+            return of.record(), false;
         }
         if (CTRL_PREFIX + 'ArrowDown' === keyValue) {
             if (!hasValue('\n', after)) {
-                return that.select(), false;
+                return of.select(), false;
             }
-            that.insert("");
-            that.replace(/^([^\n]*?)(\n|$)/, "", 1);
-            that.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-            var _$ = that.$();
+            of.insert("");
+            of.replace(/^([^\n]*?)(\n|$)/, "", 1);
+            of.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+            var _$ = of.$();
             after = _$.after;
             end = _$.end;
             lineAfter = after.split('\n').shift();
-            that.select(end = end + toCount(lineAfter)).wrap('\n', value);
+            of.select(end = end + toCount(lineAfter)).wrap('\n', value);
             end += 1;
-            that.select(end, end + toCount(value));
-            return that.record(), false;
+            of.select(end, end + toCount(value));
+            return of.record(), false;
         }
         return true;
     }
 
-    function canKeyDownTab(map, that) {
-        var charIndent = that.state.source.tab || that.state.tab || '\t',
+    function canKeyDownTab(map, of) {
+        var charIndent = of.state.source.tab || of.state.tab || '\t',
             keyValue = map + "";
         // Indent with `⇥`
         if ('Tab' === keyValue) {
-            return that.push(charIndent).record(), false;
+            return of.push(charIndent).record(), false;
         }
         // Outdent with `⇧+⇥`
         if (SHIFT_PREFIX + 'Tab' === keyValue) {
-            return that.pull(charIndent).record(), false;
+            return of.pull(charIndent).record(), false;
         }
         return true;
     }
-    var bounce = debounce(function (that) {
-        return that.record();
+    var bounce = debounce(function (of) {
+        return of.record();
     }, 100);
 
-    function canKeyUp(map, that) {
-        return bounce(that), true;
+    function canKeyUp(map, of) {
+        return bounce(of), true;
     }
     var state = defaults;
     exports.canKeyDown = canKeyDown;

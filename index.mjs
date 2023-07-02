@@ -88,7 +88,7 @@ export function canKeyDown(map, of) {
         }
         return true;
     }
-    if ('Enter' === keyValue) {
+    if ('Enter' === keyValue || SHIFT_PREFIX + 'Enter' === keyValue) {
         let {after, before, value} = of.$(),
             lineBefore = before.split('\n').pop(),
             lineMatch = lineBefore.match(/^(\s+)/),
@@ -211,7 +211,7 @@ export function canKeyDownEnter(map, of) {
             lineMatchIndent = lineMatch && lineMatch[1] || "";
         if (before || after) {
             if (queue.Shift) {
-                // Insert line over with `⎈⇧↵`
+                // Insert line above with `⎈⇧↵`
                 return of.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
             }
             // Insert line below with `⎈↵`

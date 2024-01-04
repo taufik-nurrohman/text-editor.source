@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2023 Taufik Nurrohman <https://github.com/taufik-nurrohman>
+ * Copyright © 2024 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -24,14 +24,99 @@
  *
  */
 (function (g, f) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? f(exports) : typeof define === 'function' && define.amd ? define(['exports'], f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, f((g.TE = g.TE || {}, g.TE.Source = {})));
-})(this, (function (exports) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, (g.TextEditor = g.TextEditor || {}, g.TextEditor.Source = f()));
+})(this, (function () {
     'use strict';
+    var debounce = function debounce(then, time) {
+        var timer;
+        return function () {
+            var _arguments = arguments,
+                _this = this;
+            timer && clearTimeout(timer);
+            timer = setTimeout(function () {
+                return then.apply(_this, _arguments);
+            }, time);
+        };
+    };
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
     var isArray = function isArray(x) {
         return Array.isArray(x);
+    };
+    var isDefined$1 = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isInstance$1 = function isInstance(x, of) {
+        return x && isSet$1(of) && x instanceof of ;
+    };
+    var isNull$1 = function isNull(x) {
+        return null === x;
+    };
+    var isObject = function isObject(x, isPlain) {
+        if (isPlain === void 0) {
+            isPlain = true;
+        }
+        if ('object' !== typeof x) {
+            return false;
+        }
+        return isPlain ? isInstance$1(x, Object) : true;
+    };
+    var isSet$1 = function isSet(x) {
+        return isDefined$1(x) && !isNull$1(x);
+    };
+    var isString = function isString(x) {
+        return 'string' === typeof x;
+    };
+    var toCount = function toCount(x) {
+        return x.length;
+    };
+    var toObjectValues = function toObjectValues(x) {
+        return Object.values(x);
+    };
+    var fromStates = function fromStates() {
+        for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
+            lot[_key] = arguments[_key];
+        }
+        var out = lot.shift();
+        for (var i = 0, j = toCount(lot); i < j; ++i) {
+            for (var k in lot[i]) {
+                // Assign value
+                if (!isSet$1(out[k])) {
+                    out[k] = lot[i][k];
+                    continue;
+                }
+                // Merge array
+                if (isArray(out[k]) && isArray(lot[i][k])) {
+                    out[k] = [ /* Clone! */ ].concat(out[k]);
+                    for (var ii = 0, jj = toCount(lot[i][k]); ii < jj; ++ii) {
+                        if (!hasValue(lot[i][k][ii], out[k])) {
+                            out[k].push(lot[i][k][ii]);
+                        }
+                    }
+                    // Merge object recursive
+                } else if (isObject(out[k]) && isObject(lot[i][k])) {
+                    out[k] = fromStates({
+                        /* Clone! */ }, out[k], lot[i][k]);
+                    // Replace value
+                } else {
+                    out[k] = lot[i][k];
+                }
+            }
+        }
+        return out;
+    };
+    var offEvent = function offEvent(name, node, then) {
+        node.removeEventListener(name, then);
+    };
+    var offEventDefault = function offEventDefault(e) {
+        return e && e.preventDefault();
+    };
+    var onEvent = function onEvent(name, node, then, options) {
+        if (options === void 0) {
+            options = false;
+        }
+        node.addEventListener(name, then, options);
     };
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
@@ -45,27 +130,6 @@
     var isSet = function isSet(x) {
         return isDefined(x) && !isNull(x);
     };
-    var isString = function isString(x) {
-        return 'string' === typeof x;
-    };
-    var toCount = function toCount(x) {
-        return x.length;
-    };
-    var toObjectValues = function toObjectValues(x) {
-        return Object.values(x);
-    };
-    var W = window;
-    var debounce = function debounce(then, time) {
-        var timer;
-        return function () {
-            var _arguments = arguments,
-                _this = this;
-            timer && clearTimeout(timer);
-            timer = setTimeout(function () {
-                return then.apply(_this, _arguments);
-            }, time);
-        };
-    };
     var isPattern = function isPattern(pattern) {
         return isInstance(pattern, RegExp);
     };
@@ -73,375 +137,301 @@
         if (isPattern(pattern)) {
             return pattern;
         }
-        // No need to escape `/` in the pattern string
-        pattern = pattern.replace(/\//g, '\\/');
         return new RegExp(pattern, isSet(opt) ? opt : 'g');
     };
-    var pairs = {
-        '`': '`',
-        '(': ')',
-        '{': '}',
-        '[': ']',
-        '"': '"',
-        "'": "'",
-        '<': '>'
-    };
-
-    function promisify(type, lot) {
-        return new Promise(function (resolve, reject) {
-            var r = W[type].apply(W, lot);
-            return r ? resolve(r) : reject(r);
-        });
-    }
-    var defaults = {
-        source: {
-            pairs: pairs,
-            type: null
-        }
-    };
-    ['alert', 'confirm', 'prompt'].forEach(function (type) {
-        defaults.source[type] = function () {
-            for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
-                lot[_key] = arguments[_key];
-            }
-            return promisify(type, lot);
-        };
-    });
-    var that = {};
-    that.toggle = function (open, close, wrap, tidy) {
-        if (tidy === void 0) {
-            tidy = false;
-        }
-        if (!close && "" !== close) {
-            close = open;
-        }
-        var t = this,
-            _t$$ = t.$(),
-            after = _t$$.after,
-            before = _t$$.before,
-            value = _t$$.value,
-            closeCount = toCount(close),
-            openCount = toCount(open);
-        if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
-            return t.peel(open, close, wrap);
-        }
-        if (false !== tidy) {
-            if (isString(tidy)) {
-                tidy = [tidy, tidy];
-            } else if (!isArray(tidy)) {
-                tidy = ["", ""];
-            }
-            if (!isSet(tidy[1])) {
-                tidy[1] = tidy[0];
-            }
-            t.trim(tidy[0], tidy[1]);
-        }
-        return t.wrap(open, close, wrap);
-    };
+    var ALT_PREFIX = 'Alt-';
     var CTRL_PREFIX = 'Control-';
     var SHIFT_PREFIX = 'Shift-';
 
-    function canKeyDown(map, of) {
+    function onKeyDown(e) {
+        var _editor$state$source, _editor$state$source2;
+        var self = this,
+            editor = self.TextEditor,
+            key = self.Key;
+        if (!editor || !key) {
+            return;
+        }
         var charAfter,
             charBefore,
-            charIndent = of.state.source.tab || of.state.tab || '\t',
-            charPairs = of.state.source.pairs || {},
-            charPairsValues = toObjectValues(charPairs),
-            key = map.key,
-            queue = map.queue,
-            keyValue = map + "";
+            charIndent = ((_editor$state$source = editor.state.source) == null ? void 0 : _editor$state$source.tab) || editor.state.tab || '\t',
+            charKey = key + "",
+            charPairs = ((_editor$state$source2 = editor.state.source) == null ? void 0 : _editor$state$source2.pairs) || {},
+            charPairsValues = toObjectValues(charPairs);
+        var _editor$$ = editor.$(),
+            after = _editor$$.after,
+            before = _editor$$.before,
+            end = _editor$$.end,
+            start = _editor$$.start,
+            value = _editor$$.value,
+            lineAfter = after.split('\n').shift(),
+            lineBefore = before.split('\n').pop(),
+            lineMatch = lineBefore.match(/^(\s+)/),
+            lineMatchIndent = lineMatch && lineMatch[1] || "";
+        // Indent with `⎈]`
+        if (CTRL_PREFIX + ']' === charKey) {
+            offEventDefault(e);
+            return editor.push(charIndent).record();
+        }
+        // Outdent with `⎈[`
+        if (CTRL_PREFIX + '[' === charKey) {
+            offEventDefault(e);
+            return editor.pull(charIndent).record();
+        }
+        // Redo with `⎈y`
+        if (CTRL_PREFIX + 'y' === charKey) {
+            offEventDefault(e);
+            return editor.redo();
+        }
+        // Undo with `⎈z`
+        if (CTRL_PREFIX + 'z' === charKey) {
+            offEventDefault(e);
+            return editor.undo();
+        }
+        if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === charKey) {
+            if (before || after) {
+                // Insert line above with `⎈⇧↵`
+                offEventDefault(e);
+                return editor.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
+            }
+            return;
+        }
+        if (CTRL_PREFIX + 'Enter' === charKey) {
+            if (before || after) {
+                // Insert line below with `⎈↵`
+                offEventDefault(e);
+                return editor.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
+            }
+        }
         // Do nothing
-        if (queue.Alt || queue.Control) {
-            return true;
+        if (ALT_PREFIX === charKey + '-' || CTRL_PREFIX === charKey + '-') {
+            offEventDefault(e);
+            return;
         }
-        if (' ' === keyValue) {
-            var _of$$ = of.$(),
-                _after = _of$$.after,
-                _before = _of$$.before,
-                _value = _of$$.value;
-            charAfter = charPairs[charBefore = _before.slice(-1)];
-            if (!_value && charAfter && charBefore && charAfter === _after[0]) {
-                of.wrap(' ', ' ');
-                return false;
+        if (' ' === charKey) {
+            charAfter = charPairs[charBefore = before.slice(-1)];
+            if (!value && charAfter && charBefore && charAfter === after[0]) {
+                offEventDefault(e);
+                return editor.wrap(' ', ' ');
             }
-            return true;
+            return;
         }
-        if ('Enter' === keyValue || SHIFT_PREFIX + 'Enter' === keyValue) {
-            var _of$$2 = of.$(),
-                _after2 = _of$$2.after,
-                _before2 = _of$$2.before,
-                _value2 = _of$$2.value,
-                lineBefore = _before2.split('\n').pop(),
-                lineMatch = lineBefore.match(/^(\s+)/),
-                lineMatchIndent = lineMatch && lineMatch[1] || "";
-            if (!_value2) {
-                if (_after2 && _before2 && (charAfter = charPairs[charBefore = _before2.slice(-1)]) && charAfter === _after2[0]) {
-                    of.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
-                    return false;
-                }
-                if (lineMatchIndent) {
-                    of.insert('\n' + lineMatchIndent, -1).record();
-                    return false;
-                }
-            }
-            return true;
-        }
-        if ('Backspace' === keyValue) {
-            var _of$$3 = of.$(),
-                _after3 = _of$$3.after,
-                _before3 = _of$$3.before,
-                _value3 = _of$$3.value;
-            _after3.split('\n')[0];
-            var _lineBefore = _before3.split('\n').pop(),
-                _lineMatch = _lineBefore.match(/^(\s+)/),
-                _lineMatchIndent = _lineMatch && _lineMatch[1] || "";
-            charAfter = charPairs[charBefore = _before3.slice(-1)];
+        if ('Backspace' === charKey) {
+            charAfter = charPairs[charBefore = before.slice(-1)];
             // Do nothing on escape
             if ('\\' === charBefore) {
-                return true;
+                return;
             }
-            if (_value3) {
-                if (_after3 && _before3 && charAfter && charAfter === _after3[0] && !_before3.endsWith('\\' + charBefore)) {
-                    of.record().peel(charBefore, charAfter).record();
-                    return false;
+            if (value) {
+                if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
+                    offEventDefault(e);
+                    return editor.record().peel(charBefore, charAfter).record();
                 }
-                return true;
+                return;
             }
-            charAfter = charPairs[charBefore = _before3.trim().slice(-1)];
+            charAfter = charPairs[charBefore = before.trim().slice(-1)];
             if (charAfter && charBefore) {
-                if (_after3.startsWith(' ' + charAfter) && _before3.endsWith(charBefore + ' ') || _after3.startsWith('\n' + _lineMatchIndent + charAfter) && _before3.endsWith(charBefore + '\n' + _lineMatchIndent)) {
+                if (after.startsWith(' ' + charAfter) && before.endsWith(charBefore + ' ') || after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
                     // Collapse bracket(s)
-                    of.trim("", "").record();
-                    return false;
+                    offEventDefault(e);
+                    return editor.trim("", "").record();
                 }
             }
             // Outdent
-            if (_lineBefore.endsWith(charIndent)) {
-                of.pull(charIndent).record();
-                return false;
+            if (lineBefore.endsWith(charIndent)) {
+                offEventDefault(e);
+                return editor.pull(charIndent).record();
             }
-            if (_after3 && _before3 && !_before3.endsWith('\\' + charBefore)) {
-                if (charAfter === _after3[0] && charBefore === _before3.slice(-1)) {
+            if (after && before && !before.endsWith('\\' + charBefore)) {
+                if (charAfter === after[0] && charBefore === before.slice(-1)) {
                     // Peel pair
-                    of.peel(charBefore, charAfter).record();
-                    return false;
+                    offEventDefault(e);
+                    return editor.peel(charBefore, charAfter).record();
                 }
             }
-            return true;
+            return;
         }
-        var _of$$4 = of.$(),
-            after = _of$$4.after,
-            before = _of$$4.before,
-            start = _of$$4.start,
-            value = _of$$4.value;
+        if ('Enter' === charKey || SHIFT_PREFIX + 'Enter' === charKey) {
+            if (!value) {
+                if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
+                    offEventDefault(e);
+                    return editor.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
+                }
+                if (lineMatchIndent) {
+                    offEventDefault(e);
+                    return editor.insert('\n' + lineMatchIndent, -1).record();
+                }
+            }
+            return;
+        }
         // Do nothing on escape
         if ('\\' === (charBefore = before.slice(-1))) {
-            return true;
+            return;
         }
         charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
+        charKey = charKey.replace(SHIFT_PREFIX, "");
         // `|}`
-        if (!value && after && before && charAfter && key === charAfter) {
+        if (!value && after && before && charAfter && charKey === charAfter) {
             // Move to the next character
             // `}|`
-            of.select(start + 1).record();
-            return false;
+            offEventDefault(e);
+            return editor.select(start + 1).record();
         }
         for (charBefore in charPairs) {
             charAfter = charPairs[charBefore];
             // `{|`
-            if (key === charBefore && charAfter) {
+            if (charKey === charBefore && charAfter) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
-                of.wrap(charBefore, charAfter).record();
-                return false;
+                offEventDefault(e);
+                return editor.wrap(charBefore, charAfter).record();
             }
             // `|}`
-            if (key === charAfter) {
+            if (charKey === charAfter) {
                 if (value) {
                     // Wrap selection
                     // `{|aaa|}`
-                    of.record().wrap(charBefore, charAfter).record();
-                    return false;
+                    offEventDefault(e);
+                    return editor.record().wrap(charBefore, charAfter).record();
                 }
                 break;
             }
         }
-        return true;
-    }
-
-    function canKeyDownDent(map, of) {
-        var charIndent = of.state.source.tab || of.state.tab || '\t';
-        map.key;
-        map.queue;
-        var keyValue = map + "";
-        // Indent with `⎈]`
-        if (CTRL_PREFIX + ']' === keyValue) {
-            of.push(charIndent).record();
-            return false;
-        }
-        // Outdent with `⎈[`
-        if (CTRL_PREFIX + '[' === keyValue) {
-            of.pull(charIndent).record();
-            return false;
-        }
-        return true;
-    }
-
-    function canKeyDownEnter(map, of) {
-        map.key;
-        var queue = map.queue;
-        if (queue.Control && queue.Enter) {
-            var _of$$5 = of.$(),
-                after = _of$$5.after,
-                before = _of$$5.before,
-                end = _of$$5.end,
-                start = _of$$5.start,
-                value = _of$$5.value,
-                lineAfter = after.split('\n').shift(),
-                lineBefore = before.split('\n').pop(),
-                lineMatch = lineBefore.match(/^(\s+)/),
-                lineMatchIndent = lineMatch && lineMatch[1] || "";
-            if (before || after) {
-                if (queue.Shift) {
-                    // Insert line above with `⎈⇧↵`
-                    return of.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
-                }
-                // Insert line below with `⎈↵`
-                return of.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
-            }
-        }
-        return true;
-    }
-
-    function canKeyDownHistory(map, of) {
-        var keyValue = map + "";
-        // Redo with `⎈y`
-        if (CTRL_PREFIX + 'y' === keyValue) {
-            return of.redo(), false;
-        }
-        // Undo with `⎈z`
-        if (CTRL_PREFIX + 'z' === keyValue) {
-            return of.undo(), false;
-        }
-        return true;
-    }
-
-    function canKeyDownMove(map, of) {
-        map.key;
-        var queue = map.queue,
-            keyValue = map + "";
-        if (!queue.Control) {
-            return true;
-        }
-        var _of$$6 = of.$(),
-            after = _of$$6.after,
-            before = _of$$6.before,
-            end = _of$$6.end,
-            start = _of$$6.start,
-            value = _of$$6.value,
-            charPair,
+        var charPair,
             charPairValue,
-            charPairs = of.state.source.pairs || {},
-            boundaries = [],
-            m;
+            m,
+            tokens = [];
         if (value) {
             for (charPair in charPairs) {
                 if (!(charPairValue = charPairs[charPair])) {
                     continue;
                 }
-                boundaries.push('(?:\\' + charPair + '(?:\\\\.|[^\\' + charPair + (charPairValue !== charPair ? '\\' + charPairValue : "") + '])*\\' + charPairValue + ')');
+                tokens.push('(?:\\' + charPair + '(?:\\\\.|[^\\' + charPair + (charPairValue !== charPair ? '\\' + charPairValue : "") + '])*\\' + charPairValue + ')');
             }
-            boundaries.push('\\w+'); // Word(s)
-            boundaries.push('\\s+'); // White-space(s)
-            boundaries.push('[\\s\\S]'); // Last try!
-            if (CTRL_PREFIX + 'ArrowLeft' === keyValue) {
-                if (m = before.match(toPattern('(' + boundaries.join('|') + ')$', ""))) {
-                    of.insert("").select(start - toCount(m[0])).insert(value);
-                    return of.record(), false;
+            tokens.push('\\w+'); // Word(s)
+            tokens.push('\\s+'); // White-space(s)
+            tokens.push('[\\s\\S]'); // Last try!
+            if (CTRL_PREFIX + 'ArrowLeft' === charKey) {
+                offEventDefault(e);
+                if (m = before.match(toPattern('(' + tokens.join('|') + ')$', ""))) {
+                    return editor.insert("").select(start - toCount(m[0])).insert(value).record();
                 }
-                return of.select(), false;
+                return editor.select();
             }
-            if (CTRL_PREFIX + 'ArrowRight' === keyValue) {
-                if (m = after.match(toPattern('^(' + boundaries.join('|') + ')', ""))) {
-                    of.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value);
-                    return of.record(), false;
+            if (CTRL_PREFIX + 'ArrowRight' === charKey) {
+                offEventDefault(e);
+                if (m = after.match(toPattern('^(' + tokens.join('|') + ')', ""))) {
+                    return editor.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
                 }
-                return of.select(), false;
+                return editor.select();
             }
         }
-        var lineAfter = after.split('\n').shift(),
-            lineBefore = before.split('\n').pop(),
-            lineMatch = lineBefore.match(/^(\s+)/);
-        lineMatch && lineMatch[1] || "";
         // Force to select the current line if there is no selection
         end += toCount(lineAfter);
         start -= toCount(lineBefore);
         value = lineBefore + value + lineAfter;
-        if (CTRL_PREFIX + 'ArrowUp' === keyValue) {
+        if (CTRL_PREFIX + 'ArrowUp' === charKey) {
+            offEventDefault(e);
             if (!hasValue('\n', before)) {
-                return of.select(), false;
+                return editor.select();
             }
-            of.insert("");
-            of.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
-            of.replace(/(^|\n)([^\n]*?)$/, "", -1);
-            var $ = of.$();
+            editor.insert("");
+            editor.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+            editor.replace(/(^|\n)([^\n]*?)$/, "", -1);
+            var $ = editor.$();
             before = $.before;
             start = $.start;
             lineBefore = before.split('\n').pop();
-            of.select(start = start - toCount(lineBefore)).wrap(value, '\n');
-            of.select(start, start + toCount(value));
-            return of.record(), false;
+            editor.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+            editor.select(start, start + toCount(value));
+            return editor.record();
         }
-        if (CTRL_PREFIX + 'ArrowDown' === keyValue) {
+        if (CTRL_PREFIX + 'ArrowDown' === charKey) {
+            offEventDefault(e);
             if (!hasValue('\n', after)) {
-                return of.select(), false;
+                return editor.select();
             }
-            of.insert("");
-            of.replace(/^([^\n]*?)(\n|$)/, "", 1);
-            of.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-            var _$ = of.$();
+            editor.insert("");
+            editor.replace(/^([^\n]*?)(\n|$)/, "", 1);
+            editor.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+            var _$ = editor.$();
             after = _$.after;
             end = _$.end;
             lineAfter = after.split('\n').shift();
-            of.select(end = end + toCount(lineAfter)).wrap('\n', value);
+            editor.select(end = end + toCount(lineAfter)).wrap('\n', value);
             end += 1;
-            of.select(end, end + toCount(value));
-            return of.record(), false;
+            editor.select(end, end + toCount(value));
+            return editor.record();
         }
-        return true;
+        return;
     }
 
-    function canKeyDownTab(map, of) {
-        var charIndent = of.state.source.tab || of.state.tab || '\t',
-            keyValue = map + "";
-        // Indent with `⇥`
-        if ('Tab' === keyValue) {
-            return of.push(charIndent).record(), false;
-        }
-        // Outdent with `⇧+⇥`
-        if (SHIFT_PREFIX + 'Tab' === keyValue) {
-            return of.pull(charIndent).record(), false;
-        }
-        return true;
+    function onKeyUp(e) {
+        this.BounceSource();
     }
-    var bounce = debounce(function (of) {
-        return of.record();
-    }, 100);
 
-    function canKeyUp(map, of) {
-        return bounce(of), true;
+    function attach(self) {
+        var $ = this;
+        $.state = fromStates({
+            source: {
+                pairs: {
+                    '`': '`',
+                    '(': ')',
+                    '{': '}',
+                    '[': ']',
+                    '"': '"',
+                    "'": "'",
+                    '<': '>'
+                },
+                type: null
+            }
+        }, $.state);
+        $.toggle = function (open, close, wrap, tidy) {
+            if (tidy === void 0) {
+                tidy = false;
+            }
+            if (!close && "" !== close) {
+                close = open;
+            }
+            var _$$$ = $.$(),
+                after = _$$$.after,
+                before = _$$$.before,
+                value = _$$$.value,
+                closeCount = toCount(close),
+                openCount = toCount(open);
+            if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
+                return $.peel(open, close, wrap);
+            }
+            if (false !== tidy) {
+                if (isString(tidy)) {
+                    tidy = [tidy, tidy];
+                } else if (!isArray(tidy)) {
+                    tidy = ["", ""];
+                }
+                if (!isSet$1(tidy[1])) {
+                    tidy[1] = tidy[0];
+                }
+                $.trim(tidy[0], tidy[1]);
+            }
+            return $.wrap(open, close, wrap);
+        };
+        self.BounceSource = debounce(function () {
+            return $.record();
+        }, 100);
+        onEvent('keydown', self, onKeyDown);
+        onEvent('keyup', self, onKeyUp);
+        return $.record();
     }
-    var state = defaults;
-    exports.canKeyDown = canKeyDown;
-    exports.canKeyDownDent = canKeyDownDent;
-    exports.canKeyDownEnter = canKeyDownEnter;
-    exports.canKeyDownHistory = canKeyDownHistory;
-    exports.canKeyDownMove = canKeyDownMove;
-    exports.canKeyDownTab = canKeyDownTab;
-    exports.canKeyUp = canKeyUp;
-    exports.state = state;
-    exports.that = that;
-    Object.defineProperty(exports, '__esModule', {
-        value: true
-    });
+
+    function detach(self) {
+        var $ = this;
+        delete self.BounceSource;
+        offEvent('keydown', self, onKeyDown);
+        offEvent('keyup', self, onKeyUp);
+        return $;
+    }
+    var index_js = {
+        attach: attach,
+        detach: detach
+    };
+    return index_js;
 }));

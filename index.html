@@ -2,105 +2,35 @@
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Provides a set of key strokes to generate responses like in a typical source code editor." name="description">
-    <title>Text Editor Source 2.2.11</title>
+    <title>Source 3.0.0</title>
+    <link href="../layout/index.min.css" rel="stylesheet">
     <style>
-      * {
-        box-sizing: border-box;
-      }
-      :root {
-        background: #fff;
-        border-top: 4px solid;
-        color: #000;
-        font: normal normal 16px/1.25 serif;
-      }
-      a {
-        color: #009;
-        text-decoration: none;
-      }
-      a,
-      code {
-        word-wrap: break-word;
-      }
-      code {
-        font-family: monospace;
-        font-size: 80%;
-      }
-      footer,
-      header,
-      main,
-      nav {
-        margin: 0 auto;
-        max-width: 700px;
-      }
-      hr {
-        border: 0;
-        border-top: 1px dashed;
-        color: inherit;
-        height: 0;
-      }
-      mark {
-        background: #ff0;
-        border: 1px solid #f00;
-        display: inline-block;
-        height: 1.25em;
-        min-width: 3px;
-        vertical-align: middle;
-      }
-      pre {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
-      pre code {
-        background: #eee;
-        display: block;
-        padding: 1em;
-      }
-      table {
-        width: 100%;
-      }
-      textarea {
-        display: block;
-        height: 20em;
-        width: 100%;
-      }
-      td,
-      th {
-        text-align: left;
-        vertical-align: top;
-      }
-      [role='alert'] {
-        background: #ffa;
-        border: 1px dashed;
-        margin-top: 0;
-        padding: .75em 1em;
-      }
-      .log {
-        color: #060;
-        display: inline-block;
-        font-weight: bold;
-        margin: 0 0 0 1em;
-      }
-      .source {
-        background: #ccc;
-        border: 2px solid #000;
-        color: #000;
-        padding: 1em;
+      @media (min-width: 45rem) {
+        :root {
+          padding-bottom: 3rem;
+          padding-top: 3rem;
+        }
+        body > * {
+          margin-left: auto;
+          margin-right: auto;
+          max-width: 45rem;
+        }
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Text Editor Source 2.2.11</h1>
-      <p>Source code editor extension for <a href="../text-editor/index.html">text editor</a>.</p>
+      <h1>Source 3.0.0</h1>
+      <p>Source code editor extension for <a href="../text-editor/index.html">Text Editor</a>.</p>
       <hr>
       <p>Provides a set of key strokes to generate responses like in a typical source code editor.</p>
     </header>
     <main>
-      <p><label><input checked onchange="this.checked ? setEditor() : letEditor();" type="checkbox"> <span>Enable Source Editor</span></label></p>
-      <p><textarea placeholder="Code goes here&hellip;" spellcheck="false"></textarea></p>
-      <p><button onclick="editor.toggle('&quot;').record();">Toggle Test</button> <code class="log"></code></p>
+      <p><textarea placeholder="Code goes here&hellip;" spellcheck="false" style="display:block;width:100%;"></textarea></p>
+      <p role="group"><button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;').record(), false;">Test Toggle</button></p>
       <h2>Features</h2>
       <ul>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>↵</kbd>.</li>
@@ -116,343 +46,61 @@
         <li><code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⇧</kbd><kbd>↵</kbd>.</li>
         <li><code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.</li>
         <li>Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
-        <li>Press <kbd>⇥</kbd> to indent via <code>canKeyDownTab</code>.</li>
-        <li>Press <kbd>⇧</kbd><kbd>⇥</kbd> to outdent via <code>canKeyDownTab</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>[</kbd> to outdent via <code>canKeyDownDent</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>]</kbd> to indent via <code>canKeyDownDent</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>y</kbd> to redo via <code>canKeyDownHistory</code>.</li>
-        <li>Press <kbd>⎈</kbd><kbd>z</kbd> to undo via <code>canKeyDownHistory</code>.</li>
+        <li>Press <kbd>⎈</kbd><kbd>[</kbd> to outdent.</li>
+        <li>Press <kbd>⎈</kbd><kbd>]</kbd> to indent.</li>
+        <li>Press <kbd>⎈</kbd><kbd>y</kbd> to redo.</li>
+        <li>Press <kbd>⎈</kbd><kbd>z</kbd> to undo.</li>
       </ul>
       <h2>Usage</h2>
-      <h4>Browser</h4>
-      <pre><code>&lt;script src="<a href="../key/index.min.js" target="_blank">./key/index.min.js</a>"&gt;&lt;/script&gt;
-&lt;script src="<a href="../text-editor/index.min.js" target="_blank">./text-editor/index.min.js</a>"&gt;&lt;/script&gt;
+      <h3>Browser</h3>
+      <pre><code>&lt;script src="<a href="../text-editor/index.min.js" target="_blank">./text-editor/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script src="<a href="../text-editor.history/index.min.js" target="_blank">./text-editor.history/index.min.js</a>"&gt;&lt;/script&gt;
+&lt;script src="<a href="../text-editor.key/index.min.js" target="_blank">./text-editor.key/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
-
-  // Add `history()`, `loss()`, `record()`, `redo()`, `toggle()`, `undo()` methods to `TE`
-  Object.assign(TE.prototype, TE.History.that, TE.Source.that);
-
-  // Create a new editor and its key map
-  const editor = new TE(document.querySelector('textarea'));
-  const map = new K(editor);
-
-  const {
-      canKeyDown: canKeyDownSource,
-      canKeyDownEnter: canKeyDownEnterSource,
-      canKeyDownHistory: canKeyDownHistorySource,
-      canKeyDownMove: canKeyDownMoveSource,
-      canKeyDownTab: canKeyDownTabSource,
-      canKeyUp: canKeyUpSource
-  } = TE.Source;
-
-  // Function to combine multiple objects into one object
-  function fromStates(...lot) { <a href="https://github.com/taufik-nurrohman/from" target="_blank">&hellip;</a> }
-
-  editor.state = fromStates({}, editor.state, TE.Source.state, {
-      commands: map.commands,
-      keys: map.keys
+  const editor = new TextEditor(document.querySelector('textarea'), {
+      tab: ' '.repeat(4),
+      with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
   });
-
-  // Reset editor key map
-  editor.self.addEventListener('blur', () => map.pull());
-  editor.self.addEventListener('input', () => map.pull());
-
-  let debounce;
-
-  editor.self.addEventListener('keydown', e =&gt; {
-      map.push(e.key);
-      let command = map.command();
-      // Check for custom command…
-      if (command) {
-          let value = map.fire(command);
-          if (false === value) {
-              e.preventDefault();
-          } else if (null === value) {
-              console.error('Unknown command:', command);
-          }
-      // Else, execute defaults!
-      } else {
-          if (
-              canKeyDownSource(map, editor) &amp;&amp;
-              canKeyDownEnterSource(map, editor) &amp;&amp;
-              canKeyDownHistorySource(map, editor) &amp;&amp;
-              canKeyDownMoveSource(map, editor) &amp;&amp;
-              canKeyDownTabSource(map, editor)
-          ) {
-              // Normal key strokes. Add more key strokes extension here!
-          } else {
-              e.preventDefault();
-          }
-      }
-      // Reset editor key map
-      debounce && clearTimeout(debounce);
-      debounce = setTimeout(() => map.pull(), 1000);
-  });
-
-  editor.self.addEventListener('keyup', e =&gt; {
-      canKeyUpSource(map, editor) || e.preventDefault();
-      // Reset editor key map per `e.key`
-      map.pull(e.key);
-  });
-
-  // Record the first history data!
-  editor.record();
-
 &lt;/script&gt;</code></pre>
-      <h4>CommonJS</h4>
-      <pre><code>const {fromStates} = require('@taufik-nurrohman/from');
-const {debounce} = require('@taufik-nurrohman/tick');
-const K = require('@taufik-nurrohman/key').default;
-const TE = require('@taufik-nurrohman/text-editor').default;
-const {that: thatHistory} = require('@taufik-nurrohman/text-editor.history');
+      <h3>CommonJS</h3>
+      <pre><code>const TextEditor = require('@taufik-nurrohman/text-editor').default;
+const TextEditorHistory = require('@taufik-nurrohman/text-editor.history').default;
+const TextEditorKey = require('@taufik-nurrohman/text-editor.key').default;
+const TextEditorSource = require('@taufik-nurrohman/text-editor.source').default;
 
-const {
-    canKeyDown: canKeyDownSource,
-    canKeyDownEnter: canKeyDownEnterSource,
-    canKeyDownHistory: canKeyDownHistorySource,
-    canKeyDownMove: canKeyDownMoveSource,
-    canKeyDownTab: canKeyDownTabSource,
-    canKeyUp: canKeyUpSource,
-    state: stateSource,
-    that: thatSource
-} = require('@taufik-nurrohman/text-editor.source');
+const editor = new TextEditor(document.querySelector('textarea'), {
+    tab: ' '.repeat(4),
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
+});</code></pre>
+      <h3>ECMAScript</h3>
+      <pre><code>import TextEditor from '@taufik-nurrohman/text-editor';
+import TextEditorHistory from '@taufik-nurrohman/text-editor.history';
+import TextEditorKey from '@taufik-nurrohman/text-editor.key';
+import TextEditorSource from '@taufik-nurrohman/text-editor.source';
 
-// Add `history()`, `loss()`, `record()`, `redo()`, `toggle()`, `undo()` methods to `TE`
-Object.assign(TE.prototype, thatHistory, thatSource);
-
-// Create a new editor and its key map
-const editor = new TE(document.querySelector('textarea'));
-const map = new K(editor);
-
-// Reset editor key map
-const bounce = debounce(() => map.pull(), 1000);
-
-editor.state = fromStates({}, editor.state, stateSource, {
-    commands: map.commands,
-    keys: map.keys
-});
-
-// Reset editor key map
-editor.self.addEventListener('blur', () => map.pull());
-editor.self.addEventListener('input', () => map.pull());
-
-editor.self.addEventListener('keydown', e =&gt; {
-    map.push(e.key);
-    let command = map.command();
-    // Check for custom command…
-    if (command) {
-        let value = map.fire(command);
-        if (false === value) {
-            e.preventDefault();
-        } else if (null === value) {
-            console.error('Unknown command:', command);
-        }
-    // Else, execute defaults!
-    } else {
-        if (
-            canKeyDownSource(map, editor) &amp;&amp;
-            canKeyDownEnterSource(map, editor) &amp;&amp;
-            canKeyDownHistorySource(map, editor) &amp;&amp;
-            canKeyDownMoveSource(map, editor) &amp;&amp;
-            canKeyDownTabSource(map, editor)
-        ) {
-            // Normal key strokes. Add more key strokes extension here!
-        } else {
-            e.preventDefault();
-        }
-    }
-    bounce();
-});
-
-editor.self.addEventListener('keyup', e =&gt; {
-    canKeyUpSource(map, editor) || e.preventDefault();
-    // Reset editor key map per `e.key`
-    map.pull(e.key);
-});
-
-// Record the first history data!
-editor.record();</code></pre>
-      <h4>ECMAScript</h4>
-      <pre><code>import {fromStates} from '@taufik-nurrohman/from';
-import {debounce} from '@taufik-nurrohman/tick';
-import K from '@taufik-nurrohman/key';
-import TE from '@taufik-nurrohman/text-editor';
-import {that as thatHistory} from '@taufik-nurrohman/text-editor.history';
-
-import {
-    canKeyDown as canKeyDownSource,
-    canKeyDownEnter as canKeyDownEnterSource,
-    canKeyDownHistory as canKeyDownHistorySource,
-    canKeyDownMove as canKeyDownMoveSource,
-    canKeyDownTab as canKeyDownTabSource,
-    canKeyUp as canKeyUpSource,
-    state as stateSource,
-    that as thatSource
-} from '@taufik-nurrohman/text-editor.source';
-
-// Add `history()`, `loss()`, `record()`, `redo()`, `toggle()`, `undo()` methods to `TE`
-Object.assign(TE.prototype, thatHistory, thatSource);
-
-// Create a new editor and its key map
-const editor = new TE(document.querySelector('textarea'));
-const map = new K(editor);
-
-// Reset editor key map
-const bounce = debounce(() => map.pull(), 1000);
-
-editor.state = fromStates({}, editor.state, stateSource, {
-    commands: map.commands,
-    keys: map.keys
-});
-
-// Reset editor key map
-editor.self.addEventListener('blur', () => map.pull());
-editor.self.addEventListener('input', () => map.pull());
-
-editor.self.addEventListener('keydown', e =&gt; {
-    map.push(e.key);
-    let command = map.command();
-    // Check for custom command…
-    if (command) {
-        let value = map.fire(command);
-        if (false === value) {
-            e.preventDefault();
-        } else if (null === value) {
-            console.error('Unknown command:', command);
-        }
-    // Else, execute defaults!
-    } else {
-        if (
-            canKeyDownSource(map, editor) &amp;&amp;
-            canKeyDownEnterSource(map, editor) &amp;&amp;
-            canKeyDownHistorySource(map, editor) &amp;&amp;
-            canKeyDownMoveSource(map, editor) &amp;&amp;
-            canKeyDownTabSource(map, editor)
-        ) {
-            // Normal key strokes. Add more key strokes extension here!
-        } else {
-            e.preventDefault();
-        }
-    }
-    bounce();
-});
-
-editor.self.addEventListener('keyup', e =&gt; {
-    canKeyUpSource(map, editor) || e.preventDefault();
-    // Reset editor key map per `e.key`
-    map.pull(e.key);
-});
-
-// Record the first history data!
-editor.record();</code></pre>
-      <h3>Methods</h3>
-      <h4>editor.toggle(open, close = open, wrap = false, tidy = false)</h4>
+const editor = new TextEditor(document.querySelector('textarea'), {
+    tab: ' '.repeat(4),
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
+});</code></pre>
+      <h2>Methods</h2>
+      <h3><code>editor.toggle(open, close = open, wrap = false, tidy = false)</code></h3>
       <p>Toggle wrap and peel selection with <code>open</code> and <code>close</code> string.</p>
-      <h3>Properties</h3>
-      <h4>TE.Source.state</h4>
-      <p>Return the default state to be combined with <code>editor.state</code>.</p>
-      <h3>Strokes</h3>
-      <p>Strokes can either return <code>false</code> or <code>true</code>. If it returns <code>false</code>, it means that this extension has manipulated the existing value. If it returns <code>true</code>, it means that current key stroke works normally.</p>
-      <h4>TE.Source.canKeyDown(map, of)</h4>
-      <p>This will handle tasks such as automatic bracket closing and continuous indentation.</p>
-      <h4>TE.Source.canKeyDownDent(map, of)</h4>
-      <p>Strokes to handle indentation tasks using the key combination <kbd>⎈</kbd><kbd>]</kbd> for indent and <kbd>⎈</kbd><kbd>[</kbd> for outdent. Use this as an alternative to <code>canKeyDownTab</code> so that it is possible to use the tab key normally.</p>
-      <h4>TE.Source.canKeyDownEnter(map, of)</h4>
-      <p>Strokes to handle line insertion tasks using the key combination <kbd>⎈</kbd><kbd>↵</kbd> and <kbd>⎈</kbd><kbd>↵</kbd>.</p>
-      <h4>TE.Source.canKeyDownHistory(map, of)</h4>
-      <p>Strokes to handle history tasks using the key combination <kbd>⎈</kbd><kbd>z</kbd> for undo and <kbd>⎈</kbd><kbd>y</kbd> for redo.</p>
-      <h4>TE.Source.canKeyDownMove(map, of)</h4>
-      <p>Strokes to handle line or selection move tasks using the key combination <kbd>⎈</kbd><kbd>←</kbd>, <kbd>⎈</kbd><kbd>↑</kbd>, <kbd>⎈</kbd><kbd>→</kbd>, and <kbd>⎈</kbd><kbd>↓</kbd>.</p>
-      <h4>TE.Source.canKeyDownTab(map, of)</h4>
-      <p>Strokes to handle indentation tasks using the <kbd>⇥</kbd> key for indent and <kbd>⇧</kbd><kbd>⇥</kbd> for outdent.</p>
-      <h4>TE.Source.canKeyUp(map, of)</h4>
-      <p>Currently only functions to update the history data as you type.</p>
     </main>
     <footer>
       <hr>
-      <p>&copy; 2023 <a href="/">Taufik Nurrohman</a></p>
+      <p>&copy; 2024 <a href="/">Taufik Nurrohman</a></p>
     </footer>
     <script src="../key/index.min.js"></script>
     <script src="../text-editor/index.min.js"></script>
     <script src="../text-editor.history/index.min.js"></script>
+    <script src="../text-editor.key/index.min.js"></script>
     <script src="index.min.js"></script>
     <script>
-      Object.assign(TE.prototype, TE.History.that, TE.Source.that);
-      let editor = new TE(document.querySelector('textarea'), '  '),
-          log = document.querySelector('code.log'),
-          map = new K(editor),
-          {
-              canKeyDown: canKeyDownSource,
-              canKeyDownDent: canKeyDownDentSource,
-              canKeyDownEnter: canKeyDownEnterSource,
-              canKeyDownHistory: canKeyDownHistorySource,
-              canKeyDownMove: canKeyDownMoveSource,
-              canKeyUp: canKeyUpSource
-          } = TE.Source;
-      editor.state = Object.assign({}, editor.state, TE.Source.state, {
-          commands: map.commands,
-          keys: map.keys
+      const editor = new TextEditor(document.querySelector('textarea'), {
+          tab: ' '.repeat(4),
+          with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
       });
-
-      function onBlur() {
-          map.pull(); // Reset all!
-      }
-
-      function onInput() {
-          map.pull(); // Reset all!
-      }
-      let debounce;
-
-      function onKeyDown(e) {
-          map.push(e.key);
-          let command = map.command();
-          // Check for custom command…
-          if (command) {
-              let value = map.fire(command);
-              if (false === value) {
-                  e.preventDefault();
-              } else if (null === value) {
-                  console.error('Unknown command:', command);
-              }
-              // Else, run the defaults!
-          } else {
-              canKeyDownSource(map, editor) && canKeyDownDentSource(map, editor) && canKeyDownEnterSource(map, editor) && canKeyDownHistorySource(map, editor) && canKeyDownMoveSource(map, editor) || e.preventDefault();
-          }
-          log.textContent = map + "";
-          debounce && clearTimeout(debounce);
-          debounce = setTimeout(() => map.pull(), 1000);
-      }
-
-      function onKeyUp(e) {
-          canKeyUpSource(map, editor) || e.preventDefault();
-          map.pull(e.key);
-          log.textContent = map + "";
-      }
-
-      function letEditor() {
-          editor.self.classList.remove('source');
-          editor.self.parentNode.nextElementSibling.style.display = 'none';
-          editor.self.removeEventListener('blur', onBlur);
-          editor.self.removeEventListener('input', onInput);
-          editor.self.removeEventListener('keydown', onKeyDown);
-          editor.self.removeEventListener('keyup', onKeyUp);
-          editor.loss(true); // Remove all history data!
-          return editor;
-      }
-
-      function setEditor() {
-          editor.self.classList.add('source');
-          editor.self.parentNode.nextElementSibling.style.display = "";
-          editor.self.addEventListener('blur', onBlur, false);
-          editor.self.addEventListener('input', onInput, false);
-          editor.self.addEventListener('keydown', onKeyDown, false);
-          editor.self.addEventListener('keyup', onKeyUp, false);
-          editor.record(); // Record the first history data!
-          return editor;
-      }
-      setEditor();
     </script>
   </body>
 </html>

@@ -1,0 +1,105 @@
+extends _index.pug
+
+block state
+  - const scripts = ['../key/index.min.js', '../text-editor/index.min.js', '../text-editor.history/index.min.js', '../text-editor.key/index.min.js', 'index.min.js']
+  - const styles = ['../layout/index.min.css']
+  - const theme = '#000'
+  - const title = 'Source ' + version
+
+block script
+  script
+    | const editor = new TextEditor(document.querySelector('textarea'), {
+    |     tab: ' '.repeat(4),
+    |     with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
+    | });
+
+block style
+  style
+    | @media (min-width: 45rem) {
+    |   :root {
+    |     padding-bottom: 3rem;
+    |     padding-top: 3rem;
+    |   }
+    |   body > * {
+    |     margin-left: auto;
+    |     margin-right: auto;
+    |     max-width: 45rem;
+    |   }
+    | }
+
+block content
+  header
+    h1= title
+    p Source code editor extension for #[a(href='../text-editor/index.html') Text Editor].
+    hr
+    p Provides a set of key strokes to generate responses like in a typical source code editor.
+  main
+    p
+      textarea(placeholder!='Code goes here&hellip;' spellcheck='false' style={
+        'display': 'block',
+        'width': '100%'
+      })
+    p(role='group')
+      button(onclick='return editor.toggle(\'<b>\', \'</b>\').record(), false;') Test Toggle
+    h2 Features
+    ul
+      li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>↵</kbd>.
+      li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>⌫</kbd>.
+      li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>␣</kbd>.
+      li <code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>⌫</kbd>.
+      li <code><mark>asdf</mark> asdf</code>, then press <kbd>⎈</kbd><kbd>→</kbd>.
+      li <code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
+      li <code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↑</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↓</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>↵</kbd>.
+      li <code>as<mark></mark>df</code> or <code><mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>⇧</kbd><kbd>↵</kbd>.
+      li <code>asdf <mark>asdf</mark></code>, then press <kbd>⎈</kbd><kbd>←</kbd>.
+      li Press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.
+      li Press <kbd>⎈</kbd><kbd>[</kbd> to outdent.
+      li Press <kbd>⎈</kbd><kbd>]</kbd> to indent.
+      li Press <kbd>⎈</kbd><kbd>y</kbd> to redo.
+      li Press <kbd>⎈</kbd><kbd>z</kbd> to undo.
+    h2 Usage
+    h3 Browser
+    pre: code
+      | &lt;script src="#[a(href='../text-editor/index.min.js' target='_blank') ./text-editor/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script src="#[a(href='../text-editor.history/index.min.js' target='_blank') ./text-editor.history/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script src="#[a(href='../text-editor.key/index.min.js' target='_blank') ./text-editor.key/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script src="#[a(href='index.min.js' target='_blank') ./text-editor.source/index.min.js]"&gt;&lt;/script&gt;
+      | &lt;script&gt;
+      |   const editor = new TextEditor(document.querySelector('textarea'), {
+      |       tab: ' '.repeat(4),
+      |       with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
+      |   });
+      | &lt;/script&gt;
+    h3 CommonJS
+    pre: code
+      | const TextEditor = require('@taufik-nurrohman/text-editor').default;
+      | const TextEditorHistory = require('@taufik-nurrohman/text-editor.history').default;
+      | const TextEditorKey = require('@taufik-nurrohman/text-editor.key').default;
+      | const TextEditorSource = require('@taufik-nurrohman/text-editor.source').default;
+      |
+      | const editor = new TextEditor(document.querySelector('textarea'), {
+      |     tab: ' '.repeat(4),
+      |     with: [TextEditorHistory, TextEditorKey, TextEditorSource]
+      | });
+    h3 ECMAScript
+    pre: code
+      | import TextEditor from '@taufik-nurrohman/text-editor';
+      | import TextEditorHistory from '@taufik-nurrohman/text-editor.history';
+      | import TextEditorKey from '@taufik-nurrohman/text-editor.key';
+      | import TextEditorSource from '@taufik-nurrohman/text-editor.source';
+      |
+      | const editor = new TextEditor(document.querySelector('textarea'), {
+      |     tab: ' '.repeat(4),
+      |     with: [TextEditorHistory, TextEditorKey, TextEditorSource]
+      | });
+    h2 Methods
+    h3: code editor.toggle(open, close = open, wrap = false, tidy = false)
+    p Toggle wrap and peel selection with #[code open] and #[code close] string.
+  footer
+    hr
+    p
+      != '&copy; ' + year + ' '
+      a(href='/') Taufik Nurrohman

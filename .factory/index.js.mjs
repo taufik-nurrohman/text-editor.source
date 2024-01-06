@@ -10,17 +10,22 @@ const ALT_PREFIX = 'Alt-';
 const CTRL_PREFIX = 'Control-';
 const SHIFT_PREFIX = 'Shift-';
 
+const bounce = debounce($ => $.record(), 10);
+
 function onKeyDown(e) {
     let self = this,
         editor = self.TextEditor,
-        key = self.Key;
-    if (!editor || !key) {
+        keys = editor.k();
+    if (!editor || e.defaultPrevented) {
+        return;
+    }
+    bounce(editor);
+    if (editor.keys[keys]) {
         return;
     }
     let charAfter,
         charBefore,
         charIndent = editor.state.source?.tab || editor.state.tab || '\t',
-        charKey = key + "",
         charPairs = editor.state.source?.pairs || {},
         charPairsValues = toObjectValues(charPairs);
     let {after, before, end, start, value} = editor.$(),
@@ -28,27 +33,7 @@ function onKeyDown(e) {
         lineBefore = before.split('\n').pop(),
         lineMatch = lineBefore.match(/^(\s+)/),
         lineMatchIndent = lineMatch && lineMatch[1] || "";
-    // Indent with `⎈]`
-    if (CTRL_PREFIX + ']' === charKey) {
-        offEventDefault(e);
-        return editor.push(charIndent).record();
-    }
-    // Outdent with `⎈[`
-    if (CTRL_PREFIX + '[' === charKey) {
-        offEventDefault(e);
-        return editor.pull(charIndent).record();
-    }
-    // Redo with `⎈y`
-    if (CTRL_PREFIX + 'y' === charKey) {
-        offEventDefault(e);
-        return editor.redo();
-    }
-    // Undo with `⎈z`
-    if (CTRL_PREFIX + 'z' === charKey) {
-        offEventDefault(e);
-        return editor.undo();
-    }
-    if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === charKey) {
+    if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === keys) {
         if (before || after) {
             // Insert line above with `⎈⇧↵`
             offEventDefault(e);
@@ -56,7 +41,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if (CTRL_PREFIX + 'Enter' === charKey) {
+    if (CTRL_PREFIX + 'Enter' === keys) {
         if (before || after) {
             // Insert line below with `⎈↵`
             offEventDefault(e);
@@ -64,11 +49,11 @@ function onKeyDown(e) {
         }
     }
     // Do nothing
-    if (ALT_PREFIX === charKey + '-' || CTRL_PREFIX === charKey + '-') {
+    if (ALT_PREFIX === keys + '-' || CTRL_PREFIX === keys + '-') {
         offEventDefault(e);
         return;
     }
-    if (' ' === charKey) {
+    if (' ' === keys) {
         charAfter = charPairs[charBefore = before.slice(-1)];
         if (!value && charAfter && charBefore && charAfter === after[0]) {
             offEventDefault(e);
@@ -76,7 +61,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if ('Backspace' === charKey) {
+    if ('Backspace' === keys) {
         charAfter = charPairs[charBefore = before.slice(-1)];
         // Do nothing on escape
         if ('\\' === charBefore) {
@@ -114,7 +99,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if ('Enter' === charKey || SHIFT_PREFIX + 'Enter' === charKey) {
+    if ('Enter' === keys || SHIFT_PREFIX + 'Enter' === keys) {
         if (!value) {
             if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                 offEventDefault(e);
@@ -132,9 +117,9 @@ function onKeyDown(e) {
         return;
     }
     charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
-    charKey = charKey.replace(SHIFT_PREFIX, "");
+    keys = keys.replace(SHIFT_PREFIX, "");
     // `|}`
-    if (!value && after && before && charAfter && charKey === charAfter) {
+    if (!value && after && before && charAfter && keys === charAfter) {
         // Move to the next character
         // `}|`
         offEventDefault(e);
@@ -143,14 +128,14 @@ function onKeyDown(e) {
     for (charBefore in charPairs) {
         charAfter = charPairs[charBefore];
         // `{|`
-        if (charKey === charBefore && charAfter) {
+        if (keys === charBefore && charAfter) {
             // Wrap pair or selection
             // `{|}` `{|aaa|}`
             offEventDefault(e);
             return editor.wrap(charBefore, charAfter).record();
         }
         // `|}`
-        if (charKey === charAfter) {
+        if (keys === charAfter) {
             if (value) {
                 // Wrap selection
                 // `{|aaa|}`
@@ -173,14 +158,14 @@ function onKeyDown(e) {
         tokens.push('\\w+'); // Word(s)
         tokens.push('\\s+'); // White-space(s)
         tokens.push('[\\s\\S]'); // Last try!
-        if (CTRL_PREFIX + 'ArrowLeft' === charKey) {
+        if (CTRL_PREFIX + 'ArrowLeft' === keys) {
             offEventDefault(e);
             if (m = before.match(toPattern('(' + tokens.join('|') + ')$', ""))) {
                 return editor.insert("").select(start - toCount(m[0])).insert(value).record();
             }
             return editor.select();
         }
-        if (CTRL_PREFIX + 'ArrowRight' === charKey) {
+        if (CTRL_PREFIX + 'ArrowRight' === keys) {
             offEventDefault(e);
             if (m = after.match(toPattern('^(' + tokens.join('|') + ')', ""))) {
                 return editor.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
@@ -192,7 +177,7 @@ function onKeyDown(e) {
     end += toCount(lineAfter);
     start -= toCount(lineBefore);
     value = lineBefore + value + lineAfter;
-    if (CTRL_PREFIX + 'ArrowUp' === charKey) {
+    if (CTRL_PREFIX + 'ArrowUp' === keys) {
         offEventDefault(e);
         if (!hasValue('\n', before)) {
             return editor.select();
@@ -208,7 +193,7 @@ function onKeyDown(e) {
         editor.select(start, start + toCount(value));
         return editor.record();
     }
-    if (CTRL_PREFIX + 'ArrowDown' === charKey) {
+    if (CTRL_PREFIX + 'ArrowDown' === keys) {
         offEventDefault(e);
         if (!hasValue('\n', after)) {
             return editor.select();
@@ -226,10 +211,6 @@ function onKeyDown(e) {
         return editor.record();
     }
     return;
-}
-
-function onKeyUp(e) {
-    this.BounceSource();
 }
 
 function attach(self) {
@@ -274,17 +255,13 @@ function attach(self) {
         }
         return $.wrap(open, close, wrap);
     };
-    self.BounceSource = debounce(() => $.record(), 100);
     onEvent('keydown', self, onKeyDown);
-    onEvent('keyup', self, onKeyUp);
     return $.record();
 }
 
 function detach(self) {
     let $ = this;
-    delete self.BounceSource;
     offEvent('keydown', self, onKeyDown);
-    offEvent('keyup', self, onKeyUp);
     return $;
 }
 

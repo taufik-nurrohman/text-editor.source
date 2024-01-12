@@ -51,25 +51,28 @@
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
 
+  const TextEditorSourceExtra = {
+      attach: function () {
+          let $ = this;
+          $.key('Control-[', () => {
+              return $.pull().record(), false;
+          });
+          $.key('Control-]', () => {
+              return $.push().record(), false;
+          });
+          $.key('Control-y', () => {
+              return $.redo(), false;
+          });
+          $.key('Control-z', () => {
+              return $.undo(), false;
+          });
+          return $;
+      }
+  };
+
   const editor = new TextEditor(document.querySelector('textarea'), {
       tab: ' '.repeat(4),
-      with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
-  });
-
-  editor.key('Control-[', function () {
-      return this.pull().record(), false;
-  });
-
-  editor.key('Control-]', function () {
-      return this.push().record(), false;
-  });
-
-  editor.key('Control-y', function () {
-      return this.redo(), false;
-  });
-
-  editor.key('Control-z', function () {
-      return this.undo(), false;
+      with: [TextEditor.History, TextEditor.Key, TextEditor.Source, TextEditorSourceExtra]
   });
 
 &lt;/script&gt;</code></pre>
@@ -79,25 +82,28 @@ const TextEditorHistory = require('@taufik-nurrohman/text-editor.history').defau
 const TextEditorKey = require('@taufik-nurrohman/text-editor.key').default;
 const TextEditorSource = require('@taufik-nurrohman/text-editor.source').default;
 
+const TextEditorSourceExtra = {
+    attach: function () {
+        let $ = this;
+        $.key('Control-[', () => {
+            return $.pull().record(), false;
+        });
+        $.key('Control-]', () => {
+            return $.push().record(), false;
+        });
+        $.key('Control-y', () => {
+            return $.redo(), false;
+        });
+        $.key('Control-z', () => {
+            return $.undo(), false;
+        });
+        return $;
+    }
+};
+
 const editor = new TextEditor(document.querySelector('textarea'), {
     tab: ' '.repeat(4),
-    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
-});
-
-editor.key('Control-[', function () {
-    return this.pull().record(), false;
-});
-
-editor.key('Control-]', function () {
-    return this.push().record(), false;
-});
-
-editor.key('Control-y', function () {
-    return this.redo(), false;
-});
-
-editor.key('Control-z', function () {
-    return this.undo(), false;
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource, TextEditorSourceExtra]
 });</code></pre>
       <h3>ECMAScript</h3>
       <pre><code>import TextEditor from '@taufik-nurrohman/text-editor';
@@ -105,25 +111,28 @@ import TextEditorHistory from '@taufik-nurrohman/text-editor.history';
 import TextEditorKey from '@taufik-nurrohman/text-editor.key';
 import TextEditorSource from '@taufik-nurrohman/text-editor.source';
 
+const TextEditorSourceExtra = {
+    attach: function () {
+        let $ = this;
+        $.key('Control-[', () => {
+            return $.pull().record(), false;
+        });
+        $.key('Control-]', () => {
+            return $.push().record(), false;
+        });
+        $.key('Control-y', () => {
+            return $.redo(), false;
+        });
+        $.key('Control-z', () => {
+            return $.undo(), false;
+        });
+        return $;
+    }
+};
+
 const editor = new TextEditor(document.querySelector('textarea'), {
     tab: ' '.repeat(4),
-    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
-});
-
-editor.key('Control-[', function () {
-    return this.pull().record(), false;
-});
-
-editor.key('Control-]', function () {
-    return this.push().record(), false;
-});
-
-editor.key('Control-y', function () {
-    return this.redo(), false;
-});
-
-editor.key('Control-z', function () {
-    return this.undo(), false;
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource, TextEditorSourceExtra]
 });</code></pre>
       <h2>Methods</h2>
       <h3>Instance Methods</h3>
@@ -141,21 +150,27 @@ editor.key('Control-z', function () {
     <script src="../text-editor.key/index.min.js"></script>
     <script src="index.min.js"></script>
     <script>
+      const TextEditorSourceExtra = {
+          attach: function () {
+              let $ = this;
+              $.key('Control-[', () => {
+                  return $.pull().record(), false;
+              });
+              $.key('Control-]', () => {
+                  return $.push().record(), false;
+              });
+              $.key('Control-y', () => {
+                  return $.redo(), false;
+              });
+              $.key('Control-z', () => {
+                  return $.undo(), false;
+              });
+              return $;
+          }
+      };
       const editor = new TextEditor(document.querySelector('textarea'), {
           tab: ' '.repeat(4),
-          with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
-      });
-      editor.key('Control-[', function () {
-          return this.pull().record(), false;
-      });
-      editor.key('Control-]', function () {
-          return this.push().record(), false;
-      });
-      editor.key('Control-y', function () {
-          return this.redo(), false;
-      });
-      editor.key('Control-z', function () {
-          return this.undo(), false;
+          with: [TextEditor.History, TextEditor.Key, TextEditor.Source, TextEditorSourceExtra]
       });
     </script>
   </body>

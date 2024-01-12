@@ -25,6 +25,7 @@
       <hr>
     </header>
     <main>
+      <p><label><input checked onchange="return TextEditor.Source[this.checked ? 'attach' : 'detach'].call(editor), false;" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <p><textarea placeholder="Code goes here&hellip;" spellcheck="false" style="display:block;width:100%;"></textarea></p>
       <p role="group"><button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;').record(), false;">Test Toggle</button></p>
       <h2>Features</h2>
@@ -33,6 +34,7 @@
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Backspace</kbd>.</li>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>&nbsp;</kbd> (Space).</li>
         <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>Backspace</kbd>.</li>
+        <li><code>(<mark>asdf</mark>)</code>, <code>[<mark>asdf</mark>]</code>, <code>{<mark>asdf</mark>}</code>, <code>'<mark>asdf</mark>'</code>, <code>"<mark>asdf</mark>"</code>, or <code>&lt;<mark>asdf</mark>&gt;</code>, then press <kbd>Delete</kbd>.</li>
         <li><code><mark>asdf</mark> asdf</code>, then press <kbd>Control</kbd> + <kbd>ArrowRight</kbd>.</li>
         <li><code><mark>asdf</mark></code> then press <kbd>(</kbd>, <kbd>[</kbd>, <kbd>{</kbd>, <kbd>'</kbd>, <kbd>"</kbd>, or <kbd>&lt;</kbd>.</li>
         <li><code><mark>asdf</mark></code> then press <kbd>)</kbd>, <kbd>]</kbd>, <kbd>}</kbd>, or <kbd>&gt;</kbd>.</li>
@@ -51,28 +53,29 @@
 &lt;script src="<a href="index.min.js" target="_blank">./text-editor.source/index.min.js</a>"&gt;&lt;/script&gt;
 &lt;script&gt;
 
-  const TextEditorSourceExtra = {
-      attach: function () {
-          let $ = this;
-          $.key('Control-[', () => {
-              return $.pull().record(), false;
-          });
-          $.key('Control-]', () => {
-              return $.push().record(), false;
-          });
-          $.key('Control-y', () => {
-              return $.redo(), false;
-          });
-          $.key('Control-z', () => {
-              return $.undo(), false;
-          });
-          return $;
-      }
-  };
-
   const editor = new TextEditor(document.querySelector('textarea'), {
-      tab: ' '.repeat(4),
-      with: [TextEditor.History, TextEditor.Key, TextEditor.Source, TextEditorSourceExtra]
+      commands: {
+          pull: function () {
+              return this.pull().record(), false;
+          },
+          push: function () {
+              return this.push().record(), false;
+          },
+          redo: function () {
+              return this.redo(), false;
+          },
+          undo: function () {
+              return this.undo(), false;
+          }
+      },
+      keys: {
+          'Control-[': 'pull',
+          'Control-]': 'push',
+          'Control-y': 'redo',
+          'Control-z': 'undo'
+      },
+      tab: 4,
+      with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
   });
 
 &lt;/script&gt;</code></pre>
@@ -82,28 +85,29 @@ const TextEditorHistory = require('@taufik-nurrohman/text-editor.history').defau
 const TextEditorKey = require('@taufik-nurrohman/text-editor.key').default;
 const TextEditorSource = require('@taufik-nurrohman/text-editor.source').default;
 
-const TextEditorSourceExtra = {
-    attach: function () {
-        let $ = this;
-        $.key('Control-[', () => {
-            return $.pull().record(), false;
-        });
-        $.key('Control-]', () => {
-            return $.push().record(), false;
-        });
-        $.key('Control-y', () => {
-            return $.redo(), false;
-        });
-        $.key('Control-z', () => {
-            return $.undo(), false;
-        });
-        return $;
-    }
-};
-
 const editor = new TextEditor(document.querySelector('textarea'), {
-    tab: ' '.repeat(4),
-    with: [TextEditorHistory, TextEditorKey, TextEditorSource, TextEditorSourceExtra]
+    commands: {
+        pull: function () {
+            return this.pull().record(), false;
+        },
+        push: function () {
+            return this.push().record(), false;
+        },
+        redo: function () {
+            return this.redo(), false;
+        },
+        undo: function () {
+            return this.undo(), false;
+        }
+    },
+    keys: {
+        'Control-[': 'pull',
+        'Control-]': 'push',
+        'Control-y': 'redo',
+        'Control-z': 'undo'
+    },
+    tab: 4,
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
 });</code></pre>
       <h3>ECMAScript</h3>
       <pre><code>import TextEditor from '@taufik-nurrohman/text-editor';
@@ -111,28 +115,29 @@ import TextEditorHistory from '@taufik-nurrohman/text-editor.history';
 import TextEditorKey from '@taufik-nurrohman/text-editor.key';
 import TextEditorSource from '@taufik-nurrohman/text-editor.source';
 
-const TextEditorSourceExtra = {
-    attach: function () {
-        let $ = this;
-        $.key('Control-[', () => {
-            return $.pull().record(), false;
-        });
-        $.key('Control-]', () => {
-            return $.push().record(), false;
-        });
-        $.key('Control-y', () => {
-            return $.redo(), false;
-        });
-        $.key('Control-z', () => {
-            return $.undo(), false;
-        });
-        return $;
-    }
-};
-
 const editor = new TextEditor(document.querySelector('textarea'), {
-    tab: ' '.repeat(4),
-    with: [TextEditorHistory, TextEditorKey, TextEditorSource, TextEditorSourceExtra]
+    commands: {
+        pull: function () {
+            return this.pull().record(), false;
+        },
+        push: function () {
+            return this.push().record(), false;
+        },
+        redo: function () {
+            return this.redo(), false;
+        },
+        undo: function () {
+            return this.undo(), false;
+        }
+    },
+    keys: {
+        'Control-[': 'pull',
+        'Control-]': 'push',
+        'Control-y': 'redo',
+        'Control-z': 'undo'
+    },
+    tab: 4,
+    with: [TextEditorHistory, TextEditorKey, TextEditorSource]
 });</code></pre>
       <h2>Methods</h2>
       <h3>Instance Methods</h3>
@@ -150,27 +155,29 @@ const editor = new TextEditor(document.querySelector('textarea'), {
     <script src="../text-editor.key/index.min.js"></script>
     <script src="index.min.js"></script>
     <script>
-      const TextEditorSourceExtra = {
-          attach: function () {
-              let $ = this;
-              $.key('Control-[', () => {
-                  return $.pull().record(), false;
-              });
-              $.key('Control-]', () => {
-                  return $.push().record(), false;
-              });
-              $.key('Control-y', () => {
-                  return $.redo(), false;
-              });
-              $.key('Control-z', () => {
-                  return $.undo(), false;
-              });
-              return $;
-          }
-      };
       const editor = new TextEditor(document.querySelector('textarea'), {
-          tab: ' '.repeat(4),
-          with: [TextEditor.History, TextEditor.Key, TextEditor.Source, TextEditorSourceExtra]
+          commands: {
+              pull: function () {
+                  return this.pull().record(), false;
+              },
+              push: function () {
+                  return this.push().record(), false;
+              },
+              redo: function () {
+                  return this.redo(), false;
+              },
+              undo: function () {
+                  return this.undo(), false;
+              }
+          },
+          keys: {
+              'Control-[': 'pull',
+              'Control-]': 'push',
+              'Control-y': 'redo',
+              'Control-z': 'undo'
+          },
+          tab: 4,
+          with: [TextEditor.History, TextEditor.Key, TextEditor.Source]
       });
     </script>
   </body>

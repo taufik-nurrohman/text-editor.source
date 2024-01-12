@@ -50,8 +50,14 @@
     var isInstance$1 = function isInstance(x, of) {
         return x && isSet$1(of) && x instanceof of ;
     };
+    var isInteger = function isInteger(x) {
+        return isNumber(x) && 0 === x % 1;
+    };
     var isNull$1 = function isNull(x) {
         return null === x;
+    };
+    var isNumber = function isNumber(x) {
+        return 'number' === typeof x;
     };
     var isObject = function isObject(x, isPlain) {
         if (isPlain === void 0) {
@@ -106,17 +112,8 @@
         }
         return out;
     };
-    var offEvent = function offEvent(name, node, then) {
-        node.removeEventListener(name, then);
-    };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
-    };
-    var onEvent = function onEvent(name, node, then, options) {
-        if (options === void 0) {
-            options = false;
-        }
-        node.addEventListener(name, then, options);
     };
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
@@ -145,33 +142,34 @@
     var bounce = debounce(function ($) {
         return $.record();
     }, 10);
-    var id = 'TextEditor_' + Date.now();
 
     function onKeyDown(e) {
-        var _editor$state$source, _editor$state$source2;
-        var self = this,
-            editor = self[id],
-            key = editor.k(false).pop(),
+        var _$$state$source, _$$state$source2;
+        var $ = this,
+            key = $.k(false).pop(),
             // Capture the last key
-            keys = editor.k();
-        if (!editor || e.defaultPrevented) {
+            keys = $.k();
+        if (!$ || e.defaultPrevented) {
             return;
         }
-        bounce(editor);
-        if (editor.keys[keys]) {
+        bounce($);
+        if ($.keys[keys]) {
             return;
         }
         var charAfter,
             charBefore,
-            charIndent = ((_editor$state$source = editor.state.source) == null ? void 0 : _editor$state$source.tab) || editor.state.tab || '\t',
-            charPairs = ((_editor$state$source2 = editor.state.source) == null ? void 0 : _editor$state$source2.pairs) || {},
+            charIndent = ((_$$state$source = $.state.source) == null ? void 0 : _$$state$source.tab) || $.state.tab || '\t',
+            charPairs = ((_$$state$source2 = $.state.source) == null ? void 0 : _$$state$source2.pairs) || {},
             charPairsValues = toObjectValues(charPairs);
-        var _editor$$ = editor.$(),
-            after = _editor$$.after,
-            before = _editor$$.before,
-            end = _editor$$.end,
-            start = _editor$$.start,
-            value = _editor$$.value,
+        if (isInteger(charIndent)) {
+            charIndent = ' '.repeat(charIndent);
+        }
+        var _$$$ = $.$(),
+            after = _$$$.after,
+            before = _$$$.before,
+            end = _$$$.end,
+            start = _$$$.start,
+            value = _$$$.value,
             lineAfter = after.split('\n').shift(),
             lineBefore = before.split('\n').pop(),
             lineMatch = lineBefore.match(/^(\s+)/),
@@ -180,7 +178,7 @@
             if (before || after) {
                 // Insert line above with `⎈⇧↵`
                 offEventDefault(e);
-                return editor.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
+                return $.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
             }
             return;
         }
@@ -188,7 +186,7 @@
             if (before || after) {
                 // Insert line below with `⎈↵`
                 offEventDefault(e);
-                return editor.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
+                return $.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
             }
         }
         // Do nothing
@@ -200,11 +198,11 @@
             charAfter = charPairs[charBefore = before.slice(-1)];
             if (!value && charAfter && charBefore && charAfter === after[0]) {
                 offEventDefault(e);
-                return editor.wrap(' ', ' ');
+                return $.wrap(' ', ' ');
             }
             return;
         }
-        if ('Backspace' === keys) {
+        if ('Backspace' === keys || 'Delete' === keys) {
             charAfter = charPairs[charBefore = before.slice(-1)];
             // Do nothing on escape
             if ('\\' === charBefore) {
@@ -213,7 +211,7 @@
             if (value) {
                 if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
                     offEventDefault(e);
-                    return editor.record().peel(charBefore, charAfter).record();
+                    return $.record().peel(charBefore, charAfter).record();
                 }
                 return;
             }
@@ -222,19 +220,19 @@
                 if (after.startsWith(' ' + charAfter) && before.endsWith(charBefore + ' ') || after.startsWith('\n' + lineMatchIndent + charAfter) && before.endsWith(charBefore + '\n' + lineMatchIndent)) {
                     // Collapse bracket(s)
                     offEventDefault(e);
-                    return editor.trim("", "").record();
+                    return $.trim("", "").record();
                 }
             }
             // Outdent
-            if (lineBefore.endsWith(charIndent)) {
+            if ('Delete' !== keys && lineBefore.endsWith(charIndent)) {
                 offEventDefault(e);
-                return editor.pull(charIndent).record();
+                return $.pull(charIndent).record();
             }
             if (after && before && !before.endsWith('\\' + charBefore)) {
                 if (charAfter === after[0] && charBefore === before.slice(-1)) {
                     // Peel pair
                     offEventDefault(e);
-                    return editor.peel(charBefore, charAfter).record();
+                    return $.peel(charBefore, charAfter).record();
                 }
             }
             return;
@@ -243,11 +241,11 @@
             if (!value) {
                 if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                     offEventDefault(e);
-                    return editor.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
+                    return $.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
                 }
                 if (lineMatchIndent) {
                     offEventDefault(e);
-                    return editor.insert('\n' + lineMatchIndent, -1).record();
+                    return $.insert('\n' + lineMatchIndent, -1).record();
                 }
             }
             return;
@@ -262,7 +260,7 @@
             // Move to the next character
             // `}|`
             offEventDefault(e);
-            return editor.select(start + 1).record();
+            return $.select(start + 1).record();
         }
         for (charBefore in charPairs) {
             charAfter = charPairs[charBefore];
@@ -271,7 +269,7 @@
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
                 offEventDefault(e);
-                return editor.wrap(charBefore, charAfter).record();
+                return $.wrap(charBefore, charAfter).record();
             }
             // `|}`
             if (key === charAfter) {
@@ -279,7 +277,7 @@
                     // Wrap selection
                     // `{|aaa|}`
                     offEventDefault(e);
-                    return editor.record().wrap(charBefore, charAfter).record();
+                    return $.record().wrap(charBefore, charAfter).record();
                 }
                 break;
             }
@@ -301,16 +299,16 @@
             if (CTRL_PREFIX + 'ArrowLeft' === keys) {
                 offEventDefault(e);
                 if (m = before.match(toPattern('(' + tokens.join('|') + ')$', ""))) {
-                    return editor.insert("").select(start - toCount(m[0])).insert(value).record();
+                    return $.insert("").select(start - toCount(m[0])).insert(value).record();
                 }
-                return editor.select();
+                return $.select();
             }
             if (CTRL_PREFIX + 'ArrowRight' === keys) {
                 offEventDefault(e);
                 if (m = after.match(toPattern('^(' + tokens.join('|') + ')', ""))) {
-                    return editor.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
+                    return $.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
                 }
-                return editor.select();
+                return $.select();
             }
         }
         // Force to select the current line if there is no selection
@@ -320,40 +318,40 @@
         if (CTRL_PREFIX + 'ArrowUp' === keys) {
             offEventDefault(e);
             if (!hasValue('\n', before)) {
-                return editor.select();
+                return $.select();
             }
-            editor.insert("");
-            editor.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
-            editor.replace(/(^|\n)([^\n]*?)$/, "", -1);
-            var $ = editor.$();
-            before = $.before;
-            start = $.start;
+            $.insert("");
+            $.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+            $.replace(/(^|\n)([^\n]*?)$/, "", -1);
+            var s = $.$();
+            before = s.before;
+            start = s.start;
             lineBefore = before.split('\n').pop();
-            editor.select(start = start - toCount(lineBefore)).wrap(value, '\n');
-            editor.select(start, start + toCount(value));
-            return editor.record();
+            $.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+            $.select(start, start + toCount(value));
+            return $.record();
         }
         if (CTRL_PREFIX + 'ArrowDown' === keys) {
             offEventDefault(e);
             if (!hasValue('\n', after)) {
-                return editor.select();
+                return $.select();
             }
-            editor.insert("");
-            editor.replace(/^([^\n]*?)(\n|$)/, "", 1);
-            editor.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-            var _$ = editor.$();
-            after = _$.after;
-            end = _$.end;
+            $.insert("");
+            $.replace(/^([^\n]*?)(\n|$)/, "", 1);
+            $.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+            var _s = $.$();
+            after = _s.after;
+            end = _s.end;
             lineAfter = after.split('\n').shift();
-            editor.select(end = end + toCount(lineAfter)).wrap('\n', value);
+            $.select(end = end + toCount(lineAfter)).wrap('\n', value);
             end += 1;
-            editor.select(end, end + toCount(value));
-            return editor.record();
+            $.select(end, end + toCount(value));
+            return $.record();
         }
         return;
     }
 
-    function attach(self) {
+    function attach() {
         var $ = this;
         $.state = fromStates({
             source: {
@@ -376,10 +374,10 @@
             if (!close && "" !== close) {
                 close = open;
             }
-            var _$$$ = $.$(),
-                after = _$$$.after,
-                before = _$$$.before,
-                value = _$$$.value,
+            var _$$$2 = $.$(),
+                after = _$$$2.after,
+                before = _$$$2.before,
+                value = _$$$2.value,
                 closeCount = toCount(close),
                 openCount = toCount(open);
             if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
@@ -398,16 +396,11 @@
             }
             return $.wrap(open, close, wrap);
         };
-        onEvent('keydown', self, onKeyDown);
-        self[id] = $;
-        return $.record();
+        return $.on('key.down', onKeyDown).record();
     }
 
-    function detach(self) {
-        var $ = this;
-        delete self[id];
-        offEvent('keydown', self, onKeyDown);
-        return $;
+    function detach() {
+        return this.off('key.down', onKeyDown);
     }
     var index_js = {
         attach: attach,

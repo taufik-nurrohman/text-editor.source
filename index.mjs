@@ -1,8 +1,8 @@
 import {debounce} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
-import {isArray, isSet, isString} from '@taufik-nurrohman/is';
-import {onEvent, offEvent, offEventDefault} from '@taufik-nurrohman/event';
+import {isArray, isInteger, isSet, isString} from '@taufik-nurrohman/is';
+import {offEventDefault} from '@taufik-nurrohman/event';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
@@ -11,26 +11,27 @@ const CTRL_PREFIX = 'Control-';
 const SHIFT_PREFIX = 'Shift-';
 
 const bounce = debounce($ => $.record(), 10);
-const id = 'TextEditor_' + Date.now();
 
 function onKeyDown(e) {
-    let self = this,
-        editor = self[id],
-        key = editor.k(false).pop(), // Capture the last key
-        keys = editor.k();
-    if (!editor || e.defaultPrevented) {
+    let $ = this,
+        key = $.k(false).pop(), // Capture the last key
+        keys = $.k();
+    if (!$ || e.defaultPrevented) {
         return;
     }
-    bounce(editor);
-    if (editor.keys[keys]) {
+    bounce($);
+    if ($.keys[keys]) {
         return;
     }
     let charAfter,
         charBefore,
-        charIndent = editor.state.source?.tab || editor.state.tab || '\t',
-        charPairs = editor.state.source?.pairs || {},
+        charIndent = $.state.source?.tab || $.state.tab || '\t',
+        charPairs = $.state.source?.pairs || {},
         charPairsValues = toObjectValues(charPairs);
-    let {after, before, end, start, value} = editor.$(),
+    if (isInteger(charIndent)) {
+        charIndent = ' '.repeat(charIndent);
+    }
+    let {after, before, end, start, value} = $.$(),
         lineAfter = after.split('\n').shift(),
         lineBefore = before.split('\n').pop(),
         lineMatch = lineBefore.match(/^(\s+)/),
@@ -39,7 +40,7 @@ function onKeyDown(e) {
         if (before || after) {
             // Insert line above with `⎈⇧↵`
             offEventDefault(e);
-            return editor.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
+            return $.select(start - toCount(lineBefore)).wrap(lineMatchIndent, '\n').insert(value).record(), false;
         }
         return;
     }
@@ -47,7 +48,7 @@ function onKeyDown(e) {
         if (before || after) {
             // Insert line below with `⎈↵`
             offEventDefault(e);
-            return editor.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
+            return $.select(end + toCount(lineAfter)).wrap('\n' + lineMatchIndent, "").insert(value).record(), false;
         }
     }
     // Do nothing
@@ -59,11 +60,11 @@ function onKeyDown(e) {
         charAfter = charPairs[charBefore = before.slice(-1)];
         if (!value && charAfter && charBefore && charAfter === after[0]) {
             offEventDefault(e);
-            return editor.wrap(' ', ' ');
+            return $.wrap(' ', ' ');
         }
         return;
     }
-    if ('Backspace' === keys) {
+    if ('Backspace' === keys || 'Delete' === keys) {
         charAfter = charPairs[charBefore = before.slice(-1)];
         // Do nothing on escape
         if ('\\' === charBefore) {
@@ -72,7 +73,7 @@ function onKeyDown(e) {
         if (value) {
             if (after && before && charAfter && charAfter === after[0] && !before.endsWith('\\' + charBefore)) {
                 offEventDefault(e);
-                return editor.record().peel(charBefore, charAfter).record();
+                return $.record().peel(charBefore, charAfter).record();
             }
             return;
         }
@@ -84,19 +85,19 @@ function onKeyDown(e) {
             ) {
                 // Collapse bracket(s)
                 offEventDefault(e);
-                return editor.trim("", "").record();
+                return $.trim("", "").record();
             }
         }
         // Outdent
-        if (lineBefore.endsWith(charIndent)) {
+        if ('Delete' !== keys && lineBefore.endsWith(charIndent)) {
             offEventDefault(e);
-            return editor.pull(charIndent).record();
+            return $.pull(charIndent).record();
         }
         if (after && before && !before.endsWith('\\' + charBefore)) {
             if (charAfter === after[0] && charBefore === before.slice(-1)) {
                 // Peel pair
                 offEventDefault(e);
-                return editor.peel(charBefore, charAfter).record();
+                return $.peel(charBefore, charAfter).record();
             }
         }
         return;
@@ -105,11 +106,11 @@ function onKeyDown(e) {
         if (!value) {
             if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                 offEventDefault(e);
-                return editor.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
+                return $.wrap('\n' + lineMatchIndent + (charBefore !== charAfter ? charIndent : ""), '\n' + lineMatchIndent).record();
             }
             if (lineMatchIndent) {
                 offEventDefault(e);
-                return editor.insert('\n' + lineMatchIndent, -1).record();
+                return $.insert('\n' + lineMatchIndent, -1).record();
             }
         }
         return;
@@ -124,7 +125,7 @@ function onKeyDown(e) {
         // Move to the next character
         // `}|`
         offEventDefault(e);
-        return editor.select(start + 1).record();
+        return $.select(start + 1).record();
     }
     for (charBefore in charPairs) {
         charAfter = charPairs[charBefore];
@@ -133,7 +134,7 @@ function onKeyDown(e) {
             // Wrap pair or selection
             // `{|}` `{|aaa|}`
             offEventDefault(e);
-            return editor.wrap(charBefore, charAfter).record();
+            return $.wrap(charBefore, charAfter).record();
         }
         // `|}`
         if (key === charAfter) {
@@ -141,7 +142,7 @@ function onKeyDown(e) {
                 // Wrap selection
                 // `{|aaa|}`
                 offEventDefault(e);
-                return editor.record().wrap(charBefore, charAfter).record();
+                return $.record().wrap(charBefore, charAfter).record();
             }
             break;
         }
@@ -162,16 +163,16 @@ function onKeyDown(e) {
         if (CTRL_PREFIX + 'ArrowLeft' === keys) {
             offEventDefault(e);
             if (m = before.match(toPattern('(' + tokens.join('|') + ')$', ""))) {
-                return editor.insert("").select(start - toCount(m[0])).insert(value).record();
+                return $.insert("").select(start - toCount(m[0])).insert(value).record();
             }
-            return editor.select();
+            return $.select();
         }
         if (CTRL_PREFIX + 'ArrowRight' === keys) {
             offEventDefault(e);
             if (m = after.match(toPattern('^(' + tokens.join('|') + ')', ""))) {
-                return editor.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
+                return $.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
             }
-            return editor.select();
+            return $.select();
         }
     }
     // Force to select the current line if there is no selection
@@ -181,40 +182,40 @@ function onKeyDown(e) {
     if (CTRL_PREFIX + 'ArrowUp' === keys) {
         offEventDefault(e);
         if (!hasValue('\n', before)) {
-            return editor.select();
+            return $.select();
         }
-        editor.insert("");
-        editor.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
-        editor.replace(/(^|\n)([^\n]*?)$/, "", -1);
-        let $ = editor.$();
-        before = $.before;
-        start = $.start;
+        $.insert("");
+        $.replace(/^([^\n]*?)(\n|$)/, '$2', 1);
+        $.replace(/(^|\n)([^\n]*?)$/, "", -1);
+        let s = $.$();
+        before = s.before;
+        start = s.start;
         lineBefore = before.split('\n').pop();
-        editor.select(start = start - toCount(lineBefore)).wrap(value, '\n');
-        editor.select(start, start + toCount(value));
-        return editor.record();
+        $.select(start = start - toCount(lineBefore)).wrap(value, '\n');
+        $.select(start, start + toCount(value));
+        return $.record();
     }
     if (CTRL_PREFIX + 'ArrowDown' === keys) {
         offEventDefault(e);
         if (!hasValue('\n', after)) {
-            return editor.select();
+            return $.select();
         }
-        editor.insert("");
-        editor.replace(/^([^\n]*?)(\n|$)/, "", 1);
-        editor.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
-        let $ = editor.$();
-        after = $.after;
-        end = $.end;
+        $.insert("");
+        $.replace(/^([^\n]*?)(\n|$)/, "", 1);
+        $.replace(/(^|\n)([^\n]*?)$/, '$1', -1);
+        let s = $.$();
+        after = s.after;
+        end = s.end;
         lineAfter = after.split('\n').shift();
-        editor.select(end = end + toCount(lineAfter)).wrap('\n', value);
+        $.select(end = end + toCount(lineAfter)).wrap('\n', value);
         end += 1;
-        editor.select(end, end + toCount(value));
-        return editor.record();
+        $.select(end, end + toCount(value));
+        return $.record();
     }
     return;
 }
 
-function attach(self) {
+function attach() {
     let $ = this;
     $.state = fromStates({
         source: {
@@ -256,16 +257,11 @@ function attach(self) {
         }
         return $.wrap(open, close, wrap);
     };
-    onEvent('keydown', self, onKeyDown);
-    self[id] = $;
-    return $.record();
+    return $.on('key.down', onKeyDown).record();
 }
 
-function detach(self) {
-    let $ = this;
-    delete self[id];
-    offEvent('keydown', self, onKeyDown);
-    return $;
+function detach() {
+    return this.off('key.down', onKeyDown);
 }
 
 export default {attach, detach};

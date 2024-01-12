@@ -54,7 +54,7 @@ block content
   main
     p
       label
-        input(checked onchange='return TextEditor.Source[this.checked ? \'attach\' : \'detach\'].call(editor), false;' type='checkbox')
+        input(checked onchange='return editor[this.checked ? \'attach\' : \'detach\'](), false;' type='checkbox')
         = ' '
         span Enable Source Editor
     p

@@ -25,7 +25,7 @@
       <hr>
     </header>
     <main>
-      <p><label><input checked onchange="return TextEditor.Source[this.checked ? 'attach' : 'detach'].call(editor), false;" type="checkbox"> <span>Enable Source Editor</span></label></p>
+      <p><label><input checked onchange="return editor[this.checked ? 'attach' : 'detach'](), false;" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <p><textarea placeholder="Code goes here&hellip;" spellcheck="false" style="display:block;width:100%;"></textarea></p>
       <p role="group"><button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;').record(), false;">Test Toggle</button></p>
       <h2>Features</h2>

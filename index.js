@@ -145,11 +145,14 @@
     var bounce = debounce(function ($) {
         return $.record();
     }, 10);
+    var id = 'TextEditor_' + Date.now();
 
     function onKeyDown(e) {
         var _editor$state$source, _editor$state$source2;
         var self = this,
-            editor = self.TextEditor,
+            editor = self[id],
+            key = editor.k(false).pop(),
+            // Capture the last key
             keys = editor.k();
         if (!editor || e.defaultPrevented) {
             return;
@@ -254,9 +257,8 @@
             return;
         }
         charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
-        keys = keys.replace(SHIFT_PREFIX, "");
         // `|}`
-        if (!value && after && before && charAfter && keys === charAfter) {
+        if (!value && after && before && charAfter && key === charAfter) {
             // Move to the next character
             // `}|`
             offEventDefault(e);
@@ -265,14 +267,14 @@
         for (charBefore in charPairs) {
             charAfter = charPairs[charBefore];
             // `{|`
-            if (keys === charBefore && charAfter) {
+            if (key === charBefore && charAfter) {
                 // Wrap pair or selection
                 // `{|}` `{|aaa|}`
                 offEventDefault(e);
                 return editor.wrap(charBefore, charAfter).record();
             }
             // `|}`
-            if (keys === charAfter) {
+            if (key === charAfter) {
                 if (value) {
                     // Wrap selection
                     // `{|aaa|}`
@@ -397,11 +399,13 @@
             return $.wrap(open, close, wrap);
         };
         onEvent('keydown', self, onKeyDown);
+        self[id] = $;
         return $.record();
     }
 
     function detach(self) {
         var $ = this;
+        delete self[id];
         offEvent('keydown', self, onKeyDown);
         return $;
     }

@@ -11,10 +11,12 @@ const CTRL_PREFIX = 'Control-';
 const SHIFT_PREFIX = 'Shift-';
 
 const bounce = debounce($ => $.record(), 10);
+const id = 'TextEditor_' + Date.now();
 
 function onKeyDown(e) {
     let self = this,
-        editor = self.TextEditor,
+        editor = self[id],
+        key = editor.k(false).pop(), // Capture the last key
         keys = editor.k();
     if (!editor || e.defaultPrevented) {
         return;
@@ -117,9 +119,8 @@ function onKeyDown(e) {
         return;
     }
     charAfter = hasValue(after[0], charPairsValues) ? after[0] : charPairs[charBefore];
-    keys = keys.replace(SHIFT_PREFIX, "");
     // `|}`
-    if (!value && after && before && charAfter && keys === charAfter) {
+    if (!value && after && before && charAfter && key === charAfter) {
         // Move to the next character
         // `}|`
         offEventDefault(e);
@@ -128,14 +129,14 @@ function onKeyDown(e) {
     for (charBefore in charPairs) {
         charAfter = charPairs[charBefore];
         // `{|`
-        if (keys === charBefore && charAfter) {
+        if (key === charBefore && charAfter) {
             // Wrap pair or selection
             // `{|}` `{|aaa|}`
             offEventDefault(e);
             return editor.wrap(charBefore, charAfter).record();
         }
         // `|}`
-        if (keys === charAfter) {
+        if (key === charAfter) {
             if (value) {
                 // Wrap selection
                 // `{|aaa|}`
@@ -256,11 +257,13 @@ function attach(self) {
         return $.wrap(open, close, wrap);
     };
     onEvent('keydown', self, onKeyDown);
+    self[id] = $;
     return $.record();
 }
 
 function detach(self) {
     let $ = this;
+    delete self[id];
     offEvent('keydown', self, onKeyDown);
     return $;
 }

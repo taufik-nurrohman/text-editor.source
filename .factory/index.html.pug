@@ -197,8 +197,8 @@ block content
       | editor.prompt('URL:', 'http://', function (value) {
       |     console.log(value); // Here, `value` can be the text you have submitted or `false`
       | });
-    h4: code editor.toggle(open, close = open, wrap = false)
-    p Toggle wrap and peel selection with #[code open] and #[code close] string.
+    h4: code editor.toggle(open, close, wrap = false)
+    p Toggle wrap and peel selection with #[var open] and #[var close] string.
     pre: code
       | editor.toggle('&lt;b&gt;', '&lt;/b&gt;');
   footer

@@ -243,9 +243,6 @@ function attach() {
         return then.call($, W.prompt ? W.prompt(hint, value) : false);
     };
     $.toggle = (open, close, wrap) => {
-        if (!close && "" !== close) {
-            close = open;
-        }
         let {after, before, value} = $.$(),
             closeCount = toCount(close),
             openCount = toCount(open);

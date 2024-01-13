@@ -156,8 +156,8 @@ const editor = new TextEditor(document.querySelector('textarea'), {
       <pre><code>editor.prompt('URL:', 'http://', function (value) {
     console.log(value); // Here, `value` can be the text you have submitted or `false`
 });</code></pre>
-      <h4><code>editor.toggle(open, close = open, wrap = false)</code></h4>
-      <p>Toggle wrap and peel selection with <code>open</code> and <code>close</code> string.</p>
+      <h4><code>editor.toggle(open, close, wrap = false)</code></h4>
+      <p>Toggle wrap and peel selection with <var>open</var> and <var>close</var> string.</p>
       <pre><code>editor.toggle('&lt;b&gt;', '&lt;/b&gt;');</code></pre>
     </main>
     <footer>

@@ -376,9 +376,6 @@
             return then.call($, W.prompt ? W.prompt(hint, value) : false);
         };
         $.toggle = function (open, close, wrap) {
-            if (!close && "" !== close) {
-                close = open;
-            }
             var _$$$2 = $.$(),
                 after = _$$$2.after,
                 before = _$$$2.before,

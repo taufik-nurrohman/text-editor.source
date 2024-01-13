@@ -63,7 +63,9 @@ block content
         'width': '100%'
       })
     p(role='group')
-      button(onclick='return editor.toggle(\'<b>\', \'</b>\').record(), false;') Test Toggle
+      button(onclick='return editor.toggle(\'<b>\', \'</b>\').record(), false;') Test Toggle #1
+      = ' '
+      button(onclick='return editor.toggle(\'<b>\', \'</b>\', true).record(), false;') Test Toggle #2
     h2 Features
     ul
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Enter</kbd>.

@@ -179,7 +179,25 @@ block content
       | });
     h2 Methods
     h3 Instance Methods
-    h4: code editor.toggle(open, close = open, wrap = false, tidy = false)
+    h4: code editor.alert(hint, then)
+    p Spawn an alert dialog box.
+    pre: code
+      | editor.alert('Hello!', function (value) {
+      |     console.log(value); // Here, `value` will always be `true`
+      | });
+    h4: code editor.confirm(hint, then)
+    p Spawn a confirmation dialog box.
+    pre: code
+      | editor.confirm('Are you sure?', function (value) {
+      |     console.log(value); // Here, `value` can be `true` or `false`
+      | });
+    h4: code editor.prompt(hint, value, then)
+    p Spawn a prompt dialog box.
+    pre: code
+      | editor.prompt('URL:', 'http://', function (value) {
+      |     console.log(value); // Here, `value` can be the text you have submitted or `false`
+      | });
+    h4: code editor.toggle(open, close = open, wrap = false)
     p Toggle wrap and peel selection with #[code open] and #[code close] string.
     pre: code
       | editor.toggle('&lt;b&gt;', '&lt;/b&gt;');

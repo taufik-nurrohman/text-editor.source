@@ -141,7 +141,22 @@ const editor = new TextEditor(document.querySelector('textarea'), {
 });</code></pre>
       <h2>Methods</h2>
       <h3>Instance Methods</h3>
-      <h4><code>editor.toggle(open, close = open, wrap = false, tidy = false)</code></h4>
+      <h4><code>editor.alert(hint, then)</code></h4>
+      <p>Spawn an alert dialog box.</p>
+      <pre><code>editor.alert('Hello!', function (value) {
+    console.log(value); // Here, `value` will always be `true`
+});</code></pre>
+      <h4><code>editor.confirm(hint, then)</code></h4>
+      <p>Spawn a confirmation dialog box.</p>
+      <pre><code>editor.confirm('Are you sure?', function (value) {
+    console.log(value); // Here, `value` can be `true` or `false`
+});</code></pre>
+      <h4><code>editor.prompt(hint, value, then)</code></h4>
+      <p>Spawn a prompt dialog box.</p>
+      <pre><code>editor.prompt('URL:', 'http://', function (value) {
+    console.log(value); // Here, `value` can be the text you have submitted or `false`
+});</code></pre>
+      <h4><code>editor.toggle(open, close = open, wrap = false)</code></h4>
       <p>Toggle wrap and peel selection with <code>open</code> and <code>close</code> string.</p>
       <pre><code>editor.toggle('&lt;b&gt;', '&lt;/b&gt;');</code></pre>
     </main>

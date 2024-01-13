@@ -1,3 +1,4 @@
+import {W} from '@taufik-nurrohman/document';
 import {debounce} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -231,7 +232,17 @@ function attach() {
             type: null
         }
     }, $.state);
-    $.toggle = function (open, close, wrap, tidy = false) {
+    $.alert = (hint, then) => {
+        W.alert && W.alert(hint);
+        return then.call($, true);
+    };
+    $.confirm = (hint, then) => {
+        return then.call($, W.confirm && W.confirm(hint));
+    };
+    $.prompt = (hint, value, then) => {
+        return then.call($, W.prompt ? W.prompt(hint, value) : false);
+    };
+    $.toggle = (open, close, wrap) => {
         if (!close && "" !== close) {
             close = open;
         }
@@ -243,17 +254,6 @@ function attach() {
             (close === after.slice(0, closeCount) && open === before.slice(-openCount))
         ) {
             return $.peel(open, close, wrap);
-        }
-        if (false !== tidy) {
-            if (isString(tidy)) {
-                tidy = [tidy, tidy];
-            } else if (!isArray(tidy)) {
-                tidy = ["", ""];
-            }
-            if (!isSet(tidy[1])) {
-                tidy[1] = tidy[0];
-            }
-            $.trim(tidy[0], tidy[1]);
         }
         return $.wrap(open, close, wrap);
     };

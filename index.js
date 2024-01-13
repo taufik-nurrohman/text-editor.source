@@ -27,17 +27,6 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, (g.TextEditor = g.TextEditor || {}, g.TextEditor.Source = f()));
 })(this, (function () {
     'use strict';
-    var debounce = function debounce(then, time) {
-        var timer;
-        return function () {
-            var _arguments = arguments,
-                _this = this;
-            timer && clearTimeout(timer);
-            timer = setTimeout(function () {
-                return then.apply(_this, _arguments);
-            }, time);
-        };
-    };
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
@@ -70,9 +59,6 @@
     };
     var isSet$1 = function isSet(x) {
         return isDefined$1(x) && !isNull$1(x);
-    };
-    var isString = function isString(x) {
-        return 'string' === typeof x;
     };
     var toCount = function toCount(x) {
         return x.length;
@@ -111,6 +97,18 @@
             }
         }
         return out;
+    };
+    var W = window;
+    var debounce = function debounce(then, time) {
+        var timer;
+        return function () {
+            var _arguments = arguments,
+                _this = this;
+            timer && clearTimeout(timer);
+            timer = setTimeout(function () {
+                return then.apply(_this, _arguments);
+            }, time);
+        };
     };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
@@ -367,10 +365,17 @@
                 type: null
             }
         }, $.state);
-        $.toggle = function (open, close, wrap, tidy) {
-            if (tidy === void 0) {
-                tidy = false;
-            }
+        $.alert = function (hint, then) {
+            W.alert && W.alert(hint);
+            return then.call($, true);
+        };
+        $.confirm = function (hint, then) {
+            return then.call($, W.confirm && W.confirm(hint));
+        };
+        $.prompt = function (hint, value, then) {
+            return then.call($, W.prompt ? W.prompt(hint, value) : false);
+        };
+        $.toggle = function (open, close, wrap) {
             if (!close && "" !== close) {
                 close = open;
             }
@@ -382,17 +387,6 @@
                 openCount = toCount(open);
             if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
                 return $.peel(open, close, wrap);
-            }
-            if (false !== tidy) {
-                if (isString(tidy)) {
-                    tidy = [tidy, tidy];
-                } else if (!isArray(tidy)) {
-                    tidy = ["", ""];
-                }
-                if (!isSet$1(tidy[1])) {
-                    tidy[1] = tidy[0];
-                }
-                $.trim(tidy[0], tidy[1]);
             }
             return $.wrap(open, close, wrap);
         };

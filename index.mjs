@@ -2,7 +2,7 @@ import {W} from '@taufik-nurrohman/document';
 import {debounce} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
-import {isArray, isInteger, isSet, isString} from '@taufik-nurrohman/is';
+import {isArray, isFunction, isInteger, isSet, isString} from '@taufik-nurrohman/is';
 import {offEventDefault} from '@taufik-nurrohman/event';
 import {toCount, toObjectValues} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
@@ -234,13 +234,13 @@ function attach() {
     }, $.state);
     $.alert = (hint, then) => {
         W.alert && W.alert(hint);
-        return then.call($, true);
+        return isFunction(then) && then.call($, true);
     };
     $.confirm = (hint, then) => {
-        return then.call($, W.confirm && W.confirm(hint));
+        return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
     };
     $.prompt = (hint, value, then) => {
-        return then.call($, W.prompt ? W.prompt(hint, value) : false);
+        return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
     };
     $.toggle = (open, close, wrap) => {
         let {after, before, value} = $.$(),

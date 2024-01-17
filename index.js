@@ -36,6 +36,9 @@
     var isDefined$1 = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
+    var isFunction = function isFunction(x) {
+        return 'function' === typeof x;
+    };
     var isInstance$1 = function isInstance(x, of) {
         return x && isSet$1(of) && x instanceof of ;
     };
@@ -367,13 +370,13 @@
         }, $.state);
         $.alert = function (hint, then) {
             W.alert && W.alert(hint);
-            return then.call($, true);
+            return isFunction(then) && then.call($, true);
         };
         $.confirm = function (hint, then) {
-            return then.call($, W.confirm && W.confirm(hint));
+            return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
         };
         $.prompt = function (hint, value, then) {
-            return then.call($, W.prompt ? W.prompt(hint, value) : false);
+            return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
         };
         $.toggle = function (open, close, wrap) {
             var _$$$2 = $.$(),

@@ -170,7 +170,7 @@
             value = _$$$.value,
             lineAfter = after.split('\n').shift(),
             lineBefore = before.split('\n').pop(),
-            lineMatch = lineBefore.match(/^(\s+)/),
+            lineMatch = /^(\s+)/.exec(lineBefore),
             lineMatchIndent = lineMatch && lineMatch[1] || "";
         if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === keys) {
             if (before || after) {
@@ -296,7 +296,7 @@
             tokens.push('[\\s\\S]'); // Last try!
             if (CTRL_PREFIX + 'ArrowLeft' === keys) {
                 offEventDefault(e);
-                if (m = before.match(toPattern('(' + tokens.join('|') + ')$', ""))) {
+                if (m = toPattern('(' + tokens.join('|') + ')$', "").exec(before)) {
                     return $.insert("").select(start - toCount(m[0])).insert(value).record();
                 }
                 return $.select();

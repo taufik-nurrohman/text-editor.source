@@ -17,11 +17,8 @@ function onKeyDown(e) {
     let $ = this,
         key = $.k(false).pop(), // Capture the last key
         keys = $.k();
-    if (!$ || e.defaultPrevented) {
-        return;
-    }
     bounce($);
-    if ($.keys[keys]) {
+    if (e.defaultPrevented || $.keys[keys]) {
         return;
     }
     let charAfter,

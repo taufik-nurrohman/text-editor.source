@@ -361,8 +361,7 @@
                     '"': '"',
                     "'": "'",
                     '<': '>'
-                },
-                type: null
+                }
             }
         }, $.state);
         $.alert = function (hint, then) {

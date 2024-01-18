@@ -225,8 +225,7 @@ function attach() {
                 '"': '"',
                 "'": "'",
                 '<': '>'
-            },
-            type: null
+            }
         }
     }, $.state);
     $.alert = (hint, then) => {

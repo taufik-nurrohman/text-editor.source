@@ -384,10 +384,10 @@
                 lineMatch = /^\s+/.exec(lineBefore),
                 lineMatchIndent = lineMatch && lineMatch[0] || "";
             if (-1 === mode) {
-                return $.select(start - lineBeforeCount).insert('\n', 1).push(lineMatchIndent).insert(value, mode, false);
+                return $.select(start - lineBeforeCount).insert('\n', 1).push(lineMatchIndent).insert(value, 1, false);
             }
             if (1 === mode) {
-                return $.select(end + lineAfterCount).insert('\n', -1).push(lineMatchIndent).insert(value, mode, false);
+                return $.select(end + lineAfterCount).insert('\n', -1).push(lineMatchIndent).insert(value, 1, false);
             }
             return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
         };

@@ -151,6 +151,14 @@ const editor = new TextEditor(document.querySelector('textarea'), {
       <pre><code>editor.confirm('Are you sure?', function (value) {
     console.log(value); // Here, `value` can be `true` or `false`
 });</code></pre>
+      <h4><code>editor.insertBlock(value, mode = 0)</code></h4>
+      <p>Insert <var>value</var> above/below the current line, or replace the current line with <var>value</var>.</p>
+      <pre><code>editor.insertBlock('asdf'); // Replace the current line with `'asdf'`
+editor.insertBlock('asdf', -1); // Insert `'asdf'` above the current line
+editor.insertBlock('asdf', +1); // Insert `'asdf'` below the current line</code></pre>
+      <h4><code>editor.peelBlock(open, close, wrap = false)</code></h4>
+      <p>Select the current line then perform the peel command on it.</p>
+      <pre><code>editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
       <h4><code>editor.prompt(hint, value, then)</code></h4>
       <p>Spawn a prompt dialog box.</p>
       <pre><code>editor.prompt('URL:', 'http://', function (value) {
@@ -159,6 +167,12 @@ const editor = new TextEditor(document.querySelector('textarea'), {
       <h4><code>editor.toggle(open, close, wrap = false)</code></h4>
       <p>Toggle wrap and peel selection with <var>open</var> and <var>close</var> string.</p>
       <pre><code>editor.toggle('&lt;b&gt;', '&lt;/b&gt;');</code></pre>
+      <h4><code>editor.toggleBlock(open, close, wrap = false)</code></h4>
+      <p>Select the current line then perform the toggle command on it.</p>
+      <pre><code>editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
+      <h4><code>editor.wrapBlock(open, close, wrap = false)</code></h4>
+      <p>Select the current line then perform the wrap command on it.</p>
+      <pre><code>editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
     </main>
     <footer>
       <hr>

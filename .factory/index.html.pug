@@ -193,6 +193,16 @@ block content
       | editor.confirm('Are you sure?', function (value) {
       |     console.log(value); // Here, `value` can be `true` or `false`
       | });
+    h4: code editor.insertBlock(value, mode = 0)
+    p Insert #[var value] above/below the current line, or replace the current line with #[var value].
+    pre: code
+      | editor.insertBlock('asdf'); // Replace the current line with `'asdf'`
+      | editor.insertBlock('asdf', -1); // Insert `'asdf'` above the current line
+      | editor.insertBlock('asdf', +1); // Insert `'asdf'` below the current line
+    h4: code editor.peelBlock(open, close, wrap = false)
+    p Select the current line then perform the peel command on it.
+    pre: code
+      | editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');
     h4: code editor.prompt(hint, value, then)
     p Spawn a prompt dialog box.
     pre: code
@@ -203,6 +213,14 @@ block content
     p Toggle wrap and peel selection with #[var open] and #[var close] string.
     pre: code
       | editor.toggle('&lt;b&gt;', '&lt;/b&gt;');
+    h4: code editor.toggleBlock(open, close, wrap = false)
+    p Select the current line then perform the toggle command on it.
+    pre: code
+      | editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;');
+    h4: code editor.wrapBlock(open, close, wrap = false)
+    p Select the current line then perform the wrap command on it.
+    pre: code
+      | editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');
   footer
     hr
     p

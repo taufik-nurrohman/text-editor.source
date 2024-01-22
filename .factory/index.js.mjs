@@ -235,6 +235,22 @@ function attach() {
     $.confirm = (hint, then) => {
         return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
     };
+    $.insertBlock = (value, mode) => {
+        let {after, before, end, start} = $.$(),
+            afterCount = toCount(after.split('\n').shift()),
+            beforeCount = toCount(before.split('\n').pop());
+        if (-1 === mode) {
+            return $.select(start - beforeCount).insert('\n', 1).insert(value, mode, false);
+        }
+        if (1 === mode) {
+            return $.select(end + afterCount).insert('\n', -1).insert(value, mode, false);
+        }
+        return $.select(start - beforeCount, end + afterCount).insert(value, mode, true);
+    };
+    $.peelBlock = (open, close, wrap) => {
+        let {after, before, end, start} = $.$();
+        return $.select(start - toCount(before.split('\n').pop()) + (wrap ? 0 : toCount(open)), end + toCount(after.split('\n').shift()) - (wrap ? 0 : toCount(close || open))).peel(open, close, wrap);
+    };
     $.prompt = (hint, value, then) => {
         return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
     };
@@ -249,6 +265,15 @@ function attach() {
             return $.peel(open, close, wrap);
         }
         return $.wrap(open, close, wrap);
+    };
+    $.toggleBlock = (open, close, wrap) => {
+        if (wrap) {
+
+        }
+    };
+    $.wrapBlock = (open, close, wrap) => {
+        let {after, before, end, start} = $.$();
+        return $.select(start - toCount(before.split('\n').pop()), end + toCount(after.split('\n').shift())).wrap(open, close, wrap);
     };
     return $.on('key.down', onKeyDown).record();
 }

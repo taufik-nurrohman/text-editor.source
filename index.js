@@ -371,20 +371,53 @@
         $.confirm = function (hint, then) {
             return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
         };
+        $.insertBlock = function (value, mode) {
+            var _$$$2 = $.$(),
+                after = _$$$2.after,
+                before = _$$$2.before,
+                end = _$$$2.end,
+                start = _$$$2.start,
+                afterCount = toCount(after.split('\n').shift()),
+                beforeCount = toCount(before.split('\n').pop());
+            if (-1 === mode) {
+                return $.select(start - beforeCount).insert('\n', 1).insert(value, mode, false);
+            }
+            if (1 === mode) {
+                return $.select(end + afterCount).insert('\n', -1).insert(value, mode, false);
+            }
+            return $.select(start - beforeCount, end + afterCount).insert(value, mode, true);
+        };
+        $.peelBlock = function (open, close, wrap) {
+            var _$$$3 = $.$(),
+                after = _$$$3.after,
+                before = _$$$3.before,
+                end = _$$$3.end,
+                start = _$$$3.start;
+            return $.select(start - toCount(before.split('\n').pop()) + (wrap ? 0 : toCount(open)), end + toCount(after.split('\n').shift()) - (wrap ? 0 : toCount(close || open))).peel(open, close, wrap);
+        };
         $.prompt = function (hint, value, then) {
             return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
         };
         $.toggle = function (open, close, wrap) {
-            var _$$$2 = $.$(),
-                after = _$$$2.after,
-                before = _$$$2.before,
-                value = _$$$2.value,
+            var _$$$4 = $.$(),
+                after = _$$$4.after,
+                before = _$$$4.before,
+                value = _$$$4.value,
                 closeCount = toCount(close),
                 openCount = toCount(open);
             if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === after.slice(0, closeCount) && open === before.slice(-openCount)) {
                 return $.peel(open, close, wrap);
             }
             return $.wrap(open, close, wrap);
+        };
+        $.toggleBlock = function (open, close, wrap) {};
+        $.wrapBlock = function (open, close, wrap) {
+            var _$$$5 = $.$(),
+                after = _$$$5.after,
+                before = _$$$5.before,
+                end = _$$$5.end,
+                start = _$$$5.start;
+            return $.select(start - toCount(before.split('\n').pop()), end + toCount(after.split('\n').shift())).wrap(open, close, wrap);
         };
         return $.on('key.down', onKeyDown).record();
     }

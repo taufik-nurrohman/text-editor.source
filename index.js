@@ -170,8 +170,8 @@
             value = _$$$.value,
             lineAfter = after.split('\n').shift(),
             lineBefore = before.split('\n').pop(),
-            lineMatch = /^(\s+)/.exec(lineBefore),
-            lineMatchIndent = lineMatch && lineMatch[1] || "";
+            lineMatch = /^\s+/.exec(lineBefore),
+            lineMatchIndent = lineMatch && lineMatch[0] || "";
         if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === keys) {
             if (before || after) {
                 // Insert line above with `⎈⇧↵`
@@ -377,15 +377,19 @@
                 before = _$$$2.before,
                 end = _$$$2.end,
                 start = _$$$2.start,
-                afterCount = toCount(after.split('\n').shift()),
-                beforeCount = toCount(before.split('\n').pop());
+                lineAfter = after.split('\n').shift(),
+                lineAfterCount = toCount(lineAfter),
+                lineBefore = before.split('\n').pop(),
+                lineBeforeCount = toCount(lineBefore),
+                lineMatch = /^\s+/.exec(lineBefore),
+                lineMatchIndent = lineMatch && lineMatch[0] || "";
             if (-1 === mode) {
-                return $.select(start - beforeCount).insert('\n', 1).insert(value, mode, false);
+                return $.select(start - lineBeforeCount).insert('\n', 1).push(lineMatchIndent).insert(value, mode, false);
             }
             if (1 === mode) {
-                return $.select(end + afterCount).insert('\n', -1).insert(value, mode, false);
+                return $.select(end + lineAfterCount).insert('\n', -1).push(lineMatchIndent).insert(value, mode, false);
             }
-            return $.select(start - beforeCount, end + afterCount).insert(value, mode, true);
+            return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
         };
         $.peelBlock = function (open, close, wrap) {
             var _$$$3 = $.$(),

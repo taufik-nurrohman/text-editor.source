@@ -28,7 +28,8 @@
       <p><label><input checked onchange="return editor[this.checked ? 'attach' : 'detach'](), false;" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <p><textarea placeholder="Code goes here&hellip;" spellcheck="false" style="display:block;width:100%;"></textarea></p>
       <p role="group"><button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;').record(), false;">Test Toggle #1</button> <button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;', true).record(), false;">Test Toggle #2</button></p>
-      <p role="group"><button onclick="return editor.insertBlock('---', +1).record(), false;">Test Insert After Line</button> <button onclick="return editor.insertBlock('---', -1).record(), false;">Test Insert Before Line</button> <button onclick="return editor.insertBlock('---').record(), false;">Test Replace Line</button></p>
+      <p role="group"><button onclick="return editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;').record(), false;">Test Toggle Block #1</button> <button onclick="return editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;', true).record(), false;">Test Toggle Block #2</button></p>
+      <p role="group"><button onclick="return editor.selectBlock(), false;">Test Select Current Line</button> <button onclick="return editor.insertBlock('---', +1).record(), false;">Test Insert After Line</button> <button onclick="return editor.insertBlock('---', -1).record(), false;">Test Insert Before Line</button> <button onclick="return editor.insertBlock('---').record(), false;">Test Replace Current Line</button></p>
       <h2>Strokes</h2>
       <ul>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Enter</kbd>.</li>
@@ -165,6 +166,9 @@ editor.insertBlock('asdf', +1); // Insert `'asdf'` below the current line</code>
       <pre><code>editor.prompt('URL:', 'http://', function (value) {
     console.log(value); // Here, `value` can be the text you have submitted or `false`
 });</code></pre>
+      <h4><code>editor.selectBlock()</code></h4>
+      <p>Select the current line.</p>
+      <pre><code>editor.selectBlock();</code></pre>
       <h4><code>editor.toggle(open, close, wrap = false)</code></h4>
       <p>Toggle wrap and peel selection with <var>open</var> and <var>close</var> string.</p>
       <pre><code>editor.toggle('&lt;b&gt;', '&lt;/b&gt;');</code></pre>

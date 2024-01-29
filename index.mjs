@@ -252,11 +252,31 @@ function attach() {
         return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
     };
     $.peelBlock = (open, close, wrap) => {
-        let {after, before, end, start} = $.$();
-        return $.select(start - toCount(before.split('\n').pop()) + (wrap ? 0 : toCount(open)), end + toCount(after.split('\n').shift()) - (wrap ? 0 : toCount(close || open))).peel(open, close, wrap);
+        let {after, before, end, start, value} = $.$(),
+            closeCount = toCount(close),
+            lineAfter = after.split('\n').shift(),
+            lineAfterCount = toCount(lineAfter),
+            lineBefore = before.split('\n').pop(),
+            lineBeforeCount = toCount(lineBefore),
+            openCount = toCount(open);
+        if (
+            (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) ||
+            (close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount))
+        ) {
+            return $.select(start - lineBeforeCount + (wrap ? 0 : openCount), end + lineAfterCount - (wrap ? 0 : closeCount)).peel(open, close, wrap);
+        }
+        return $.select(start, end);
     };
     $.prompt = (hint, value, then) => {
         return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
+    };
+    $.selectBlock = () => {
+        let {after, before, end, start} = $.$(),
+            lineAfter = after.split('\n').shift(),
+            lineAfterCount = toCount(lineAfter),
+            lineBefore = before.split('\n').pop(),
+            lineBeforeCount = toCount(lineBefore);
+        return $.select(start - lineBeforeCount, end + lineAfterCount);
     };
     $.toggle = (open, close, wrap) => {
         let {after, before, value} = $.$(),
@@ -271,13 +291,26 @@ function attach() {
         return $.wrap(open, close, wrap);
     };
     $.toggleBlock = (open, close, wrap) => {
-        if (wrap) {
-
+        let {after, before, value} = $.$(),
+            closeCount = toCount(close),
+            lineAfter = after.split('\n').shift(),
+            lineBefore = before.split('\n').pop(),
+            openCount = toCount(open);
+        if (
+            (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) ||
+            (close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount))
+        ) {
+            return $.peelBlock(open, close, wrap);
         }
+        return $.wrapBlock(open, close, wrap);
     };
     $.wrapBlock = (open, close, wrap) => {
-        let {after, before, end, start} = $.$();
-        return $.select(start - toCount(before.split('\n').pop()), end + toCount(after.split('\n').shift())).wrap(open, close, wrap);
+        let {after, before, end, start} = $.$(),
+            lineAfter = after.split('\n').shift(),
+            lineAfterCount = toCount(lineAfter),
+            lineBefore = before.split('\n').pop(),
+            lineBeforeCount = toCount(lineBefore);
+        return $.select(start - lineBeforeCount, end + lineAfterCount).wrap(open, close, wrap);
     };
     return $.on('key.down', onKeyDown).record();
 }

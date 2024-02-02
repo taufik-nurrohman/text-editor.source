@@ -73,6 +73,8 @@ block content
     p(role='group')
       button(onclick='return editor.selectBlock(), false;') Test Select Current Line
       = ' '
+      button(onclick='return editor.selectBlock(false), false;') Test Select Current Line (Without the Space(s))
+      = ' '
       button(onclick='return editor.insertBlock(\'---\', +1).record(), false;') Test Insert After Line
       = ' '
       button(onclick='return editor.insertBlock(\'---\', -1).record(), false;') Test Insert Before Line
@@ -221,7 +223,7 @@ block content
       | editor.prompt('URL:', 'http://', function (value) {
       |     console.log(value); // Here, `value` can be the text you have submitted or `false`
       | });
-    h4: code editor.selectBlock()
+    h4: code editor.selectBlock(withSpaces = true)
     p Select the current line.
     pre: code
       | editor.selectBlock();

@@ -33,19 +33,19 @@
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
-    var isDefined = function isDefined(x) {
+    var isDefined$1 = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
     var isFunction = function isFunction(x) {
         return 'function' === typeof x;
     };
-    var isInstance = function isInstance(x, of) {
-        return x && isSet(of) && x instanceof of ;
+    var isInstance$1 = function isInstance(x, of) {
+        return x && isSet$1(of) && x instanceof of ;
     };
     var isInteger = function isInteger(x) {
         return isNumber(x) && 0 === x % 1;
     };
-    var isNull = function isNull(x) {
+    var isNull$1 = function isNull(x) {
         return null === x;
     };
     var isNumber = function isNumber(x) {
@@ -58,10 +58,10 @@
         if ('object' !== typeof x) {
             return false;
         }
-        return isPlain ? isInstance(x, Object) : true;
+        return isPlain ? isInstance$1(x, Object) : true;
     };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
+    var isSet$1 = function isSet(x) {
+        return isDefined$1(x) && !isNull$1(x);
     };
     var toCount = function toCount(x) {
         return x.length;
@@ -77,7 +77,7 @@
         for (var i = 0, j = toCount(lot); i < j; ++i) {
             for (var k in lot[i]) {
                 // Assign value
-                if (!isSet(out[k])) {
+                if (!isSet$1(out[k])) {
                     out[k] = lot[i][k];
                     continue;
                 }
@@ -115,6 +115,18 @@
     };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
+    };
+    var isDefined = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isInstance = function isInstance(x, of) {
+        return x && isSet(of) && x instanceof of ;
+    };
+    var isNull = function isNull(x) {
+        return null === x;
+    };
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
     };
     var isPattern = function isPattern(pattern) {
         return isInstance(pattern, RegExp);
@@ -400,17 +412,42 @@
         $.prompt = function (hint, value, then) {
             return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
         };
-        $.selectBlock = function () {
+        $.selectBlock = function (withSpaces) {
+            if (withSpaces === void 0) {
+                withSpaces = true;
+            }
             var _$$$4 = $.$(),
                 after = _$$$4.after,
                 before = _$$$4.before,
                 end = _$$$4.end,
                 start = _$$$4.start,
+                value = _$$$4.value,
                 lineAfter = after.split('\n').shift(),
                 lineAfterCount = toCount(lineAfter),
                 lineBefore = before.split('\n').pop(),
                 lineBeforeCount = toCount(lineBefore);
-            return $.select(start - lineBeforeCount, end + lineAfterCount);
+            if (!withSpaces) {
+                var lineAfterSpaces = /\s+$/.exec(lineAfter),
+                    lineBeforeSpaces = /^\s+/.exec(lineBefore);
+                if (lineAfterSpaces) {
+                    lineAfterCount -= toCount(lineAfterSpaces[0]);
+                }
+                if (lineBeforeSpaces) {
+                    lineBeforeCount -= toCount(lineBeforeSpaces[0]);
+                }
+            }
+            $.select(start - lineBeforeCount, end + lineAfterCount);
+            if (!withSpaces) {
+                var s = $.$(),
+                    m;
+                end = s.end;
+                start = s.start;
+                value = s.value;
+                if (m = /^(\s+)?[\s\S]+?(\s+)?$/.exec(value)) {
+                    return $.select(start + toCount(m[1] || ""), end - toCount(m[2] || ""));
+                }
+            }
+            return $;
         };
         $.toggle = function (open, close, wrap) {
             var _$$$5 = $.$(),

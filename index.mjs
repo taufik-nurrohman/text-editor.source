@@ -270,13 +270,33 @@ function attach() {
     $.prompt = (hint, value, then) => {
         return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
     };
-    $.selectBlock = () => {
-        let {after, before, end, start} = $.$(),
+    $.selectBlock = (withSpaces = true) => {
+        let {after, before, end, start, value} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
             lineBefore = before.split('\n').pop(),
             lineBeforeCount = toCount(lineBefore);
-        return $.select(start - lineBeforeCount, end + lineAfterCount);
+        if (!withSpaces) {
+            let lineAfterSpaces = /\s+$/.exec(lineAfter),
+                lineBeforeSpaces = /^\s+/.exec(lineBefore);
+            if (lineAfterSpaces) {
+                lineAfterCount -= toCount(lineAfterSpaces[0]);
+            }
+            if (lineBeforeSpaces) {
+                lineBeforeCount -= toCount(lineBeforeSpaces[0]);
+            }
+        }
+        $.select(start - lineBeforeCount, end + lineAfterCount);
+        if (!withSpaces) {
+            let s = $.$(), m;
+            end = s.end;
+            start = s.start;
+            value = s.value;
+            if (m = /^(\s+)?[\s\S]+?(\s+)?$/.exec(value)) {
+                return $.select(start + toCount(m[1] || ""), end - toCount(m[2] || ""));
+            }
+        }
+        return $;
     };
     $.toggle = (open, close, wrap) => {
         let {after, before, value} = $.$(),

@@ -143,6 +143,7 @@
     var bounce = debounce(function ($) {
         return $.record();
     }, 10);
+    var name = 'TextEditor.Source';
 
     function onKeyDown(e) {
         var _$$state$source, _$$state$source2;
@@ -351,6 +352,7 @@
 
     function attach() {
         var $ = this;
+        var $$ = $.constructor.prototype;
         $.state = fromStates({
             source: {
                 pairs: {
@@ -364,14 +366,15 @@
                 }
             }
         }, $.state);
-        $.alert = function (hint, then) {
+        !isFunction($$.alert) && ($$.alert = function (hint, then) {
             W.alert && W.alert(hint);
-            return isFunction(then) && then.call($, true);
-        };
-        $.confirm = function (hint, then) {
-            return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
-        };
-        $.insertBlock = function (value, mode) {
+            return isFunction(then) && then.call(this, true);
+        });
+        !isFunction($$.confirm) && ($$.confirm = function (hint, then) {
+            return isFunction(then) && then.call(this, W.confirm && W.confirm(hint));
+        });
+        !isFunction($$.insertBlock) && ($$.insertBlock = function (value, mode) {
+            var $ = this;
             var _$$$2 = $.$(),
                 after = _$$$2.after,
                 before = _$$$2.before,
@@ -390,8 +393,9 @@
                 return $.select(end + lineAfterCount).insert('\n', -1).push(lineMatchIndent).insert(value, 1, false);
             }
             return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
-        };
-        $.peelBlock = function (open, close, wrap) {
+        });
+        !isFunction($$.peelBlock) && ($$.peelBlock = function (open, close, wrap) {
+            var $ = this;
             var _$$$3 = $.$(),
                 after = _$$$3.after,
                 before = _$$$3.before,
@@ -408,14 +412,15 @@
                 return $.select(start - lineBeforeCount + (wrap ? 0 : openCount), end + lineAfterCount - (wrap ? 0 : closeCount)).peel(open, close, wrap);
             }
             return $.select(start, end);
-        };
-        $.prompt = function (hint, value, then) {
-            return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
-        };
-        $.selectBlock = function (withSpaces) {
+        });
+        !isFunction($$.prompt) && ($$.prompt = function (hint, value, then) {
+            return isFunction(then) && then.call(this, W.prompt ? W.prompt(hint, value) : false);
+        });
+        !isFunction($$.selectBlock) && ($$.selectBlock = function (withSpaces) {
             if (withSpaces === void 0) {
                 withSpaces = true;
             }
+            var $ = this;
             var _$$$4 = $.$(),
                 after = _$$$4.after,
                 before = _$$$4.before,
@@ -448,8 +453,9 @@
                 }
             }
             return $;
-        };
-        $.toggle = function (open, close, wrap) {
+        });
+        !isFunction($$.toggle) && ($$.toggle = function (open, close, wrap) {
+            var $ = this;
             var _$$$5 = $.$(),
                 after = _$$$5.after,
                 before = _$$$5.before,
@@ -460,8 +466,9 @@
                 return $.peel(open, close, wrap);
             }
             return $.wrap(open, close, wrap);
-        };
-        $.toggleBlock = function (open, close, wrap) {
+        });
+        !isFunction($$.toggleBlock) && ($$.toggleBlock = function (open, close, wrap) {
+            var $ = this;
             var _$$$6 = $.$(),
                 after = _$$$6.after,
                 before = _$$$6.before,
@@ -474,8 +481,9 @@
                 return $.peelBlock(open, close, wrap);
             }
             return $.wrapBlock(open, close, wrap);
-        };
-        $.wrapBlock = function (open, close, wrap) {
+        });
+        !isFunction($$.wrapBlock) && ($$.wrapBlock = function (open, close, wrap) {
+            var $ = this;
             var _$$$7 = $.$(),
                 after = _$$$7.after,
                 before = _$$$7.before,
@@ -486,7 +494,7 @@
                 lineBefore = before.split('\n').pop(),
                 lineBeforeCount = toCount(lineBefore);
             return $.select(start - lineBeforeCount, end + lineAfterCount).wrap(open, close, wrap);
-        };
+        });
         return $.on('key.down', onKeyDown).record();
     }
 
@@ -495,7 +503,8 @@
     }
     var index_js = {
         attach: attach,
-        detach: detach
+        detach: detach,
+        name: name
     };
     return index_js;
 }));

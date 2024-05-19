@@ -1,7 +1,7 @@
 extends _index.pug
 
 block state
-  - const scripts = ['../key/index.min.js', '../text-editor/index.min.js', '../text-editor.history/index.min.js', '../text-editor.key/index.min.js', 'index.min.js']
+  - const scripts = ['../text-editor/index.min.js', '../text-editor.history/index.min.js', '../text-editor.key/index.min.js', 'index.min.js']
   - const styles = ['../layout/index.min.css']
   - const theme = '#000'
   - const title = 'Text Editor Source ' + version
@@ -47,7 +47,7 @@ block style
 block content
   header
     h1
-      a(href='../text-editor/index.html') &laquo;
+      a(href='../text-editor/index.html#extensions') &laquo;
       = ' ' + title
     p Source extension for #[a(href='../text-editor/index.html') Text Editor]. This extension provides a set of key strokes to generate responses like in a typical source code editor.
     hr

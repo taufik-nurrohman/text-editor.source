@@ -12,6 +12,7 @@ const CTRL_PREFIX = 'Control-';
 const SHIFT_PREFIX = 'Shift-';
 
 const bounce = debounce($ => $.record(), 10);
+const name = 'TextEditor.Source';
 
 function onKeyDown(e) {
     let $ = this,
@@ -214,7 +215,8 @@ function onKeyDown(e) {
 }
 
 function attach() {
-    let $ = this;
+    const $ = this;
+    const $$ = $.constructor.prototype;
     $.state = fromStates({
         source: {
             pairs: {
@@ -228,14 +230,15 @@ function attach() {
             }
         }
     }, $.state);
-    $.alert = (hint, then) => {
+    !isFunction($$.alert) && ($$.alert = function (hint, then) {
         W.alert && W.alert(hint);
-        return isFunction(then) && then.call($, true);
-    };
-    $.confirm = (hint, then) => {
-        return isFunction(then) && then.call($, W.confirm && W.confirm(hint));
-    };
-    $.insertBlock = (value, mode) => {
+        return isFunction(then) && then.call(this, true);
+    });
+    !isFunction($$.confirm) && ($$.confirm = function (hint, then) {
+        return isFunction(then) && then.call(this, W.confirm && W.confirm(hint));
+    });
+    !isFunction($$.insertBlock) && ($$.insertBlock = function (value, mode) {
+        let $ = this;
         let {after, before, end, start} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
@@ -250,8 +253,9 @@ function attach() {
             return $.select(end + lineAfterCount).insert('\n', -1).push(lineMatchIndent).insert(value, 1, false);
         }
         return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
-    };
-    $.peelBlock = (open, close, wrap) => {
+    });
+    !isFunction($$.peelBlock) && ($$.peelBlock = function (open, close, wrap) {
+        let $ = this;
         let {after, before, end, start, value} = $.$(),
             closeCount = toCount(close),
             lineAfter = after.split('\n').shift(),
@@ -266,11 +270,12 @@ function attach() {
             return $.select(start - lineBeforeCount + (wrap ? 0 : openCount), end + lineAfterCount - (wrap ? 0 : closeCount)).peel(open, close, wrap);
         }
         return $.select(start, end);
-    };
-    $.prompt = (hint, value, then) => {
-        return isFunction(then) && then.call($, W.prompt ? W.prompt(hint, value) : false);
-    };
-    $.selectBlock = (withSpaces = true) => {
+    });
+    !isFunction($$.prompt) && ($$.prompt = function (hint, value, then) {
+        return isFunction(then) && then.call(this, W.prompt ? W.prompt(hint, value) : false);
+    });
+    !isFunction($$.selectBlock) && ($$.selectBlock = function (withSpaces = true) {
+        let $ = this;
         let {after, before, end, start, value} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
@@ -297,8 +302,9 @@ function attach() {
             }
         }
         return $;
-    };
-    $.toggle = (open, close, wrap) => {
+    });
+    !isFunction($$.toggle) && ($$.toggle = function (open, close, wrap) {
+        let $ = this;
         let {after, before, value} = $.$(),
             closeCount = toCount(close),
             openCount = toCount(open);
@@ -309,8 +315,9 @@ function attach() {
             return $.peel(open, close, wrap);
         }
         return $.wrap(open, close, wrap);
-    };
-    $.toggleBlock = (open, close, wrap) => {
+    });
+    !isFunction($$.toggleBlock) && ($$.toggleBlock = function (open, close, wrap) {
+        let $ = this;
         let {after, before, value} = $.$(),
             closeCount = toCount(close),
             lineAfter = after.split('\n').shift(),
@@ -323,15 +330,16 @@ function attach() {
             return $.peelBlock(open, close, wrap);
         }
         return $.wrapBlock(open, close, wrap);
-    };
-    $.wrapBlock = (open, close, wrap) => {
+    });
+    !isFunction($$.wrapBlock) && ($$.wrapBlock = function (open, close, wrap) {
+        let $ = this;
         let {after, before, end, start} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
             lineBefore = before.split('\n').pop(),
             lineBeforeCount = toCount(lineBefore);
         return $.select(start - lineBeforeCount, end + lineAfterCount).wrap(open, close, wrap);
-    };
+    });
     return $.on('key.down', onKeyDown).record();
 }
 
@@ -339,4 +347,4 @@ function detach() {
     return this.off('key.down', onKeyDown);
 }
 
-export default {attach, detach};
+export default {attach, detach, name};

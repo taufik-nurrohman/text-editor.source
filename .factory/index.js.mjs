@@ -24,8 +24,8 @@ function onKeyDown(e) {
     }
     let charAfter,
         charBefore,
-        charIndent = $.state.source?.tab || $.state.tab || '\t',
-        charPairs = $.state.source?.pairs || {},
+        charIndent = $.state.tab || '\t',
+        charPairs = $.state.pairs || {},
         charPairsValues = toObjectValues(charPairs);
     if (isInteger(charIndent)) {
         charIndent = ' '.repeat(charIndent);
@@ -218,16 +218,14 @@ function attach() {
     const $ = this;
     const $$ = $.constructor.prototype;
     $.state = fromStates({
-        source: {
-            pairs: {
-                '`': '`',
-                '(': ')',
-                '{': '}',
-                '[': ']',
-                '"': '"',
-                "'": "'",
-                '<': '>'
-            }
+        pairs: {
+            '`': '`',
+            '(': ')',
+            '{': '}',
+            '[': ']',
+            '"': '"',
+            "'": "'",
+            '<': '>'
         }
     }, $.state);
     !isFunction($$.alert) && ($$.alert = function (hint, then) {

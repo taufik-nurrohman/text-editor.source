@@ -146,7 +146,6 @@
     var name = 'TextEditor.Source';
 
     function onKeyDown(e) {
-        var _$$state$source, _$$state$source2;
         var $ = this,
             key = $.k(false).pop(),
             // Capture the last key
@@ -157,8 +156,8 @@
         }
         var charAfter,
             charBefore,
-            charIndent = ((_$$state$source = $.state.source) == null ? void 0 : _$$state$source.tab) || $.state.tab || '\t',
-            charPairs = ((_$$state$source2 = $.state.source) == null ? void 0 : _$$state$source2.pairs) || {},
+            charIndent = $.state.tab || '\t',
+            charPairs = $.state.pairs || {},
             charPairsValues = toObjectValues(charPairs);
         if (isInteger(charIndent)) {
             charIndent = ' '.repeat(charIndent);
@@ -354,16 +353,14 @@
         var $ = this;
         var $$ = $.constructor.prototype;
         $.state = fromStates({
-            source: {
-                pairs: {
-                    '`': '`',
-                    '(': ')',
-                    '{': '}',
-                    '[': ']',
-                    '"': '"',
-                    "'": "'",
-                    '<': '>'
-                }
+            pairs: {
+                '`': '`',
+                '(': ')',
+                '{': '}',
+                '[': ']',
+                '"': '"',
+                "'": "'",
+                '<': '>'
             }
         }, $.state);
         !isFunction($$.alert) && ($$.alert = function (hint, then) {

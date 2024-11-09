@@ -11,6 +11,14 @@ const ALT_PREFIX = 'Alt-';
 const CTRL_PREFIX = 'Control-';
 const SHIFT_PREFIX = 'Shift-';
 
+const KEY_ARROW_DOWN = 'ArrowDown';
+const KEY_ARROW_LEFT = 'ArrowLeft';
+const KEY_ARROW_RIGHT = 'ArrowRight';
+const KEY_ARROW_UP = 'ArrowUp';
+const KEY_DELETE_LEFT = 'Backspace';
+const KEY_DELETE_RIGHT = 'Delete';
+const KEY_ENTER = 'Enter';
+
 const bounce = debounce($ => $.record(), 10);
 const name = 'TextEditor.Source';
 
@@ -35,7 +43,7 @@ function onKeyDown(e) {
         lineBefore = before.split('\n').pop(),
         lineMatch = /^\s+/.exec(lineBefore),
         lineMatchIndent = lineMatch && lineMatch[0] || "";
-    if (CTRL_PREFIX + SHIFT_PREFIX + 'Enter' === keys) {
+    if (CTRL_PREFIX + SHIFT_PREFIX + KEY_ENTER === keys) {
         if (before || after) {
             // Insert line above with `⎈⇧↵`
             offEventDefault(e);
@@ -43,7 +51,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if (CTRL_PREFIX + 'Enter' === keys) {
+    if (CTRL_PREFIX + KEY_ENTER === keys) {
         if (before || after) {
             // Insert line below with `⎈↵`
             offEventDefault(e);
@@ -63,7 +71,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if ('Backspace' === keys || 'Delete' === keys) {
+    if (KEY_DELETE_LEFT === keys || KEY_DELETE_RIGHT === keys) {
         charAfter = charPairs[charBefore = before.slice(-1)];
         // Do nothing on escape
         if ('\\' === charBefore) {
@@ -88,7 +96,7 @@ function onKeyDown(e) {
             }
         }
         // Outdent
-        if ('Delete' !== keys && lineBefore.endsWith(charIndent)) {
+        if (KEY_DELETE_RIGHT !== keys && lineBefore.endsWith(charIndent)) {
             offEventDefault(e);
             return $.pull(charIndent).record();
         }
@@ -101,7 +109,7 @@ function onKeyDown(e) {
         }
         return;
     }
-    if ('Enter' === keys || SHIFT_PREFIX + 'Enter' === keys) {
+    if (KEY_ENTER === keys || SHIFT_PREFIX + KEY_ENTER === keys) {
         if (!value) {
             if (after && before && (charAfter = charPairs[charBefore = before.slice(-1)]) && charAfter === after[0]) {
                 offEventDefault(e);
@@ -159,14 +167,14 @@ function onKeyDown(e) {
         tokens.push('\\w+'); // Word(s)
         tokens.push('\\s+'); // White-space(s)
         tokens.push('[\\s\\S]'); // Last try!
-        if (CTRL_PREFIX + 'ArrowLeft' === keys) {
+        if (CTRL_PREFIX + KEY_ARROW_LEFT === keys) {
             offEventDefault(e);
             if (m = toPattern('(' + tokens.join('|') + ')$', "").exec(before)) {
                 return $.insert("").select(start - toCount(m[0])).insert(value).record();
             }
             return $.select();
         }
-        if (CTRL_PREFIX + 'ArrowRight' === keys) {
+        if (CTRL_PREFIX + KEY_ARROW_RIGHT === keys) {
             offEventDefault(e);
             if (m = after.match(toPattern('^(' + tokens.join('|') + ')', ""))) {
                 return $.insert("").select(end + toCount(m[0]) - toCount(value)).insert(value).record();
@@ -178,7 +186,7 @@ function onKeyDown(e) {
     end += toCount(lineAfter);
     start -= toCount(lineBefore);
     value = lineBefore + value + lineAfter;
-    if (CTRL_PREFIX + 'ArrowUp' === keys) {
+    if (CTRL_PREFIX + KEY_ARROW_UP === keys) {
         offEventDefault(e);
         if (!hasValue('\n', before)) {
             return $.select();
@@ -194,7 +202,7 @@ function onKeyDown(e) {
         $.select(start, start + toCount(value));
         return $.record();
     }
-    if (CTRL_PREFIX + 'ArrowDown' === keys) {
+    if (CTRL_PREFIX + KEY_ARROW_DOWN === keys) {
         offEventDefault(e);
         if (!hasValue('\n', after)) {
             return $.select();

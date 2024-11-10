@@ -75,19 +75,19 @@ block content
       = ' '
       button(onclick='return editor.toggle(\'<b>\', \'</b>\', true).record(), false;') Test Toggle #2
     p(role='group')
-      button(onclick='return editor.toggleBlock(\'<p>\', \'</p>\').record(), false;') Test Toggle Block #1
+      button(onclick='return editor.toggleLine(\'<p>\', \'</p>\').record(), false;') Test Toggle Line #1
       = ' '
-      button(onclick='return editor.toggleBlock(\'<p>\', \'</p>\', true).record(), false;') Test Toggle Block #2
+      button(onclick='return editor.toggleLine(\'<p>\', \'</p>\', true).record(), false;') Test Toggle Line #2
     p(role='group')
-      button(onclick='return editor.selectBlock(), false;') Test Select Current Line
+      button(onclick='return editor.selectLine(), false;') Test Select Current Line
       = ' '
-      button(onclick='return editor.selectBlock(false), false;') Test Select Current Line (Without the Space(s))
+      button(onclick='return editor.selectLine(false), false;') Test Select Current Line (Without the Space(s))
       = ' '
-      button(onclick='return editor.insertBlock(\'---\', +1).record(), false;') Test Insert After Line
+      button(onclick='return editor.insertLine(\'---\', +1).record(), false;') Test Insert After Line
       = ' '
-      button(onclick='return editor.insertBlock(\'---\', -1).record(), false;') Test Insert Before Line
+      button(onclick='return editor.insertLine(\'---\', -1).record(), false;') Test Insert Before Line
       = ' '
-      button(onclick='return editor.insertBlock(\'---\').record(), false;') Test Replace Current Line
+      button(onclick='return editor.insertLine(\'---\').record(), false;') Test Replace Current Line
     h2 Strokes
     ul
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Enter</kbd>.
@@ -215,38 +215,38 @@ block content
       | editor.confirm('Are you sure?', function (value) {
       |     console.log(value); // Here, `value` can be `true` or `false`
       | });
-    h4: code editor.insertBlock(value, mode = 0)
+    h4: code editor.insertLine(value, mode = 0)
     p Inserts #[var value] above/below the current line, or replace the current line with #[var value].
     pre: code
-      | editor.insertBlock('asdf'); // Replace the current line with `'asdf'`
-      | editor.insertBlock('asdf', -1); // Insert `'asdf'` above the current line
-      | editor.insertBlock('asdf', +1); // Insert `'asdf'` below the current line
-    h4: code editor.peelBlock(open, close, wrap = false)
+      | editor.insertLine('asdf'); // Replace the current line with `'asdf'`
+      | editor.insertLine('asdf', -1); // Insert `'asdf'` above the current line
+      | editor.insertLine('asdf', +1); // Insert `'asdf'` below the current line
+    h4: code editor.peelLine(open, close, wrap = false, withSpaces = false)
     p Selects the current line then perform the peel command on it.
     pre: code
-      | editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');
+      | editor.peelLine('&lt;p&gt;', '&lt;/p&gt;');
     h4: code editor.prompt(hint, value, then)
     p Spawns a prompt dialog box.
     pre: code
       | editor.prompt('URL:', 'http://', function (value) {
       |     console.log(value); // Here, `value` can be the text you have submitted or `false`
       | });
-    h4: code editor.selectBlock(withSpaces = true)
+    h4: code editor.selectLine(withSpaces = true)
     p Selects the current line.
     pre: code
-      | editor.selectBlock();
+      | editor.selectLine();
     h4: code editor.toggle(open, close, wrap = false)
     p Toggles wrap and peel selection with #[var open] and #[var close] string.
     pre: code
       | editor.toggle('&lt;b&gt;', '&lt;/b&gt;');
-    h4: code editor.toggleBlock(open, close, wrap = false)
+    h4: code editor.toggleLine(open, close, wrap = false, withSpaces = false)
     p Selects the current line then perform the toggle command on it.
     pre: code
-      | editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;');
-    h4: code editor.wrapBlock(open, close, wrap = false)
+      | editor.toggleLine('&lt;p&gt;', '&lt;/p&gt;');
+    h4: code editor.wrapLine(open, close, wrap = false, withSpaces = false)
     p Selects the current line then perform the wrap command on it.
     pre: code
-      | editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');
+      | editor.wrapLine('&lt;p&gt;', '&lt;/p&gt;');
   footer
     hr
     p

@@ -33,19 +33,25 @@
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
-    var isDefined$1 = function isDefined(x) {
+    var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
     var isFunction = function isFunction(x) {
         return 'function' === typeof x;
     };
-    var isInstance$1 = function isInstance(x, of) {
-        return x && isSet$1(of) && x instanceof of ;
+    var isInstance = function isInstance(x, of, exact) {
+        if (!x || 'object' !== typeof x) {
+            return false;
+        }
+        if (exact) {
+            return isSet(of) && isSet(x.constructor) && of === x.constructor;
+        }
+        return isSet(of) && x instanceof of ;
     };
     var isInteger = function isInteger(x) {
         return isNumber(x) && 0 === x % 1;
     };
-    var isNull$1 = function isNull(x) {
+    var isNull = function isNull(x) {
         return null === x;
     };
     var isNumber = function isNumber(x) {
@@ -55,13 +61,13 @@
         if (isPlain === void 0) {
             isPlain = true;
         }
-        if ('object' !== typeof x) {
+        if (!x || 'object' !== typeof x) {
             return false;
         }
-        return isPlain ? isInstance$1(x, Object) : true;
+        return isPlain ? isInstance(x, Object, 1) : true;
     };
-    var isSet$1 = function isSet(x) {
-        return isDefined$1(x) && !isNull$1(x);
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
     };
     var toCount = function toCount(x) {
         return x.length;
@@ -77,7 +83,7 @@
         for (var i = 0, j = toCount(lot); i < j; ++i) {
             for (var k in lot[i]) {
                 // Assign value
-                if (!isSet$1(out[k])) {
+                if (!isSet(out[k])) {
                     out[k] = lot[i][k];
                     continue;
                 }
@@ -115,18 +121,6 @@
     };
     var offEventDefault = function offEventDefault(e) {
         return e && e.preventDefault();
-    };
-    var isDefined = function isDefined(x) {
-        return 'undefined' !== typeof x;
-    };
-    var isInstance = function isInstance(x, of) {
-        return x && isSet(of) && x instanceof of ;
-    };
-    var isNull = function isNull(x) {
-        return null === x;
-    };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
     };
     var isPattern = function isPattern(pattern) {
         return isInstance(pattern, RegExp);
@@ -377,9 +371,9 @@
         !isFunction($$.confirm) && ($$.confirm = function (hint, then) {
             return isFunction(then) && then.call(this, W.confirm && W.confirm(hint));
         });
-        !isFunction($$.insertBlock) && ($$.insertBlock = function (value, mode) {
-            var $ = this;
-            var _$$$2 = $.$(),
+        !isFunction($$.insertLine) && ($$.insertLine = function (value, mode) {
+            var $ = this,
+                _$$$2 = $.$(),
                 after = _$$$2.after,
                 before = _$$$2.before,
                 end = _$$$2.end,
@@ -398,69 +392,45 @@
             }
             return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
         });
-        !isFunction($$.peelBlock) && ($$.peelBlock = function (open, close, wrap) {
-            var $ = this;
-            var _$$$3 = $.$(),
-                after = _$$$3.after,
-                before = _$$$3.before,
-                end = _$$$3.end,
-                start = _$$$3.start,
-                value = _$$$3.value,
-                closeCount = toCount(close),
-                lineAfter = after.split('\n').shift(),
-                lineAfterCount = toCount(lineAfter),
-                lineBefore = before.split('\n').pop(),
-                lineBeforeCount = toCount(lineBefore),
-                openCount = toCount(open);
-            if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount)) {
-                return $.select(start - lineBeforeCount + (wrap ? 0 : openCount), end + lineAfterCount - (wrap ? 0 : closeCount)).peel(open, close, wrap);
+        !isFunction($$.peelLine) && ($$.peelLine = function (open, close, wrap, withSpaces) {
+            if (withSpaces === void 0) {
+                withSpaces = false;
             }
-            return $.select(start, end);
+            return this.selectLine(withSpaces).peel(open, close, wrap);
         });
         !isFunction($$.prompt) && ($$.prompt = function (hint, value, then) {
             return isFunction(then) && then.call(this, W.prompt ? W.prompt(hint, value) : false);
         });
-        !isFunction($$.selectBlock) && ($$.selectBlock = function (withSpaces) {
+        !isFunction($$.selectLine) && ($$.selectLine = function (withSpaces) {
             if (withSpaces === void 0) {
                 withSpaces = true;
             }
-            var $ = this;
-            var _$$$4 = $.$(),
-                after = _$$$4.after,
-                before = _$$$4.before,
-                end = _$$$4.end,
-                start = _$$$4.start,
-                value = _$$$4.value,
+            var $ = this,
+                m,
+                _$$$3 = $.$(),
+                after = _$$$3.after,
+                before = _$$$3.before,
+                end = _$$$3.end,
+                start = _$$$3.start,
                 lineAfter = after.split('\n').shift(),
                 lineAfterCount = toCount(lineAfter),
                 lineBefore = before.split('\n').pop(),
                 lineBeforeCount = toCount(lineBefore);
-            if (!withSpaces) {
-                var lineAfterSpaces = /\s+$/.exec(lineAfter),
-                    lineBeforeSpaces = /^\s+/.exec(lineBefore);
-                if (lineAfterSpaces) {
-                    lineAfterCount -= toCount(lineAfterSpaces[0]);
-                }
-                if (lineBeforeSpaces) {
-                    lineBeforeCount -= toCount(lineBeforeSpaces[0]);
-                }
-            }
             $.select(start - lineBeforeCount, end + lineAfterCount);
             if (!withSpaces) {
-                var s = $.$(),
-                    m;
-                end = s.end;
-                start = s.start;
-                value = s.value;
-                if (m = /^(\s+)?[\s\S]+?(\s+)?$/.exec(value)) {
-                    return $.select(start + toCount(m[1] || ""), end - toCount(m[2] || ""));
+                var _$$$4 = $.$(),
+                    _end = _$$$4.end,
+                    _start = _$$$4.start,
+                    value = _$$$4.value;
+                if (m = /^(\s+)?[\s\S]*?(\s+)?$/.exec(value)) {
+                    return $.select(_start + toCount(m[1] || ""), _end - toCount(m[2] || ""));
                 }
             }
             return $;
         });
         !isFunction($$.toggle) && ($$.toggle = function (open, close, wrap) {
-            var $ = this;
-            var _$$$5 = $.$(),
+            var $ = this,
+                _$$$5 = $.$(),
                 after = _$$$5.after,
                 before = _$$$5.before,
                 value = _$$$5.value,
@@ -471,33 +441,30 @@
             }
             return $.wrap(open, close, wrap);
         });
-        !isFunction($$.toggleBlock) && ($$.toggleBlock = function (open, close, wrap) {
-            var $ = this;
-            var _$$$6 = $.$(),
-                after = _$$$6.after,
-                before = _$$$6.before,
-                value = _$$$6.value,
-                closeCount = toCount(close),
-                lineAfter = after.split('\n').shift(),
-                lineBefore = before.split('\n').pop(),
-                openCount = toCount(open);
-            if (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount) || close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount)) {
-                return $.peelBlock(open, close, wrap);
+        !isFunction($$.toggleLine) && ($$.toggleLine = function (open, close, wrap, withSpaces) {
+            if (withSpaces === void 0) {
+                withSpaces = false;
             }
-            return $.wrapBlock(open, close, wrap);
+            var $ = this.selectLine(withSpaces),
+                _$$$6 = $.$();
+            _$$$6.after;
+            _$$$6.before;
+            var value = _$$$6.value,
+                closeCount = toCount(close),
+                openCount = toCount(open);
+            if (!wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) {
+                var _$$$7 = $.$(),
+                    end = _$$$7.end,
+                    start = _$$$7.start;
+                $.select(start + openCount, end - closeCount);
+            }
+            return $.toggle(open, close, wrap);
         });
-        !isFunction($$.wrapBlock) && ($$.wrapBlock = function (open, close, wrap) {
-            var $ = this;
-            var _$$$7 = $.$(),
-                after = _$$$7.after,
-                before = _$$$7.before,
-                end = _$$$7.end,
-                start = _$$$7.start,
-                lineAfter = after.split('\n').shift(),
-                lineAfterCount = toCount(lineAfter),
-                lineBefore = before.split('\n').pop(),
-                lineBeforeCount = toCount(lineBefore);
-            return $.select(start - lineBeforeCount, end + lineAfterCount).wrap(open, close, wrap);
+        !isFunction($$.wrapLine) && ($$.wrapLine = function (open, close, wrap, withSpaces) {
+            if (withSpaces === void 0) {
+                withSpaces = false;
+            }
+            return this.selectLine(withSpaces).wrap(open, close, wrap);
         });
         return $.on('key.down', onKeyDown).record();
     }

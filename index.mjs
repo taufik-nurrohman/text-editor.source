@@ -243,9 +243,9 @@ function attach() {
     !isFunction($$.confirm) && ($$.confirm = function (hint, then) {
         return isFunction(then) && then.call(this, W.confirm && W.confirm(hint));
     });
-    !isFunction($$.insertBlock) && ($$.insertBlock = function (value, mode) {
-        let $ = this;
-        let {after, before, end, start} = $.$(),
+    !isFunction($$.insertLine) && ($$.insertLine = function (value, mode) {
+        let $ = this,
+            {after, before, end, start} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
             lineBefore = before.split('\n').pop(),
@@ -260,58 +260,31 @@ function attach() {
         }
         return $.select(start - lineBeforeCount, end + lineAfterCount).insert(value, mode, true).wrap(lineMatchIndent, "");
     });
-    !isFunction($$.peelBlock) && ($$.peelBlock = function (open, close, wrap) {
-        let $ = this;
-        let {after, before, end, start, value} = $.$(),
-            closeCount = toCount(close),
-            lineAfter = after.split('\n').shift(),
-            lineAfterCount = toCount(lineAfter),
-            lineBefore = before.split('\n').pop(),
-            lineBeforeCount = toCount(lineBefore),
-            openCount = toCount(open);
-        if (
-            (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) ||
-            (close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount))
-        ) {
-            return $.select(start - lineBeforeCount + (wrap ? 0 : openCount), end + lineAfterCount - (wrap ? 0 : closeCount)).peel(open, close, wrap);
-        }
-        return $.select(start, end);
+    !isFunction($$.peelLine) && ($$.peelLine = function (open, close, wrap, withSpaces = false) {
+        return this.selectLine(withSpaces).peel(open, close, wrap);
     });
     !isFunction($$.prompt) && ($$.prompt = function (hint, value, then) {
         return isFunction(then) && then.call(this, W.prompt ? W.prompt(hint, value) : false);
     });
-    !isFunction($$.selectBlock) && ($$.selectBlock = function (withSpaces = true) {
-        let $ = this;
-        let {after, before, end, start, value} = $.$(),
+    !isFunction($$.selectLine) && ($$.selectLine = function (withSpaces = true) {
+        let $ = this, m,
+            {after, before, end, start} = $.$(),
             lineAfter = after.split('\n').shift(),
             lineAfterCount = toCount(lineAfter),
             lineBefore = before.split('\n').pop(),
             lineBeforeCount = toCount(lineBefore);
-        if (!withSpaces) {
-            let lineAfterSpaces = /\s+$/.exec(lineAfter),
-                lineBeforeSpaces = /^\s+/.exec(lineBefore);
-            if (lineAfterSpaces) {
-                lineAfterCount -= toCount(lineAfterSpaces[0]);
-            }
-            if (lineBeforeSpaces) {
-                lineBeforeCount -= toCount(lineBeforeSpaces[0]);
-            }
-        }
         $.select(start - lineBeforeCount, end + lineAfterCount);
         if (!withSpaces) {
-            let s = $.$(), m;
-            end = s.end;
-            start = s.start;
-            value = s.value;
-            if (m = /^(\s+)?[\s\S]+?(\s+)?$/.exec(value)) {
+            let {end, start, value} = $.$();
+            if (m = /^(\s+)?[\s\S]*?(\s+)?$/.exec(value)) {
                 return $.select(start + toCount(m[1] || ""), end - toCount(m[2] || ""));
             }
         }
         return $;
     });
     !isFunction($$.toggle) && ($$.toggle = function (open, close, wrap) {
-        let $ = this;
-        let {after, before, value} = $.$(),
+        let $ = this,
+            {after, before, value} = $.$(),
             closeCount = toCount(close),
             openCount = toCount(open);
         if (
@@ -322,29 +295,19 @@ function attach() {
         }
         return $.wrap(open, close, wrap);
     });
-    !isFunction($$.toggleBlock) && ($$.toggleBlock = function (open, close, wrap) {
-        let $ = this;
-        let {after, before, value} = $.$(),
+    !isFunction($$.toggleLine) && ($$.toggleLine = function (open, close, wrap, withSpaces = false) {
+        let $ = this.selectLine(withSpaces),
+            {after, before, value} = $.$(),
             closeCount = toCount(close),
-            lineAfter = after.split('\n').shift(),
-            lineBefore = before.split('\n').pop(),
             openCount = toCount(open);
-        if (
-            (wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) ||
-            (close === lineAfter.slice(-closeCount) && open === lineBefore.slice(0, openCount))
-        ) {
-            return $.peelBlock(open, close, wrap);
+        if (!wrap && close === value.slice(-closeCount) && open === value.slice(0, openCount)) {
+            let {end, start} = $.$();
+            $.select(start + openCount, end - closeCount);
         }
-        return $.wrapBlock(open, close, wrap);
+        return $.toggle(open, close, wrap);
     });
-    !isFunction($$.wrapBlock) && ($$.wrapBlock = function (open, close, wrap) {
-        let $ = this;
-        let {after, before, end, start} = $.$(),
-            lineAfter = after.split('\n').shift(),
-            lineAfterCount = toCount(lineAfter),
-            lineBefore = before.split('\n').pop(),
-            lineBeforeCount = toCount(lineBefore);
-        return $.select(start - lineBeforeCount, end + lineAfterCount).wrap(open, close, wrap);
+    !isFunction($$.wrapLine) && ($$.wrapLine = function (open, close, wrap, withSpaces = false) {
+        return this.selectLine(withSpaces).wrap(open, close, wrap);
     });
     return $.on('key.down', onKeyDown).record();
 }

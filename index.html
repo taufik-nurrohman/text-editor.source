@@ -37,8 +37,8 @@
       <p><label><input checked onchange="return editor[this.checked ? 'attach' : 'detach'](), false;" type="checkbox"> <span>Enable Source Editor</span></label></p>
       <p><textarea placeholder="Code goes here&hellip;" spellcheck="false" style="display:block;width:100%;"></textarea></p>
       <p role="group"><button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;').record(), false;">Test Toggle #1</button> <button onclick="return editor.toggle('&lt;b&gt;', '&lt;/b&gt;', true).record(), false;">Test Toggle #2</button></p>
-      <p role="group"><button onclick="return editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;').record(), false;">Test Toggle Block #1</button> <button onclick="return editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;', true).record(), false;">Test Toggle Block #2</button></p>
-      <p role="group"><button onclick="return editor.selectBlock(), false;">Test Select Current Line</button> <button onclick="return editor.selectBlock(false), false;">Test Select Current Line (Without the Space(s))</button> <button onclick="return editor.insertBlock('---', +1).record(), false;">Test Insert After Line</button> <button onclick="return editor.insertBlock('---', -1).record(), false;">Test Insert Before Line</button> <button onclick="return editor.insertBlock('---').record(), false;">Test Replace Current Line</button></p>
+      <p role="group"><button onclick="return editor.toggleLine('&lt;p&gt;', '&lt;/p&gt;').record(), false;">Test Toggle Line #1</button> <button onclick="return editor.toggleLine('&lt;p&gt;', '&lt;/p&gt;', true).record(), false;">Test Toggle Line #2</button></p>
+      <p role="group"><button onclick="return editor.selectLine(), false;">Test Select Current Line</button> <button onclick="return editor.selectLine(false), false;">Test Select Current Line (Without the Space(s))</button> <button onclick="return editor.insertLine('---', +1).record(), false;">Test Insert After Line</button> <button onclick="return editor.insertLine('---', -1).record(), false;">Test Insert Before Line</button> <button onclick="return editor.insertLine('---').record(), false;">Test Replace Current Line</button></p>
       <h2>Strokes</h2>
       <ul>
         <li><code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Enter</kbd>.</li>
@@ -162,31 +162,31 @@ const editor = new TextEditor(document.querySelector('textarea'), {
       <pre><code>editor.confirm('Are you sure?', function (value) {
     console.log(value); // Here, `value` can be `true` or `false`
 });</code></pre>
-      <h4><code>editor.insertBlock(value, mode = 0)</code></h4>
+      <h4><code>editor.insertLine(value, mode = 0)</code></h4>
       <p>Inserts <var>value</var> above/below the current line, or replace the current line with <var>value</var>.</p>
-      <pre><code>editor.insertBlock('asdf'); // Replace the current line with `'asdf'`
-editor.insertBlock('asdf', -1); // Insert `'asdf'` above the current line
-editor.insertBlock('asdf', +1); // Insert `'asdf'` below the current line</code></pre>
-      <h4><code>editor.peelBlock(open, close, wrap = false)</code></h4>
+      <pre><code>editor.insertLine('asdf'); // Replace the current line with `'asdf'`
+editor.insertLine('asdf', -1); // Insert `'asdf'` above the current line
+editor.insertLine('asdf', +1); // Insert `'asdf'` below the current line</code></pre>
+      <h4><code>editor.peelLine(open, close, wrap = false, withSpaces = false)</code></h4>
       <p>Selects the current line then perform the peel command on it.</p>
-      <pre><code>editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
+      <pre><code>editor.peelLine('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
       <h4><code>editor.prompt(hint, value, then)</code></h4>
       <p>Spawns a prompt dialog box.</p>
       <pre><code>editor.prompt('URL:', 'http://', function (value) {
     console.log(value); // Here, `value` can be the text you have submitted or `false`
 });</code></pre>
-      <h4><code>editor.selectBlock(withSpaces = true)</code></h4>
+      <h4><code>editor.selectLine(withSpaces = true)</code></h4>
       <p>Selects the current line.</p>
-      <pre><code>editor.selectBlock();</code></pre>
+      <pre><code>editor.selectLine();</code></pre>
       <h4><code>editor.toggle(open, close, wrap = false)</code></h4>
       <p>Toggles wrap and peel selection with <var>open</var> and <var>close</var> string.</p>
       <pre><code>editor.toggle('&lt;b&gt;', '&lt;/b&gt;');</code></pre>
-      <h4><code>editor.toggleBlock(open, close, wrap = false)</code></h4>
+      <h4><code>editor.toggleLine(open, close, wrap = false, withSpaces = false)</code></h4>
       <p>Selects the current line then perform the toggle command on it.</p>
-      <pre><code>editor.toggleBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
-      <h4><code>editor.wrapBlock(open, close, wrap = false)</code></h4>
+      <pre><code>editor.toggleLine('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
+      <h4><code>editor.wrapLine(open, close, wrap = false, withSpaces = false)</code></h4>
       <p>Selects the current line then perform the wrap command on it.</p>
-      <pre><code>editor.wrapBlock('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
+      <pre><code>editor.wrapLine('&lt;p&gt;', '&lt;/p&gt;');</code></pre>
     </main>
     <footer>
       <hr>

@@ -349,6 +349,10 @@
         }
         return;
     }
+    // Partial mobile support
+    function onPutDown(e) {
+        onKeyDown.call(this, e);
+    }
 
     function attach() {
         var $ = this;
@@ -466,11 +470,11 @@
             }
             return this.selectLine(withSpaces).wrap(open, close, wrap);
         });
-        return $.on('key.down', onKeyDown).record();
+        return $.on('key.down', onKeyDown).on('put.down', onPutDown).record();
     }
 
     function detach() {
-        return this.off('key.down', onKeyDown);
+        return this.off('key.down', onKeyDown).off('put.down', onPutDown);
     }
     var index_js = {
         attach: attach,

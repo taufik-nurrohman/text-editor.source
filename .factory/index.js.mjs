@@ -222,6 +222,11 @@ function onKeyDown(e) {
     return;
 }
 
+// Partial mobile support
+function onPutDown(e) {
+    onKeyDown.call(this, e);
+}
+
 function attach() {
     const $ = this;
     const $$ = $.constructor._;
@@ -309,11 +314,11 @@ function attach() {
     !isFunction($$.wrapLine) && ($$.wrapLine = function (open, close, wrap, withSpaces = false) {
         return this.selectLine(withSpaces).wrap(open, close, wrap);
     });
-    return $.on('key.down', onKeyDown).record();
+    return $.on('key.down', onKeyDown).on('put.down', onPutDown).record();
 }
 
 function detach() {
-    return this.off('key.down', onKeyDown);
+    return this.off('key.down', onKeyDown).off('put.down', onPutDown);
 }
 
 export default {attach, detach, name};

@@ -224,7 +224,7 @@ function onKeyDown(e) {
 
 function attach() {
     const $ = this;
-    const $$ = $.constructor.prototype;
+    const $$ = $.constructor._;
     $.state = fromStates({
         pairs: {
             '`': '`',

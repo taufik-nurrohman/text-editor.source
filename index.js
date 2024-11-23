@@ -352,7 +352,7 @@
 
     function attach() {
         var $ = this;
-        var $$ = $.constructor.prototype;
+        var $$ = $.constructor._;
         $.state = fromStates({
             pairs: {
                 '`': '`',

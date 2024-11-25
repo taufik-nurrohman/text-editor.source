@@ -83,11 +83,11 @@ block content
       = ' '
       button(onclick='return editor.selectLine(false), false;') Test Select Current Line (Without the Space(s))
       = ' '
-      button(onclick='return editor.insertLine(\'---\', +1).record(), false;') Test Insert After Line
+      button(onclick='return editor.insertLine((new Date).toISOString(), +1).record(), false;') Test Insert After Line
       = ' '
-      button(onclick='return editor.insertLine(\'---\', -1).record(), false;') Test Insert Before Line
+      button(onclick='return editor.insertLine((new Date).toISOString(), -1).record(), false;') Test Insert Before Line
       = ' '
-      button(onclick='return editor.insertLine(\'---\').record(), false;') Test Replace Current Line
+      button(onclick='return editor.insertLine((new Date).toISOString()).record(), false;') Test Replace Current Line
     h2 Strokes
     ul
       li <code>(<mark></mark>)</code>, <code>[<mark></mark>]</code>, <code>{<mark></mark>}</code>, <code>'<mark></mark>'</code>, <code>"<mark></mark>"</code>, or <code>&lt;<mark></mark>&gt;</code> then press <kbd>Enter</kbd>.
